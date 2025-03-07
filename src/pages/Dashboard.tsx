@@ -1,20 +1,17 @@
 
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "@/components/layout/Header";
-import TeacherDashboard from "@/components/teacher/Dashboard";
-import AssignmentPrompt from "@/components/student/AssignmentPrompt";
-import WritingMetrics from "@/components/student/WritingMetrics";
-import CitationPrompt from "@/components/student/CitationPrompt";
-import { Button } from "@/components/common/Button";
-import { Card, CardContent } from "@/components/common/Card";
-import { Badge } from "@/components/common/Badge";
-import { useToast } from "@/hooks/use-toast";
+import Header from "../components/layout/Header";
+import TeacherDashboard from "../components/teacher/Dashboard";
+import AssignmentPrompt from "../components/student/AssignmentPrompt";
+import WritingMetrics from "../components/student/WritingMetrics";
+import CitationPrompt from "../components/student/CitationPrompt";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { Clock, FileText, BookOpen, Save, SendHorizontal, Copy, Quote } from "lucide-react";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
   
   // User state
   const [userEmail, setUserEmail] = useState<string | null>(null);
@@ -34,43 +31,78 @@ const Dashboard = () => {
   // Teacher state
   const [selectedAssignmentId, setSelectedAssignmentId] = useState("1");
   
-  // Check for user data on component mount
+  // Mock authentication function for demo purposes
   useEffect(() => {
-    // In a real app, this would fetch from localStorage or an auth system
-    const savedUserEmail = localStorage.getItem("userEmail");
-    const savedUserRole = localStorage.getItem("userRole") as "student" | "teacher" | null;
-    
-    if (savedUserEmail && savedUserRole) {
-      setUserEmail(savedUserEmail);
-      setUserRole(savedUserRole);
-      
-      // For student, maybe show the assignment prompt or set a linked assignment
-      if (savedUserRole === "student") {
-        const savedLinkedAssignment = localStorage.getItem("linkedAssignment");
-        if (savedLinkedAssignment) {
-          setLinkedAssignment(savedLinkedAssignment);
-          setStartTime(new Date());
-        } else {
-          setShowAssignmentPrompt(true);
+    // For demo, let's allow selection of role on first load
+    if (!userRole) {
+      const role = window.localStorage.getItem("authentiya-role") as "student" | "teacher" | null;
+      if (role) {
+        setUserRole(role);
+        setUserEmail(window.localStorage.getItem("authentiya-email") || "user@example.com");
+        
+        // For student, set a linked assignment for demo
+        if (role === "student") {
+          const savedLinkedAssignment = window.localStorage.getItem("linkedAssignment");
+          if (savedLinkedAssignment) {
+            setLinkedAssignment(savedLinkedAssignment);
+            setStartTime(new Date());
+          } else {
+            setShowAssignmentPrompt(true);
+          }
         }
+      } else {
+        // If no role is set, ask user to select one for the demo
+        showRoleSelection();
       }
-    } else {
-      // Redirect to login if not authenticated
-      navigate("/");
     }
-  }, [navigate]);
+  }, []);
+  
+  const showRoleSelection = () => {
+    const selectRole = window.confirm("For demo purposes, would you like to use the student view? Click OK for student, Cancel for teacher.");
+    const role = selectRole ? "student" : "teacher";
+    const email = role === "student" ? "student@example.com" : "teacher@example.com";
+    
+    setUserRole(role);
+    setUserEmail(email);
+    
+    // Save to localStorage for future visits
+    window.localStorage.setItem("authentiya-role", role);
+    window.localStorage.setItem("authentiya-email", email);
+    
+    // For student, show assignment prompt
+    if (role === "student") {
+      setShowAssignmentPrompt(true);
+    }
+  };
   
   const handleLogout = () => {
-    localStorage.removeItem("userEmail");
-    localStorage.removeItem("userRole");
-    localStorage.removeItem("linkedAssignment");
+    const switchRoles = window.confirm("Would you like to switch roles? (OK for yes, Cancel for just logout)");
     
-    toast({
-      title: "Logged out",
-      description: "You have been logged out successfully",
-    });
-    
-    navigate("/");
+    if (switchRoles) {
+      // Switch to the opposite role
+      const newRole = userRole === "student" ? "teacher" : "student";
+      const newEmail = newRole === "student" ? "student@example.com" : "teacher@example.com";
+      
+      setUserRole(newRole);
+      setUserEmail(newEmail);
+      window.localStorage.setItem("authentiya-role", newRole);
+      window.localStorage.setItem("authentiya-email", newEmail);
+      
+      // Reset student-specific state if switching to student
+      if (newRole === "student") {
+        setLinkedAssignment(null);
+        setStartTime(null);
+        setShowAssignmentPrompt(true);
+      }
+    } else {
+      // Just logout
+      window.localStorage.removeItem("authentiya-role");
+      window.localStorage.removeItem("authentiya-email");
+      window.localStorage.removeItem("linkedAssignment");
+      
+      toast.success("Logged out successfully");
+      navigate("/");
+    }
   };
   
   const handleLinkAssignment = (assignmentId: string) => {
@@ -78,11 +110,10 @@ const Dashboard = () => {
     setStartTime(new Date());
     setShowAssignmentPrompt(false);
     
-    localStorage.setItem("linkedAssignment", assignmentId);
+    window.localStorage.setItem("linkedAssignment", assignmentId);
     
-    toast({
-      title: "Assignment Linked",
-      description: "Your writing is now linked to this assignment",
+    toast.success("Assignment linked successfully", {
+      description: "Your writing is now linked to this assignment"
     });
   };
   
@@ -112,16 +143,14 @@ const Dashboard = () => {
     setCitationCount(prev => prev + 1);
     setShowCitationPrompt(false);
     
-    toast({
-      title: "Citation Added",
-      description: `Added citation from ${citation.source}`,
+    toast.success("Citation added", {
+      description: `Added citation from ${citation.source}`
     });
   };
   
   const handleSubmitAssignment = () => {
-    toast({
-      title: "Assignment Submitted",
-      description: "Your assignment has been successfully submitted",
+    toast.success("Assignment submitted", {
+      description: "Your assignment has been successfully submitted"
     });
     
     // In a real app, this would make an API call to Canvas or similar
@@ -133,7 +162,7 @@ const Dashboard = () => {
     setCitationCount(0);
     setContent("");
     
-    localStorage.removeItem("linkedAssignment");
+    window.localStorage.removeItem("linkedAssignment");
   };
   
   // For student view
@@ -152,10 +181,10 @@ const Dashboard = () => {
             <div className="flex items-center gap-2">
               {linkedAssignment ? (
                 <>
-                  <Badge variant="info" className="flex items-center gap-1">
-                    <BookOpen className="h-3 w-3" />
+                  <div className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full font-medium text-sm flex items-center">
+                    <BookOpen className="h-3 w-3 mr-1" />
                     Assignment Linked
-                  </Badge>
+                  </div>
                   <Button 
                     variant="outline" 
                     size="sm"
@@ -185,11 +214,11 @@ const Dashboard = () => {
             />
           )}
           
-          <Card>
-            <CardContent className="p-4">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div className="p-4">
               <div className="flex justify-between items-center mb-3">
                 <div className="flex items-center gap-3">
-                  <FileText className="h-5 w-5 text-muted-foreground" />
+                  <FileText className="h-5 w-5 text-gray-500" />
                   <h2 className="text-xl font-semibold">My Document</h2>
                 </div>
                 
@@ -210,9 +239,8 @@ const Dashboard = () => {
                       className="gap-2"
                       onClick={() => {
                         setCitationCount(prev => prev + 1);
-                        toast({
-                          title: "Citation Added",
-                          description: "Manual citation added",
+                        toast.success("Citation added", {
+                          description: "Manual citation added"
                         });
                       }}
                     >
@@ -233,13 +261,13 @@ const Dashboard = () => {
               </div>
               
               <textarea
-                className="w-full min-h-[300px] p-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all resize-y"
+                className="w-full min-h-[300px] p-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all resize-y"
                 placeholder="Start typing your document here..."
                 value={content}
                 onChange={handleTextAreaChange}
               ></textarea>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </main>
         
         {showAssignmentPrompt && (
