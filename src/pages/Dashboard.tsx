@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/layout/Header";
 import TeacherDashboard from "../components/teacher/Dashboard";
@@ -12,6 +12,7 @@ import { Clock, FileText, BookOpen, Save, SendHorizontal, Copy, Quote } from "lu
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   
   // User state
   const [userEmail, setUserEmail] = useState<string | null>(null);
@@ -56,6 +57,40 @@ const Dashboard = () => {
       }
     }
   }, []);
+  
+  // Add event listeners for copy-paste detection
+  useEffect(() => {
+    const handlePasteEvent = (e: ClipboardEvent) => {
+      // Only proceed if we're in student mode and have an active assignment
+      if (userRole === "student" && linkedAssignment) {
+        const pastedText = e.clipboardData?.getData('text') || "";
+        if (pastedText.trim()) {
+          setCopiedText(pastedText);
+          setCopyPasteCount(prev => prev + 1);
+          setShowCitationPrompt(true);
+          
+          // Log the paste event
+          console.log("Paste detected:", pastedText.substring(0, 50) + (pastedText.length > 50 ? "..." : ""));
+          toast.info("Content pasted", {
+            description: "Please cite your source"
+          });
+        }
+      }
+    };
+    
+    // Add event listener to the textarea
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.addEventListener('paste', handlePasteEvent);
+    }
+    
+    return () => {
+      // Clean up event listener
+      if (textarea) {
+        textarea.removeEventListener('paste', handlePasteEvent);
+      }
+    };
+  }, [userRole, linkedAssignment, textareaRef]);
   
   const showRoleSelection = () => {
     const selectRole = window.confirm("For demo purposes, would you like to use the student view? Click OK for student, Cancel for teacher.");
@@ -127,7 +162,7 @@ const Dashboard = () => {
   };
   
   // Simulate copy/paste detection
-  const handlePaste = () => {
+  const handleManualPaste = () => {
     setCopyPasteCount(prev => prev + 1);
     // Get clipboard text (in a real app, this would access navigator.clipboard)
     // For demo, we'll just simulate it
@@ -168,20 +203,20 @@ const Dashboard = () => {
   // For student view
   if (userRole === "student") {
     return (
-      <div className="min-h-screen flex flex-col bg-gray-50">
+      <div className="min-h-screen flex flex-col bg-background">
         <Header userEmail={userEmail || undefined} userRole={userRole} onLogout={handleLogout} />
         
         <main className="flex-1 container py-6 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold">Student Dashboard</h1>
+              <h1 className="text-3xl font-bold text-authentiya-charcoal-darkest dark:text-authentiya-accent-cream">Student Dashboard</h1>
               <p className="text-muted-foreground">Track your writing progress and assignments</p>
             </div>
             
             <div className="flex items-center gap-2">
               {linkedAssignment ? (
                 <>
-                  <div className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full font-medium text-sm flex items-center">
+                  <div className="bg-authentiya-maroon/10 text-authentiya-maroon px-3 py-1 rounded-full font-medium text-sm flex items-center">
                     <BookOpen className="h-3 w-3 mr-1" />
                     Assignment Linked
                   </div>
@@ -197,6 +232,7 @@ const Dashboard = () => {
                 <Button 
                   variant="default" 
                   size="sm"
+                  className="academic-btn-primary"
                   onClick={() => setShowAssignmentPrompt(true)}
                 >
                   Link to Assignment
@@ -214,12 +250,12 @@ const Dashboard = () => {
             />
           )}
           
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div className="academic-card">
             <div className="p-4">
               <div className="flex justify-between items-center mb-3">
                 <div className="flex items-center gap-3">
-                  <FileText className="h-5 w-5 text-gray-500" />
-                  <h2 className="text-xl font-semibold">My Document</h2>
+                  <FileText className="h-5 w-5 text-authentiya-maroon" />
+                  <h2 className="text-xl font-semibold text-authentiya-charcoal-darkest dark:text-authentiya-accent-cream">My Document</h2>
                 </div>
                 
                 {startTime && (
@@ -228,7 +264,7 @@ const Dashboard = () => {
                       variant="outline" 
                       size="sm" 
                       className="gap-2" 
-                      onClick={() => handlePaste()}
+                      onClick={handleManualPaste}
                     >
                       <Copy className="h-4 w-4" />
                       <span className="hidden sm:inline">Simulate Copy/Paste</span>
@@ -249,7 +285,7 @@ const Dashboard = () => {
                     </Button>
                     <Button 
                       size="sm" 
-                      className="gap-2"
+                      className="gap-2 academic-btn-primary"
                       onClick={handleSubmitAssignment}
                       disabled={!linkedAssignment || wordCount === 0}
                     >
@@ -261,7 +297,8 @@ const Dashboard = () => {
               </div>
               
               <textarea
-                className="w-full min-h-[300px] p-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all resize-y"
+                ref={textareaRef}
+                className="w-full min-h-[300px] p-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-authentiya-maroon/50 transition-all resize-y"
                 placeholder="Start typing your document here..."
                 value={content}
                 onChange={handleTextAreaChange}
@@ -290,7 +327,7 @@ const Dashboard = () => {
   
   // For teacher view
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-background">
       <Header userEmail={userEmail || undefined} userRole={userRole || undefined} onLogout={handleLogout} />
       
       <main className="flex-1 container py-6">

@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -63,27 +62,27 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-        authentiya: {
-          blue: {
-            light: '#60A5FA',
-            DEFAULT: '#3B82F6',
-            dark: '#2563EB'
-          },
-          green: {
-            light: '#34D399',
-            DEFAULT: '#10B981',
-            dark: '#059669'
-          },
-          gray: {
-            lightest: '#F9FAFB',
-            lighter: '#F3F4F6',
-            light: '#E5E7EB',
-            DEFAULT: '#9CA3AF',
-            dark: '#4B5563',
-            darker: '#1F2937',
-            darkest: '#1E293B'
-          }
-        }
+                authentiya: {
+                    maroon: {
+                        light: '#9D2235',
+                        DEFAULT: '#800020',
+                        dark: '#5D0F1A'
+                    },
+                    charcoal: {
+                        lightest: '#55565A',
+                        lighter: '#43454A',
+                        light: '#363A43',
+                        DEFAULT: '#2A2D34',
+                        dark: '#1F2228',
+                        darker: '#17191D',
+                        darkest: '#0F1012'
+                    },
+                    accent: {
+                        gold: '#D4AF37',
+                        cream: '#F5F2E9',
+                        gray: '#DAD7D3'
+                    }
+                }
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

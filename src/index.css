@@ -5,65 +5,65 @@
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    --foreground: 222 47% 11%;
+    --background: 220 14% 96%;
+    --foreground: 220 20% 16%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 220 20% 16%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 220 20% 16%;
 
-    --primary: 217 91% 60%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 350 60% 25%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222 47% 11%;
+    --secondary: 220 14% 20%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 220 14% 90%;
+    --muted-foreground: 220 8% 45%;
 
-    --accent: 152 61% 38%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 45 65% 52%;
+    --accent-foreground: 220 20% 16%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 222 47% 11%;
+    --border: 220 14% 85%;
+    --input: 220 14% 85%;
+    --ring: 350 60% 25%;
 
     --radius: 0.5rem;
   }
 
   .dark {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
+    --background: 220 20% 12%;
+    --foreground: 220 14% 90%;
 
-    --card: 222 47% 11%;
-    --card-foreground: 210 40% 98%;
+    --card: 220 20% 16%;
+    --card-foreground: 220 14% 90%;
 
-    --popover: 222 47% 11%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 220 20% 16%;
+    --popover-foreground: 220 14% 90%;
 
-    --primary: 217 91% 60%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 350 60% 25%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 220 14% 20%;
+    --secondary-foreground: 220 14% 90%;
 
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 220 14% 20%;
+    --muted-foreground: 220 8% 65%;
 
-    --accent: 152 61% 38%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 45 65% 52%;
+    --accent-foreground: 220 20% 16%;
 
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 213 27% 84%;
+    --border: 220 14% 25%;
+    --input: 220 14% 25%;
+    --ring: 350 60% 40%;
   }
 }
 
@@ -104,22 +104,38 @@
   }
 
   .authentiya-card {
-    @apply bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-all duration-300;
+    @apply bg-white dark:bg-authentiya-charcoal-light rounded-lg shadow-md overflow-hidden border border-gray-100 dark:border-authentiya-charcoal-lighter hover:shadow-lg transition-all duration-300;
   }
 
   .authentiya-heading {
-    @apply text-2xl font-bold text-gray-900 dark:text-gray-50;
+    @apply text-2xl font-bold text-authentiya-charcoal-dark dark:text-authentiya-accent-gray;
   }
 
   .authentiya-subheading {
-    @apply text-lg font-medium text-gray-700 dark:text-gray-300;
+    @apply text-lg font-medium text-authentiya-charcoal dark:text-authentiya-accent-cream;
   }
 
   .authentiya-text {
-    @apply text-gray-600 dark:text-gray-400;
+    @apply text-authentiya-charcoal-lighter dark:text-authentiya-accent-gray;
   }
 
   .authentiya-link {
-    @apply text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline-offset-2 hover:underline;
+    @apply text-authentiya-maroon dark:text-authentiya-maroon-light hover:text-authentiya-maroon-dark dark:hover:text-authentiya-maroon-light underline-offset-2 hover:underline;
+  }
+  
+  .academic-btn-primary {
+    @apply bg-authentiya-maroon text-white hover:bg-authentiya-maroon-dark;
+  }
+  
+  .academic-btn-secondary {
+    @apply bg-authentiya-charcoal text-white hover:bg-authentiya-charcoal-light;
+  }
+  
+  .academic-card {
+    @apply bg-white dark:bg-authentiya-charcoal-light border border-gray-200 dark:border-authentiya-charcoal-lighter rounded-lg shadow-sm;
+  }
+  
+  .academic-header {
+    @apply bg-authentiya-maroon text-white dark:bg-authentiya-maroon-dark;
   }
 }
