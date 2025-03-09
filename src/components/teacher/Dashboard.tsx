@@ -1,13 +1,9 @@
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/common/Card";
-import { Badge } from "@/components/common/Badge";
-import { Button } from "@/components/common/Button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
-import { BookOpen, Users, Clock, AlertTriangle, Sparkles } from "lucide-react";
-import StudentList from "./StudentList";
-import AssignmentStats from "./AssignmentStats";
+import React from "react";
 import { getStudentsByAssignment } from "@/lib/teacher-data";
+import { AssignmentOverview } from "./dashboard/AssignmentOverview";
+import { AssignmentSelector } from "./dashboard/AssignmentSelector";
+import { StatisticsCard } from "./dashboard/StatisticsCard";
 
 // Mock data for assignments
 const mockAssignments = [
@@ -63,28 +59,6 @@ export default function TeacherDashboard({
   // Get students for the selected assignment
   const students = getStudentsByAssignment(selectedAssignmentId);
   
-  // Calculate completion percentage
-  const startedPercentage = Math.round((selectedAssignment.studentsStarted / selectedAssignment.totalStudents) * 100);
-  const submittedPercentage = Math.round((selectedAssignment.studentsSubmitted / selectedAssignment.totalStudents) * 100);
-  
-  // Helper to format dates
-  const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric' 
-    };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-  };
-  
-  // Calculate time remaining until due date
-  const dueDate = new Date(selectedAssignment.dueDate);
-  const currentDate = new Date();
-  const daysRemaining = Math.ceil((dueDate.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24));
-  
-  // Check if assignment is past due
-  const isPastDue = dueDate < currentDate;
-  
   // Handler for viewing a student
   const handleViewStudent = (studentId: string) => {
     window.location.href = `/teacher/student/${studentId}?assignment=${selectedAssignmentId}`;
@@ -100,112 +74,20 @@ export default function TeacherDashboard({
           </p>
         </div>
         
-        <div className="flex flex-wrap items-center gap-2">
-          {mockAssignments.map(assignment => (
-            <Button 
-              key={assignment.id}
-              variant={assignment.id === selectedAssignmentId ? "default" : "outline"}
-              size="sm"
-              onClick={() => onAssignmentSelect(assignment.id)}
-              className="flex items-center gap-2"
-            >
-              <BookOpen className="h-4 w-4" />
-              <span className="hidden sm:inline">{assignment.title}</span>
-              <span className="sm:hidden">Assignment {assignment.id}</span>
-            </Button>
-          ))}
-        </div>
+        <AssignmentSelector 
+          assignments={mockAssignments}
+          selectedAssignmentId={selectedAssignmentId}
+          onAssignmentSelect={onAssignmentSelect}
+        />
       </div>
       
       <div className="grid gap-6 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-lg">Assignment Overview</CardTitle>
-            {isPastDue ? (
-              <Badge variant="destructive" className="flex items-center gap-1">
-                <AlertTriangle className="h-3 w-3" />
-                Past Due
-              </Badge>
-            ) : (
-              <Badge variant="outline" className="flex items-center gap-1">
-                <Clock className="h-3 w-3" />
-                {daysRemaining} {daysRemaining === 1 ? 'day' : 'days'} left
-              </Badge>
-            )}
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <h3 className="font-semibold text-xl mb-1">{selectedAssignment.title}</h3>
-              <p className="text-sm text-muted-foreground mb-2">{selectedAssignment.className}</p>
-              
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div>
-                  <span className="text-muted-foreground">Created:</span>
-                  <span className="ml-1 font-medium">{formatDate(selectedAssignment.createdAt)}</span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Due:</span>
-                  <span className="ml-1 font-medium">{formatDate(selectedAssignment.dueDate)}</span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Students:</span>
-                  <span className="ml-1 font-medium">{selectedAssignment.totalStudents}</span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Avg. Words:</span>
-                  <span className="ml-1 font-medium">{selectedAssignment.averageWordCount}</span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span>Started</span>
-                <span className="font-medium">
-                  {selectedAssignment.studentsStarted} / {selectedAssignment.totalStudents}
-                </span>
-              </div>
-              <Progress value={startedPercentage} className="h-2" />
-              
-              <div className="flex justify-between text-sm">
-                <span>Submitted</span>
-                <span className="font-medium">
-                  {selectedAssignment.studentsSubmitted} / {selectedAssignment.totalStudents}
-                </span>
-              </div>
-              <Progress value={submittedPercentage} className="h-2" />
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="md:col-span-2">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Assignment Statistics</CardTitle>
-            <CardDescription>
-              Key metrics for {selectedAssignment.title}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="stats">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="stats" className="flex items-center gap-2">
-                  <Sparkles className="h-4 w-4" />
-                  Statistics
-                </TabsTrigger>
-                <TabsTrigger value="students" className="flex items-center gap-2">
-                  <Users className="h-4 w-4" />
-                  Students
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="stats" className="animate-fade-in">
-                <AssignmentStats assignment={selectedAssignment} />
-              </TabsContent>
-              <TabsContent value="students" className="animate-fade-in">
-                <StudentList students={students} onViewStudent={handleViewStudent} />
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
+        <AssignmentOverview assignment={selectedAssignment} />
+        <StatisticsCard 
+          assignment={selectedAssignment} 
+          students={students}
+          onViewStudent={handleViewStudent}
+        />
       </div>
     </div>
   );

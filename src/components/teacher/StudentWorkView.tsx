@@ -1,14 +1,17 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Clock } from "lucide-react";
+import { Clock, Filter } from "lucide-react";
 import { StudentAssignment } from "@/lib/teacher-data";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface StudentWorkViewProps {
   studentAssignment: StudentAssignment;
 }
 
 export const StudentWorkView: React.FC<StudentWorkViewProps> = ({ studentAssignment }) => {
+  const [viewOption, setViewOption] = useState<string>("all");
+  
   // Format date and time
   const formatDateTime = (dateString: string | null) => {
     if (!dateString) return "N/A";
@@ -36,11 +39,24 @@ export const StudentWorkView: React.FC<StudentWorkViewProps> = ({ studentAssignm
           <div>
             <div className="mb-4 flex justify-between items-center">
               <h3 className="font-semibold">Student Work</h3>
-              {studentAssignment.lastActive && (
-                <span className="text-xs text-muted-foreground">
-                  Last active: {formatDateTime(studentAssignment.lastActive)}
-                </span>
-              )}
+              <div className="flex items-center gap-2">
+                {studentAssignment.lastActive && (
+                  <span className="text-xs text-muted-foreground">
+                    Last active: {formatDateTime(studentAssignment.lastActive)}
+                  </span>
+                )}
+                <Select defaultValue="all" onValueChange={setViewOption}>
+                  <SelectTrigger className="w-[140px] h-8 text-xs">
+                    <Filter className="h-3 w-3 mr-1" />
+                    <SelectValue placeholder="View options" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Content</SelectItem>
+                    <SelectItem value="paragraphs">Paragraphs</SelectItem>
+                    <SelectItem value="citations">Citations</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             
             <div className="min-h-[300px] max-h-[500px] overflow-y-auto border rounded-md p-4 bg-background">
@@ -55,4 +71,4 @@ export const StudentWorkView: React.FC<StudentWorkViewProps> = ({ studentAssignm
       </CardContent>
     </Card>
   );
-};
+}
