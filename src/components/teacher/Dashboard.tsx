@@ -7,6 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { BookOpen, Users, Clock, AlertTriangle, Sparkles } from "lucide-react";
 import StudentList from "./StudentList";
 import AssignmentStats from "./AssignmentStats";
+import { getStudentsByAssignment } from "@/lib/teacher-data";
 
 // Mock data for assignments
 const mockAssignments = [
@@ -59,6 +60,9 @@ export default function TeacherDashboard({
 }: TeacherDashboardProps) {
   const selectedAssignment = mockAssignments.find(a => a.id === selectedAssignmentId) || mockAssignments[0];
   
+  // Get students for the selected assignment
+  const students = getStudentsByAssignment(selectedAssignmentId);
+  
   // Calculate completion percentage
   const startedPercentage = Math.round((selectedAssignment.studentsStarted / selectedAssignment.totalStudents) * 100);
   const submittedPercentage = Math.round((selectedAssignment.studentsSubmitted / selectedAssignment.totalStudents) * 100);
@@ -80,6 +84,11 @@ export default function TeacherDashboard({
   
   // Check if assignment is past due
   const isPastDue = dueDate < currentDate;
+  
+  // Handler for viewing a student
+  const handleViewStudent = (studentId: string) => {
+    window.location.href = `/teacher/student/${studentId}?assignment=${selectedAssignmentId}`;
+  };
   
   return (
     <div className="space-y-6 animate-fade-in">
@@ -192,7 +201,7 @@ export default function TeacherDashboard({
                 <AssignmentStats assignment={selectedAssignment} />
               </TabsContent>
               <TabsContent value="students" className="animate-fade-in">
-                <StudentList assignmentId={selectedAssignment.id} />
+                <StudentList students={students} onViewStudent={handleViewStudent} />
               </TabsContent>
             </Tabs>
           </CardContent>
