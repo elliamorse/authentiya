@@ -1,24 +1,12 @@
-
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { Card, CardContent } from "@/components/common/Card";
 import { Badge } from "@/components/common/Badge";
 import { AlertTriangle, Clock } from "lucide-react";
-
-interface Assignment {
-  id: string;
-  title: string;
-  className: string;
-  dueDate: string;
-  totalStudents: number;
-  studentsStarted: number;
-  studentsSubmitted: number;
-  averageTimeSpent: number;
-  averageWordCount: number;
-  createdAt: string;
-}
+import { Assignment, StudentAssignment } from "@/lib/teacher-data";
 
 interface AssignmentStatsProps {
   assignment: Assignment;
+  students?: StudentAssignment[];
 }
 
 // Mock data for assignment statistics
@@ -78,7 +66,7 @@ const attentionStudents = [
   },
 ];
 
-export default function AssignmentStats({ assignment }: AssignmentStatsProps) {
+export default function AssignmentStats({ assignment, students = [] }: AssignmentStatsProps) {
   // Calculate time left until due date
   const dueDate = new Date(assignment.dueDate);
   const currentDate = new Date();
