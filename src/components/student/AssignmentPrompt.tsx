@@ -1,4 +1,15 @@
 
+/**
+ * This file provides a modal dialog for students to link their document to an assignment.
+ * It allows students to select from available classes and assignments, enhancing the
+ * organization of their work and enabling proper submission tracking.
+ * 
+ * Key features:
+ * - Class selection dropdown
+ * - Assignment filtering based on selected class
+ * - Preview of selected assignment details
+ * - Responsive modal design
+ */
 import { useState } from "react";
 import { Button } from "@/components/common/Button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/common/Card";

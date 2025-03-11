@@ -1,4 +1,9 @@
 
+/**
+ * This file provides a component for selecting assignments in the teacher dashboard.
+ * It renders a list of assignment buttons that a teacher can use to switch between
+ * different assignments they're monitoring.
+ */
 import React from "react";
 import { Button } from "@/components/common/Button";
 import { BookOpen } from "lucide-react";

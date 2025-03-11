@@ -1,6 +1,14 @@
 
 /**
  * This file provides a dialog for submitting an assignment to a chosen class/assignment.
+ * It allows students to select their class and assignment, view due dates and time remaining,
+ * and submit their completed work.
+ * 
+ * Key features:
+ * - Class and assignment selection
+ * - Due date visualization
+ * - Time remaining indication
+ * - Document name display
  */
 import { useState } from "react";
 import { Button } from "@/components/ui/button";

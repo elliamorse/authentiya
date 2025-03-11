@@ -1,4 +1,14 @@
-
+/**
+ * This file provides interfaces and mock data for the teacher dashboard functionality.
+ * It contains data structures and helper functions for managing assignments, classes,
+ * student submissions, and comments in the teacher view.
+ * 
+ * Key components:
+ * - Data interfaces for assignments, students, and classes
+ * - Mock data sets for development and demonstration
+ * - Helper functions for filtering and retrieving specific data
+ * - Utility functions for teacher-student interactions
+ */
 // Interfaces for teacher data
 export interface StudentAssignment {
   studentId: string;

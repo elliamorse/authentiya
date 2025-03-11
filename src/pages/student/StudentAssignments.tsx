@@ -1,6 +1,13 @@
+
 /**
  * This file provides the student assignments page where students can view their
- * assignments across classes and navigate to the document editor.
+ * assignments across classes, organized by status (in-progress, submitted, all).
+ * 
+ * Updates:
+ * - Added "Submitted" tab to show completed assignments
+ * - Enhanced assignment organization by due date
+ * - Added ability to click assignments to open them in the document editor
+ * - Added dummy data for all assignment states
  */
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -22,7 +29,7 @@ import {
   Plus
 } from "lucide-react";
 
-// Mock data for student classes and assignments
+// Mock data for student classes and assignments with various statuses
 const studentClasses = [
   {
     id: "c1",
@@ -47,6 +54,28 @@ const studentClasses = [
         startedOn: null,
         timeSpent: 0,
         wordCount: 0,
+      },
+      {
+        id: "5",
+        title: "Literary Criticism Review",
+        dueDate: "2023-10-25",
+        status: "submitted",
+        startedOn: "2023-10-15T09:20:00Z",
+        submittedOn: "2023-10-23T16:45:00Z",
+        timeSpent: 180,
+        wordCount: 1200,
+        grade: "A-"
+      },
+      {
+        id: "6",
+        title: "Short Story Analysis",
+        dueDate: "2023-09-18",
+        status: "submitted",
+        startedOn: "2023-09-10T11:30:00Z",
+        submittedOn: "2023-09-17T14:20:00Z",
+        timeSpent: 150,
+        wordCount: 800,
+        grade: "B+"
       }
     ]
   },
@@ -64,6 +93,17 @@ const studentClasses = [
         startedOn: "2023-11-08T10:00:00Z",
         timeSpent: 90,
         wordCount: 580,
+      },
+      {
+        id: "7",
+        title: "Lab Report: Pendulum Motion",
+        dueDate: "2023-10-10",
+        status: "submitted",
+        startedOn: "2023-10-02T13:15:00Z",
+        submittedOn: "2023-10-09T15:30:00Z",
+        timeSpent: 200,
+        wordCount: 1500,
+        grade: "A"
       }
     ]
   },
@@ -81,6 +121,17 @@ const studentClasses = [
         startedOn: null,
         timeSpent: 0,
         wordCount: 0,
+      },
+      {
+        id: "8",
+        title: "World War II Analysis",
+        dueDate: "2023-09-30",
+        status: "submitted",
+        startedOn: "2023-09-20T08:45:00Z",
+        submittedOn: "2023-09-29T17:10:00Z",
+        timeSpent: 240,
+        wordCount: 1800,
+        grade: "A+"
       }
     ]
   }
@@ -114,10 +165,20 @@ export default function StudentAssignments() {
     if (activeTab === "all") return true;
     if (activeTab === "active") return assignment.status === "in_progress";
     if (activeTab === "pending") return assignment.status === "not_started";
+    if (activeTab === "submitted") return assignment.status === "submitted";
     return false;
   });
   
-  // Group assignments by due date (today, this week, future)
+  // Open assignment in editor and store assignment ID
+  const handleOpenAssignment = (assignmentId: string) => {
+    // Save assignment ID to localStorage to link it in the editor
+    window.localStorage.setItem("linkedAssignment", assignmentId);
+    
+    // Navigate to editor
+    navigate("/student/editor");
+  };
+  
+  // Group assignments by due date (today, this week, future, past)
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
@@ -138,12 +199,17 @@ export default function StudentAssignments() {
     future: filteredAssignments.filter(a => {
       const dueDate = new Date(a.dueDate);
       dueDate.setHours(0, 0, 0, 0);
-      return dueDate > endOfWeek;
+      return dueDate > endOfWeek && a.status !== "submitted";
+    }),
+    past: filteredAssignments.filter(a => {
+      const dueDate = new Date(a.dueDate);
+      dueDate.setHours(0, 0, 0, 0);
+      return dueDate < today && a.status === "submitted";
     })
   };
   
   // Render badge for assignment status
-  const renderStatusBadge = (status: string) => {
+  const renderStatusBadge = (status: string, grade?: string) => {
     switch (status) {
       case "in_progress":
         return (
@@ -155,6 +221,12 @@ export default function StudentAssignments() {
         return (
           <Badge variant="warning" className="flex items-center gap-1">
             <AlertTriangle className="h-3 w-3" /> Not Started
+          </Badge>
+        );
+      case "submitted":
+        return (
+          <Badge variant="success" className="flex items-center gap-1">
+            <CheckCircle className="h-3 w-3" /> {grade ? `Grade: ${grade}` : "Submitted"}
           </Badge>
         );
       default:
@@ -180,7 +252,7 @@ export default function StudentAssignments() {
               <CardContent className="p-4">
                 <div className="flex justify-between items-start mb-2">
                   <h4 className="font-medium text-lg font-playfair">{assignment.title}</h4>
-                  {renderStatusBadge(assignment.status)}
+                  {renderStatusBadge(assignment.status, assignment.grade)}
                 </div>
                 
                 <div className="text-sm text-muted-foreground flex gap-1 items-center mb-1">
@@ -211,13 +283,27 @@ export default function StudentAssignments() {
                   </div>
                 )}
                 
+                {assignment.status === "submitted" && (
+                  <div className="mt-2 p-2 bg-green-50/50 dark:bg-green-900/20 rounded border border-green-100 dark:border-green-900/30 text-xs">
+                    <div className="flex justify-between mb-1">
+                      <span>Submitted on:</span>
+                      <span className="font-medium">{formatDate(assignment.submittedOn)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Word count:</span>
+                      <span className="font-medium">{assignment.wordCount}</span>
+                    </div>
+                  </div>
+                )}
+                
                 <Button 
                   variant="default" 
                   size="sm" 
                   className="w-full mt-3 academic-btn-primary"
-                  onClick={() => navigate("/dashboard")}
+                  onClick={() => handleOpenAssignment(assignment.id)}
                 >
-                  {assignment.status === "not_started" ? "Start Assignment" : "Continue Working"}
+                  {assignment.status === "not_started" ? "Start Assignment" : 
+                   assignment.status === "submitted" ? "View Submission" : "Continue Working"}
                 </Button>
               </CardContent>
             </Card>
@@ -306,7 +392,7 @@ export default function StudentAssignments() {
         </div>
         
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3 max-w-md">
+          <TabsList className="grid w-full grid-cols-4 max-w-md">
             <TabsTrigger value="all" className="flex items-center gap-1">
               <BookOpen className="h-4 w-4" />
               <span>All</span>
@@ -318,6 +404,10 @@ export default function StudentAssignments() {
             <TabsTrigger value="pending" className="flex items-center gap-1">
               <AlertTriangle className="h-4 w-4" />
               <span>Not Started</span>
+            </TabsTrigger>
+            <TabsTrigger value="submitted" className="flex items-center gap-1">
+              <CheckCircle className="h-4 w-4" />
+              <span>Submitted</span>
             </TabsTrigger>
           </TabsList>
           
@@ -337,6 +427,7 @@ export default function StudentAssignments() {
             {renderAssignmentSection("Due Today", groupedAssignments.today)}
             {renderAssignmentSection("Due This Week", groupedAssignments.thisWeek)}
             {renderAssignmentSection("Future Assignments", groupedAssignments.future)}
+            {renderAssignmentSection("Completed Assignments", groupedAssignments.past)}
             
             {filteredAssignments.length === 0 && (
               <div className="py-12 text-center">
@@ -347,9 +438,9 @@ export default function StudentAssignments() {
           </TabsContent>
           
           <TabsContent value="active" className="animate-fade-in">
-            {renderAssignmentSection("Due Today", groupedAssignments.today)}
-            {renderAssignmentSection("Due This Week", groupedAssignments.thisWeek)}
-            {renderAssignmentSection("Future Assignments", groupedAssignments.future)}
+            {renderAssignmentSection("Due Today", groupedAssignments.today.filter(a => a.status === "in_progress"))}
+            {renderAssignmentSection("Due This Week", groupedAssignments.thisWeek.filter(a => a.status === "in_progress"))}
+            {renderAssignmentSection("Future Assignments", groupedAssignments.future.filter(a => a.status === "in_progress"))}
             
             {filteredAssignments.length === 0 && (
               <div className="py-12 text-center">
@@ -360,14 +451,26 @@ export default function StudentAssignments() {
           </TabsContent>
           
           <TabsContent value="pending" className="animate-fade-in">
-            {renderAssignmentSection("Due Today", groupedAssignments.today)}
-            {renderAssignmentSection("Due This Week", groupedAssignments.thisWeek)}
-            {renderAssignmentSection("Future Assignments", groupedAssignments.future)}
+            {renderAssignmentSection("Due Today", groupedAssignments.today.filter(a => a.status === "not_started"))}
+            {renderAssignmentSection("Due This Week", groupedAssignments.thisWeek.filter(a => a.status === "not_started"))}
+            {renderAssignmentSection("Future Assignments", groupedAssignments.future.filter(a => a.status === "not_started"))}
             
             {filteredAssignments.length === 0 && (
               <div className="py-12 text-center">
                 <AlertTriangle className="h-12 w-12 mx-auto text-muted-foreground/50" />
                 <p className="mt-4 text-muted-foreground">No pending assignments</p>
+              </div>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="submitted" className="animate-fade-in">
+            {renderAssignmentSection("Recently Submitted", groupedAssignments.thisWeek.filter(a => a.status === "submitted"))}
+            {renderAssignmentSection("Past Submissions", groupedAssignments.past)}
+            
+            {filteredAssignments.filter(a => a.status === "submitted").length === 0 && (
+              <div className="py-12 text-center">
+                <CheckCircle className="h-12 w-12 mx-auto text-muted-foreground/50" />
+                <p className="mt-4 text-muted-foreground">No submitted assignments</p>
               </div>
             )}
           </TabsContent>

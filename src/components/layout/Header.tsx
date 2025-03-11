@@ -1,4 +1,15 @@
 
+/**
+ * This file provides the main application header with navigation, user information,
+ * theme toggle, and dropdown menu functionality.
+ * 
+ * Key features:
+ * - Responsive design with mobile adaptation
+ * - Role-specific navigation links (student/teacher)
+ * - User account dropdown with access to settings and logout
+ * - Theme toggle for dark/light mode
+ * - Scroll-aware styling (transparent to solid background on scroll)
+ */
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/common/Button";

@@ -2,6 +2,18 @@
 /**
  * This file is the main entry point for the React application, setting up routing,
  * global providers, and the application structure.
+ * 
+ * It includes routes for:
+ * - Index/landing page
+ * - Dashboard (student or teacher based on role)
+ * - Teacher-specific pages (classes, assignments, student view)
+ * - Student-specific pages (assignments, editor)
+ * 
+ * Also configures global providers:
+ * - Query client for data fetching
+ * - Theme provider for dark/light mode
+ * - Toast notifications
+ * - Tooltips
  */
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
