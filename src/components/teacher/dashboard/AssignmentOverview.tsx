@@ -34,62 +34,62 @@ export function AssignmentOverview({ assignment }: AssignmentOverviewProps) {
   const isPastDue = dueDate < currentDate;
   
   return (
-    <Card>
+    <Card className="shadow-md dark:bg-gray-800 dark:border-gray-700">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-lg">Assignment Overview</CardTitle>
+        <CardTitle className="text-lg font-playfair">Assignment Overview</CardTitle>
         {isPastDue ? (
-          <Badge variant="destructive" className="flex items-center gap-1">
-            <AlertTriangle className="h-3 w-3" />
-            Past Due
+          <Badge variant="secondary" className="flex items-center gap-1 dark:bg-gray-700">
+            <Clock className="h-3 w-3" />
+            Inactive
           </Badge>
         ) : (
-          <Badge variant="outline" className="flex items-center gap-1">
+          <Badge variant="primary" className="flex items-center gap-1 dark:bg-emerald-800 dark:text-emerald-100">
             <Clock className="h-3 w-3" />
-            {daysRemaining} {daysRemaining === 1 ? 'day' : 'days'} left
+            Active
           </Badge>
         )}
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
-          <h3 className="font-semibold text-xl mb-1">{assignment.title}</h3>
-          <p className="text-sm text-muted-foreground mb-2">{assignment.className}</p>
+          <h3 className="font-semibold text-xl mb-1 font-playfair dark:text-white">{assignment.title}</h3>
+          <p className="text-sm text-muted-foreground mb-2 dark:text-gray-300">{assignment.className}</p>
           
           <div className="grid grid-cols-2 gap-2 text-sm">
             <div>
-              <span className="text-muted-foreground">Created:</span>
-              <span className="ml-1 font-medium">{formatDate(assignment.createdAt)}</span>
+              <span className="text-muted-foreground dark:text-gray-400">Created:</span>
+              <span className="ml-1 font-medium dark:text-gray-200">{formatDate(assignment.createdAt)}</span>
             </div>
             <div>
-              <span className="text-muted-foreground">Due:</span>
-              <span className="ml-1 font-medium">{formatDate(assignment.dueDate)}</span>
+              <span className="text-muted-foreground dark:text-gray-400">Due:</span>
+              <span className="ml-1 font-medium dark:text-gray-200">{formatDate(assignment.dueDate)}</span>
             </div>
             <div>
-              <span className="text-muted-foreground">Students:</span>
-              <span className="ml-1 font-medium">{assignment.totalStudents}</span>
+              <span className="text-muted-foreground dark:text-gray-400">Students:</span>
+              <span className="ml-1 font-medium dark:text-gray-200">{assignment.totalStudents}</span>
             </div>
             <div>
-              <span className="text-muted-foreground">Avg. Words:</span>
-              <span className="ml-1 font-medium">{assignment.averageWordCount}</span>
+              <span className="text-muted-foreground dark:text-gray-400">Avg. Words:</span>
+              <span className="ml-1 font-medium dark:text-gray-200">{assignment.averageWordCount}</span>
             </div>
           </div>
         </div>
         
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span>Started</span>
-            <span className="font-medium">
+            <span className="dark:text-gray-300">Started</span>
+            <span className="font-medium dark:text-gray-200">
               {assignment.studentsStarted} / {assignment.totalStudents}
             </span>
           </div>
-          <Progress value={startedPercentage} className="h-2" />
+          <Progress value={startedPercentage} className="h-2 dark:bg-gray-700" />
           
           <div className="flex justify-between text-sm">
-            <span>Submitted</span>
-            <span className="font-medium">
+            <span className="dark:text-gray-300">Submitted</span>
+            <span className="font-medium dark:text-gray-200">
               {assignment.studentsSubmitted} / {assignment.totalStudents}
             </span>
           </div>
-          <Progress value={submittedPercentage} className="h-2" />
+          <Progress value={submittedPercentage} className="h-2 dark:bg-gray-700" />
         </div>
       </CardContent>
     </Card>

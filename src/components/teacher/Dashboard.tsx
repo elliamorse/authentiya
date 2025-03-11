@@ -67,13 +67,6 @@ export default function TeacherDashboard({
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Teacher Dashboard</h2>
-          <p className="text-muted-foreground">
-            Monitor student progress and assignment metrics
-          </p>
-        </div>
-        
         <AssignmentSelector 
           assignments={mockAssignments}
           selectedAssignmentId={selectedAssignmentId}

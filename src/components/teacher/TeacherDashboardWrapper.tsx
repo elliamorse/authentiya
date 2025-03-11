@@ -17,7 +17,7 @@ export default function TeacherDashboardWrapper({ userEmail }: TeacherDashboardW
     <main className="flex-1 container py-6">
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Teacher Dashboard</h2>
+          <h2 className="text-3xl font-bold tracking-tight font-playfair">Assignment Dashboard</h2>
           <p className="text-muted-foreground">
             Monitor student progress and assignment metrics
           </p>
