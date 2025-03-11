@@ -5,13 +5,15 @@ import AssignmentPrompt from "./AssignmentPrompt";
 import WritingMetrics from "./WritingMetrics";
 import CitationPrompt from "./CitationPrompt";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { 
   BookOpen, 
-  Copy, 
   FileText, 
   Quote, 
-  SendHorizontal 
+  SendHorizontal,
+  Edit,
+  Check
 } from "lucide-react";
 
 interface StudentDashboardProps {
@@ -25,6 +27,7 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
   
   const [showAssignmentPrompt, setShowAssignmentPrompt] = useState(false);
   const [linkedAssignment, setLinkedAssignment] = useState<string | null>(null);
+  const [linkedAssignmentTitle, setLinkedAssignmentTitle] = useState<string | null>(null);
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [wordCount, setWordCount] = useState(0);
   const [copyPasteCount, setCopyPasteCount] = useState(0);
@@ -32,17 +35,55 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
   const [showCitationPrompt, setShowCitationPrompt] = useState(false);
   const [copiedText, setCopiedText] = useState("");
   const [content, setContent] = useState("");
+  const [documentName, setDocumentName] = useState("Untitled Document");
+  const [isEditingName, setIsEditingName] = useState(false);
   
   // Check for saved linked assignment
   useEffect(() => {
     const savedLinkedAssignment = window.localStorage.getItem("linkedAssignment");
+    const savedLinkedAssignmentTitle = window.localStorage.getItem("linkedAssignmentTitle");
+    
     if (savedLinkedAssignment) {
       setLinkedAssignment(savedLinkedAssignment);
+      if (savedLinkedAssignmentTitle) {
+        setLinkedAssignmentTitle(savedLinkedAssignmentTitle);
+        setDocumentName(savedLinkedAssignmentTitle);
+      }
       setStartTime(new Date());
     } else {
       setShowAssignmentPrompt(true);
     }
+    
+    // Load saved document if available
+    const savedContent = window.localStorage.getItem("currentDocument");
+    if (savedContent) {
+      setContent(savedContent);
+      
+      // Count words
+      const words = savedContent.trim().split(/\s+/);
+      setWordCount(savedContent.trim() === "" ? 0 : words.length);
+    }
+    
+    // Load saved document name
+    const savedDocumentName = window.localStorage.getItem("documentName");
+    if (savedDocumentName) {
+      setDocumentName(savedDocumentName);
+    }
   }, []);
+  
+  // Save content to localStorage when it changes
+  useEffect(() => {
+    if (content) {
+      window.localStorage.setItem("currentDocument", content);
+    }
+  }, [content]);
+  
+  // Save document name to localStorage when it changes
+  useEffect(() => {
+    if (documentName) {
+      window.localStorage.setItem("documentName", documentName);
+    }
+  }, [documentName]);
   
   // Add event listeners for copy-paste detection
   useEffect(() => {
@@ -78,8 +119,15 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
     };
   }, [linkedAssignment, textareaRef]);
   
-  const handleLinkAssignment = (assignmentId: string) => {
+  const handleLinkAssignment = (assignmentId: string, assignmentTitle?: string) => {
     setLinkedAssignment(assignmentId);
+    
+    if (assignmentTitle) {
+      setLinkedAssignmentTitle(assignmentTitle);
+      setDocumentName(assignmentTitle);
+      window.localStorage.setItem("linkedAssignmentTitle", assignmentTitle);
+    }
+    
     setStartTime(new Date());
     setShowAssignmentPrompt(false);
     
@@ -97,15 +145,6 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
     // Count words (simple splitting by spaces)
     const words = newContent.trim().split(/\s+/);
     setWordCount(newContent.trim() === "" ? 0 : words.length);
-  };
-  
-  // Simulate copy/paste detection
-  const handleManualPaste = () => {
-    setCopyPasteCount(prev => prev + 1);
-    // Get clipboard text (in a real app, this would access navigator.clipboard)
-    // For demo, we'll just simulate it
-    setCopiedText("This is a simulated copied text from an external source...");
-    setShowCitationPrompt(true);
   };
   
   const handleAddCitation = (citation: {
@@ -126,16 +165,40 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
       description: "Your assignment has been successfully submitted"
     });
     
-    // In a real app, this would make an API call to Canvas or similar
     // Reset state
     setLinkedAssignment(null);
+    setLinkedAssignmentTitle(null);
     setStartTime(null);
     setWordCount(0);
     setCopyPasteCount(0);
     setCitationCount(0);
     setContent("");
+    setDocumentName("Untitled Document");
     
+    // Clear local storage
     window.localStorage.removeItem("linkedAssignment");
+    window.localStorage.removeItem("linkedAssignmentTitle");
+    window.localStorage.removeItem("currentDocument");
+    window.localStorage.removeItem("documentName");
+    
+    // Navigate to assignments page
+    navigate("/student/assignments");
+  };
+  
+  const toggleEditName = () => {
+    setIsEditingName(!isEditingName);
+  };
+  
+  const saveDocumentName = () => {
+    setIsEditingName(false);
+    
+    if (documentName.trim() === "") {
+      setDocumentName(linkedAssignmentTitle || "Untitled Document");
+    }
+    
+    toast.success("Document renamed", {
+      description: `Saved as "${documentName}"`
+    });
   };
   
   return (
@@ -188,20 +251,42 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
           <div className="flex justify-between items-center mb-3">
             <div className="flex items-center gap-3">
               <FileText className="h-5 w-5 text-authentiya-maroon" />
-              <h2 className="text-xl font-semibold text-authentiya-charcoal-darkest dark:text-authentiya-accent-cream">My Document</h2>
+              {isEditingName ? (
+                <div className="flex items-center gap-2">
+                  <Input
+                    value={documentName}
+                    onChange={(e) => setDocumentName(e.target.value)}
+                    className="h-8 w-64"
+                    autoFocus
+                  />
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={saveDocumentName}
+                    className="h-8 w-8"
+                  >
+                    <Check className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <h2 className="text-xl font-semibold text-authentiya-charcoal-darkest dark:text-authentiya-accent-cream">
+                    {documentName}
+                  </h2>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={toggleEditName}
+                    className="h-8 w-8"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
             </div>
             
             {startTime && (
               <div className="flex items-center gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="gap-2" 
-                  onClick={handleManualPaste}
-                >
-                  <Copy className="h-4 w-4" />
-                  <span className="hidden sm:inline">Simulate Copy/Paste</span>
-                </Button>
                 <Button 
                   variant="outline" 
                   size="sm" 
@@ -231,7 +316,7 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
           
           <textarea
             ref={textareaRef}
-            className="w-full min-h-[300px] p-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-authentiya-maroon/50 transition-all resize-y"
+            className="w-full min-h-[350px] p-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-authentiya-maroon/50 transition-all resize-y text-authentiya-charcoal-darkest dark:text-authentiya-charcoal-darkest bg-white"
             placeholder="Start typing your document here..."
             value={content}
             onChange={handleTextAreaChange}

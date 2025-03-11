@@ -1,126 +1,154 @@
 
-import { useState } from "react";
-import { Button } from "@/components/common/Button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/common/Card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/common/Badge";
-import { GraduationCap, BookOpen, Calendar, X } from "lucide-react";
+import React, { useState } from "react";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle,
+  DialogFooter
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { 
+  Book, 
+  CalendarClock,
+  CheckCircle 
+} from "lucide-react";
 
-interface Assignment {
-  id: string;
-  title: string;
-  class: string;
-  dueDate: string;
-}
+// Mock data for student assignments
+const studentAssignments = [
+  {
+    id: "1",
+    title: "Essay on American Literature",
+    className: "English 101",
+    teacherName: "Dr. Smith",
+    dueDate: "2023-11-15"
+  },
+  {
+    id: "2",
+    title: "Physics Problem Set",
+    className: "Physics 202",
+    teacherName: "Prof. Johnson",
+    dueDate: "2023-11-18"
+  },
+  {
+    id: "3",
+    title: "History Research Paper",
+    className: "History 105",
+    teacherName: "Dr. Williams",
+    dueDate: "2023-11-20"
+  },
+  {
+    id: "4",
+    title: "Poetry Analysis",
+    className: "English 101",
+    teacherName: "Dr. Smith",
+    dueDate: "2023-12-05"
+  }
+];
 
 interface AssignmentPromptProps {
-  onSelect: (assignmentId: string) => void;
+  onSelect: (assignmentId: string, assignmentTitle?: string) => void;
   onDismiss: () => void;
 }
 
-const mockAssignments: Assignment[] = [
-  { id: '1', title: 'Essay on American Literature', class: 'English 101', dueDate: '2023-11-15' },
-  { id: '2', title: 'Physics Problem Set', class: 'Physics 202', dueDate: '2023-11-18' },
-  { id: '3', title: 'History Research Paper', class: 'History 105', dueDate: '2023-11-20' },
-];
-
-export default function AssignmentPrompt({ onSelect, onDismiss }: AssignmentPromptProps) {
-  const [selectedClass, setSelectedClass] = useState<string | undefined>();
-  const [selectedAssignment, setSelectedAssignment] = useState<string | undefined>();
+export default function AssignmentPrompt({ 
+  onSelect, 
+  onDismiss 
+}: AssignmentPromptProps) {
+  const [selectedAssignmentId, setSelectedAssignmentId] = useState<string | null>(null);
+  const [newDocument, setNewDocument] = useState(false);
   
-  const filteredAssignments = selectedClass 
-    ? mockAssignments.filter(a => a.class === selectedClass)
-    : mockAssignments;
-  
-  const classes = Array.from(new Set(mockAssignments.map(a => a.class)));
+  const handleSelectAssignment = () => {
+    if (newDocument) {
+      onSelect("new");
+    } else if (selectedAssignmentId) {
+      const assignment = studentAssignments.find(a => a.id === selectedAssignmentId);
+      onSelect(selectedAssignmentId, assignment?.title);
+    }
+  };
   
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in">
-      <Card className="w-full max-w-md animate-slide-up">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-xl">Link to Assignment</CardTitle>
-          <Button variant="ghost" size="icon" onClick={onDismiss}>
-            <X className="h-4 w-4" />
-          </Button>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Select Class</label>
-            <Select 
-              value={selectedClass} 
-              onValueChange={setSelectedClass}
+    <Dialog open={true} onOpenChange={onDismiss}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Link to Assignment</DialogTitle>
+        </DialogHeader>
+        
+        <div className="py-4">
+          <div className="mb-4">
+            <button
+              className={`w-full text-left p-3 rounded-lg border ${newDocument ? 'border-authentiya-maroon bg-authentiya-maroon/10' : 'border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600'} transition-all mb-4`}
+              onClick={() => {
+                setNewDocument(true);
+                setSelectedAssignmentId(null);
+              }}
             >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a class" />
-              </SelectTrigger>
-              <SelectContent>
-                {classes.map(c => (
-                  <SelectItem key={c} value={c}>
-                    <div className="flex items-center gap-2">
-                      <GraduationCap className="h-4 w-4 text-muted-foreground" />
-                      {c}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Select Assignment</label>
-            <Select 
-              value={selectedAssignment} 
-              onValueChange={setSelectedAssignment}
-              disabled={!selectedClass}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder={selectedClass ? "Select an assignment" : "Select a class first"} />
-              </SelectTrigger>
-              <SelectContent>
-                {filteredAssignments.map(a => (
-                  <SelectItem key={a.id} value={a.id}>
-                    <div className="flex flex-col gap-1">
-                      <div className="flex items-center gap-2">
-                        <BookOpen className="h-4 w-4 text-muted-foreground" />
-                        {a.title}
-                      </div>
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Calendar className="h-3 w-3" />
-                        Due: {new Date(a.dueDate).toLocaleDateString()}
-                      </div>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          
-          {selectedAssignment && (
-            <div className="p-3 bg-secondary rounded-md">
-              <div className="flex items-center justify-between">
-                <h4 className="font-medium">
-                  {mockAssignments.find(a => a.id === selectedAssignment)?.title}
-                </h4>
-                <Badge variant="info">Selected</Badge>
+              <div className="flex items-center gap-3">
+                <div className={`h-8 w-8 rounded-full ${newDocument ? 'bg-authentiya-maroon/20' : 'bg-gray-100 dark:bg-gray-800'} flex items-center justify-center`}>
+                  <Book className={`h-4 w-4 ${newDocument ? 'text-authentiya-maroon' : 'text-gray-500 dark:text-gray-400'}`} />
+                </div>
+                <div>
+                  <p className="font-medium">Create New Document</p>
+                  <p className="text-sm text-muted-foreground">Start a new document without linking to an assignment</p>
+                </div>
+                {newDocument && (
+                  <CheckCircle className="ml-auto h-5 w-5 text-authentiya-maroon" />
+                )}
               </div>
-              <p className="text-sm text-muted-foreground mt-1">
-                {mockAssignments.find(a => a.id === selectedAssignment)?.class}
-              </p>
+            </button>
+            
+            <div className="text-sm font-medium mb-2">
+              Select an Assignment:
             </div>
-          )}
-        </CardContent>
-        <CardFooter className="flex justify-between">
-          <Button variant="outline" onClick={onDismiss}>
-            Dismiss
-          </Button>
-          <Button 
-            disabled={!selectedAssignment} 
-            onClick={() => selectedAssignment && onSelect(selectedAssignment)}
+            
+            <div className="max-h-60 overflow-y-auto pr-1 space-y-2">
+              {studentAssignments.map(assignment => (
+                <button
+                  key={assignment.id}
+                  className={`w-full text-left p-3 rounded-lg border ${selectedAssignmentId === assignment.id ? 'border-authentiya-maroon bg-authentiya-maroon/10' : 'border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600'} transition-all`}
+                  onClick={() => {
+                    setSelectedAssignmentId(assignment.id);
+                    setNewDocument(false);
+                  }}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`h-8 w-8 rounded-full ${selectedAssignmentId === assignment.id ? 'bg-authentiya-maroon/20' : 'bg-gray-100 dark:bg-gray-800'} flex items-center justify-center`}>
+                      <Book className={`h-4 w-4 ${selectedAssignmentId === assignment.id ? 'text-authentiya-maroon' : 'text-gray-500 dark:text-gray-400'}`} />
+                    </div>
+                    <div>
+                      <p className="font-medium">{assignment.title}</p>
+                      <p className="text-xs text-muted-foreground">{assignment.className} • {assignment.teacherName}</p>
+                      <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
+                        <CalendarClock className="h-3 w-3" />
+                        <span>Due: {assignment.dueDate}</span>
+                      </div>
+                    </div>
+                    {selectedAssignmentId === assignment.id && (
+                      <CheckCircle className="ml-auto h-5 w-5 text-authentiya-maroon" />
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+        
+        <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={onDismiss}
           >
-            Link Assignment
+            Cancel
           </Button>
-        </CardFooter>
-      </Card>
-    </div>
+          <Button
+            onClick={handleSelectAssignment}
+            disabled={!newDocument && !selectedAssignmentId}
+            className="academic-btn-primary"
+          >
+            Continue
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
