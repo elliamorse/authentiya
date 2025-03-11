@@ -21,6 +21,14 @@ Unlike competitors such as TurnItIn (which works after submission and has accura
 - **Teacher Dashboard**: Monitor student work and identify potential AI usage
 - **Assignment Management**: Create, track, and evaluate student assignments
 
+## Link Preview Information
+
+The website uses Open Graph metadata to control how the site appears when shared on social media:
+- Title: "Authentiya - Academic Integrity Solution"
+- Description: "A seamless browser extension that works in the background, detecting AI usage with real-time tracking and comprehensive reporting at scale."
+- Image: Professional image of a MacBook with code on the screen on a busy desk
+- Twitter Card: Large image summary
+
 ## Technical Details
 
 This project is built with:
