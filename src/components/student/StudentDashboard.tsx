@@ -1,11 +1,12 @@
+
 /**
  * StudentDashboard.tsx
  * 
- * This component renders the main student editor including the document editor.
+ * This component renders the main student dashboard including the document editor.
  * It allows students to write and edit documents, link to assignments, and track metrics.
  * Document names can be edited with confirmation popups only when actually changed.
  * Now uses a WordProcessor component for a more robust document editing experience.
- * Added teacher comments tab to the right of the document editor.
+ * Refactored into smaller components for better maintainability.
  */
 
 import { useState, useEffect, useRef } from "react";
@@ -18,38 +19,11 @@ import DashboardHeader from "./DashboardHeader";
 import DocumentHeader from "./DocumentHeader";
 import DocumentActions from "./DocumentActions";
 import { toast } from "sonner";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, MessageSquare } from "lucide-react";
 
 interface StudentDashboardProps {
   userEmail: string | null;
   onLogout: () => void;
 }
-
-// Mock teacher comments data
-const mockTeacherComments = [
-  {
-    id: "1",
-    teacherName: "Dr. Smith",
-    timestamp: new Date().toISOString(),
-    text: "Great introduction! Make sure to expand on your thesis statement a bit more.",
-    resolved: false
-  },
-  {
-    id: "2",
-    teacherName: "Dr. Smith",
-    timestamp: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
-    text: "Your citation format needs some work. Please follow MLA guidelines for all references.",
-    resolved: true
-  },
-  {
-    id: "3",
-    teacherName: "Prof. Johnson",
-    timestamp: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
-    text: "This paragraph could be stronger with more supporting evidence. Consider adding another example to illustrate your point.",
-    resolved: false
-  }
-];
 
 export default function StudentDashboard({ userEmail, onLogout }: StudentDashboardProps) {
   const navigate = useNavigate();
@@ -67,7 +41,6 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
   const [content, setContent] = useState("");
   const [documentName, setDocumentName] = useState("Untitled Document");
   const [originalDocumentName, setOriginalDocumentName] = useState("Untitled Document");
-  const [activeTab, setActiveTab] = useState<"document" | "comments">("document");
   
   useEffect(() => {
     const savedLinkedAssignment = window.localStorage.getItem("linkedAssignment");
@@ -164,7 +137,7 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
   };
   
   const handleAddCitation = (citation: {
-    type: "website" | "book" | "ai" | "other";
+    type: "website" | "book" | "ai";
     source: string;
     details?: string;
   }) => {
@@ -206,16 +179,6 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
     navigate("/student/assignments");
   };
   
-  const formatDateTime = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = { 
-      month: 'short', 
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit'
-    };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-  };
-  
   return (
     <main className="flex-1 container py-6 space-y-6">
       <DashboardHeader 
@@ -253,66 +216,11 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
             )}
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="md:col-span-2">
-              <WordProcessor 
-                content={content} 
-                onChange={handleTextChange}
-                placeholder="Start typing your document here..."
-              />
-            </div>
-            
-            <div className="border-l pl-4">
-              <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "document" | "comments")}>
-                <TabsList className="mb-4">
-                  <TabsTrigger value="comments" className="flex items-center gap-1">
-                    <MessageSquare className="h-4 w-4" />
-                    Teacher Comments
-                  </TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="comments" className="space-y-4">
-                  {mockTeacherComments.length === 0 ? (
-                    <div className="text-center py-6">
-                      <MessageSquare className="h-10 w-10 mx-auto text-muted-foreground/50" />
-                      <p className="mt-4 text-muted-foreground">
-                        No comments yet.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {mockTeacherComments.map((comment) => (
-                        <div 
-                          key={comment.id} 
-                          className={`p-3 rounded-md border ${
-                            comment.resolved 
-                              ? 'bg-gray-50 border-gray-200 dark:bg-gray-800/30 dark:border-gray-700' 
-                              : 'bg-blue-50/30 border-blue-100 dark:bg-blue-900/10 dark:border-blue-800/30'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2 mb-2">
-                            <div className="h-8 w-8 rounded-full bg-authentiya-maroon/10 flex items-center justify-center">
-                              <User className="h-4 w-4 text-authentiya-maroon" />
-                            </div>
-                            <div>
-                              <h4 className="font-medium text-sm">{comment.teacherName}</h4>
-                              <p className="text-xs text-muted-foreground">
-                                {formatDateTime(comment.timestamp)}
-                              </p>
-                            </div>
-                          </div>
-                          
-                          <p className="mt-2 text-sm whitespace-pre-line">
-                            {comment.text}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </TabsContent>
-              </Tabs>
-            </div>
-          </div>
+          <WordProcessor 
+            content={content} 
+            onChange={handleTextChange}
+            placeholder="Start typing your document here..."
+          />
         </div>
       </div>
       
