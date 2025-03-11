@@ -1,6 +1,6 @@
 
 import React from "react";
-import { getStudentsByAssignment } from "@/lib/teacher-data";
+import { getStudentsByAssignment } from "@/lib/teacherData";
 import { AssignmentOverview } from "./dashboard/AssignmentOverview";
 import { AssignmentSelector } from "./dashboard/AssignmentSelector";
 import { StatisticsCard } from "./dashboard/StatisticsCard";

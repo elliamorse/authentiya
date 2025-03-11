@@ -5,7 +5,7 @@ import Header from "../../components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { getClassesForTeacher, ClassInfo } from "@/lib/teacher-data";
+import { getClassesForTeacher, ClassInfo } from "@/lib/teacherData";
 import { Award, BookOpen, Clock, FileText, GraduationCap, Search, Users } from "lucide-react";
 
 export default function TeacherClasses() {

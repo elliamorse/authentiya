@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { StudentAssignment } from "@/lib/teacher-data";
+import { StudentAssignment } from "@/lib/teacherData";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/common/Badge";

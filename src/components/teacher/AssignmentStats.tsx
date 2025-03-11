@@ -11,7 +11,7 @@
  */
 
 import React, { useMemo } from "react";
-import { Assignment, StudentAssignment } from "@/lib/teacher-data";
+import { Assignment, StudentAssignment } from "@/lib/teacherData";
 import { TimeDistributionChart } from "./stats/TimeDistributionChart";
 import { WordCountChart } from "./stats/WordCountChart";
 import { StartTimeChart } from "./stats/StartTimeChart";

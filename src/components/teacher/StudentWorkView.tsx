@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Clock, Filter } from "lucide-react";
-import { StudentAssignment } from "@/lib/teacher-data";
+import { StudentAssignment } from "@/lib/teacherData";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface StudentWorkViewProps {

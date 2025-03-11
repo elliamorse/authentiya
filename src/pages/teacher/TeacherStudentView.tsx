@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Header from "../../components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getStudentAssignment, getAssignmentById } from "@/lib/teacher-data";
+import { getStudentAssignment, getAssignmentById } from "@/lib/teacherData";
 import { ArrowLeft, FileText, MessageSquare } from "lucide-react";
 import { StudentInfoCard } from "@/components/teacher/StudentInfoCard";
 import { StudentWorkView } from "@/components/teacher/StudentWorkView";

@@ -1,4 +1,3 @@
-
 /**
  * File: AssignmentOverview.tsx
  * 
@@ -13,7 +12,7 @@ import { Card, CardHeader, CardContent, CardTitle } from "@/components/common/Ca
 import { Badge } from "@/components/common/Badge";
 import { Progress } from "@/components/ui/progress";
 import { AlertTriangle, Clock, FileCheck, FileWarning, BarChart, User } from "lucide-react";
-import { Assignment } from "@/lib/teacher-data";
+import { Assignment } from "@/lib/teacherData";
 
 interface AssignmentOverviewProps {
   assignment: Assignment;

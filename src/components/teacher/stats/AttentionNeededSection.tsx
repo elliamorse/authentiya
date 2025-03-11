@@ -1,9 +1,8 @@
-
 import React, { useMemo } from "react";
 import { Card, CardContent } from "@/components/common/Card";
 import { Badge } from "@/components/common/Badge";
 import { AlertTriangle, Clock } from "lucide-react";
-import { Assignment, StudentAssignment } from "@/lib/teacher-data";
+import { Assignment, StudentAssignment } from "@/lib/teacherData";
 
 interface AttentionNeededSectionProps {
   assignment: Assignment;

@@ -14,7 +14,7 @@ import React from "react";
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/components/common/Card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Sparkles, Users } from "lucide-react";
-import { Assignment, StudentAssignment } from "@/lib/teacher-data";
+import { Assignment, StudentAssignment } from "@/lib/teacherData";
 import AssignmentStats from "../AssignmentStats";
 import StudentList from "../StudentList";
 

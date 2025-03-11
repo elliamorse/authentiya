@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/common/Badge";
-import { Comment, addCommentToStudentAssignment } from "@/lib/teacher-data";
+import { Comment, addCommentToStudentAssignment } from "@/lib/teacherData";
 import { MessageSquare, SendHorizontal, User } from "lucide-react";
 import { toast } from "sonner";
 

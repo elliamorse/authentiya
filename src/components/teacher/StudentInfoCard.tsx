@@ -2,7 +2,7 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/common/Badge";
-import { StudentAssignment } from "@/lib/teacher-data";
+import { StudentAssignment } from "@/lib/teacherData";
 import { BookOpen, Calendar, CheckCircle2, Clock, Copy, Quote, User } from "lucide-react";
 
 interface StudentInfoCardProps {

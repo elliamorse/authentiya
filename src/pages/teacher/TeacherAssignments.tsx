@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Header from "../../components/layout/Header";
@@ -11,7 +10,7 @@ import {
   getAssignmentById, 
   getAssignmentsForClass,
   getStudentAssignments
-} from "@/lib/teacher-data";
+} from "@/lib/teacherData";
 import { ArrowLeft, BookOpen, Calendar, Clock, FileText } from "lucide-react";
 
 export default function TeacherAssignments() {
@@ -19,33 +18,27 @@ export default function TeacherAssignments() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("students");
   
-  // Determine if we're viewing class assignments or a specific assignment
   const isClassView = classId && !assignmentId;
   const isAssignmentView = assignmentId && !classId;
   
-  // Get assignments based on view type
   const assignments = isClassView 
     ? getAssignmentsForClass(classId)
     : [];
     
-  // Get the current assignment details if in assignment view
   const currentAssignment = assignmentId 
     ? getAssignmentById(assignmentId)
     : undefined;
     
-  // Get students for the current assignment if in assignment view
   const students = assignmentId
     ? getStudentAssignments(assignmentId)
     : [];
     
-  // Handle view student assignment - navigate to student view
   const handleViewStudentAssignment = (studentId: string) => {
     if (assignmentId) {
       navigate(`/teacher/student/${studentId}/assignment/${assignmentId}`);
     }
   };
   
-  // Format date
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = { 
       year: 'numeric', 
@@ -64,7 +57,6 @@ export default function TeacherAssignments() {
       />
       
       <main className="flex-1 container py-6 space-y-6">
-        {/* Back button */}
         <Button 
           variant="ghost" 
           className="w-fit flex items-center gap-2 -ml-2"
@@ -74,7 +66,6 @@ export default function TeacherAssignments() {
           {isAssignmentView ? "Back to Classes" : "Back"}
         </Button>
         
-        {/* Class Assignments View */}
         {isClassView && (
           <div className="space-y-6">
             <div>
@@ -138,7 +129,6 @@ export default function TeacherAssignments() {
           </div>
         )}
         
-        {/* Single Assignment View */}
         {isAssignmentView && currentAssignment && (
           <div className="space-y-6">
             <div>
@@ -163,7 +153,7 @@ export default function TeacherAssignments() {
               <TabsContent value="students" className="mt-6">
                 <StudentList 
                   students={students} 
-                  onViewStudent={handleViewStudentAssignment} // Fix: Use this for navigation!
+                  onViewStudent={handleViewStudentAssignment}
                 />
               </TabsContent>
               
