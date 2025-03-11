@@ -1,58 +1,29 @@
-# Welcome to your Lovable project
 
-## Project info
+# Authentiya - Academic Integrity Platform
 
 **URL**: https://lovable.dev/projects/d4855ff7-0d76-4608-a6e3-33aaef944cce
 
-## How can I edit this code?
+## About Authentiya
 
-There are several ways of editing your application.
+Authentiya is a browser extension designed to solve the challenge of maintaining academic integrity in an AI-powered world. With the rise of AI tools, schools are increasingly concerned about student learning and potential plagiarism. Authentiya provides a seamless solution that:
 
-**Use Lovable**
+- Runs in the background like Grammarly
+- Offers real-time tracking of AI usage
+- Provides comprehensive reporting at scale
+- Integrates with learning management systems
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/d4855ff7-0d76-4608-a6e3-33aaef944cce) and start prompting.
+Unlike competitors such as TurnItIn (which works after submission and has accuracy issues) or GPTZero (which lacks LMS integration), Authentiya offers a vigilant and actionable solution that works alongside students and teachers.
 
-Changes made via Lovable will be committed automatically to this repo.
+## Project Features
 
-**Use your preferred IDE**
+- **Student Dashboard**: Track writing progress and manage assignments
+- **Document Editor**: Write with real-time tracking and citation support
+- **Teacher Dashboard**: Monitor student work and identify potential AI usage
+- **Assignment Management**: Create, track, and evaluate student assignments
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Technical Details
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with .
+This project is built with:
 
 - Vite
 - TypeScript
@@ -60,10 +31,26 @@ This project is built with .
 - shadcn-ui
 - Tailwind CSS
 
-## How can I deploy this project?
+## Development
 
-Simply open [Lovable](https://lovable.dev/projects/d4855ff7-0d76-4608-a6e3-33aaef944cce) and click on Share -> Publish.
+Follow these steps to run the project locally:
 
-## I want to use a custom domain - is that possible?
+```sh
+# Clone the repository
+git clone <YOUR_GIT_URL>
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+# Navigate to the project directory
+cd <YOUR_PROJECT_NAME>
+
+# Install dependencies
+npm i
+
+# Start the development server
+npm run dev
+```
+
+## Deployment
+
+Open [Lovable](https://lovable.dev/projects/d4855ff7-0d76-4608-a6e3-33aaef944cce) and click on Share -> Publish to deploy the project.
+
+For custom domain deployment, we recommend using Netlify. See our [custom domains documentation](https://docs.lovable.dev/tips-tricks/custom-domain/) for more details.
