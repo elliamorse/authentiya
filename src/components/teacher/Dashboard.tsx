@@ -1,27 +1,11 @@
 
-/**
- * This file provides the teacher dashboard component that displays assignment statistics,
- * student progress, and allows teachers to select assignments to view.
- * 
- * Features:
- * - Assignment selection from available classes
- * - Overview of assignment status and due dates
- * - Statistics on student progress with interactive charts
- * - Direct links to view individual student work
- * 
- * Updates:
- * - Enhanced mock data for better visualization
- * - Added realistic student examples for each assignment
- * - Implemented full statistics display with proper data
- * - Improved component organization
- */
 import React from "react";
 import { getStudentsByAssignment } from "@/lib/teacher-data";
 import { AssignmentOverview } from "./dashboard/AssignmentOverview";
 import { AssignmentSelector } from "./dashboard/AssignmentSelector";
 import { StatisticsCard } from "./dashboard/StatisticsCard";
 
-// Mock data for assignments with enhanced details for better visualization
+// Mock data for assignments
 const mockAssignments = [
   {
     id: "1",
@@ -59,30 +43,6 @@ const mockAssignments = [
     averageWordCount: 1200,
     createdAt: "2023-11-03",
   },
-  {
-    id: "4",
-    title: "Computer Networks Essay",
-    className: "Computer Science 301",
-    dueDate: "2023-10-05", 
-    totalStudents: 26,
-    studentsStarted: 26,
-    studentsSubmitted: 25,
-    averageTimeSpent: 180, // in minutes
-    averageWordCount: 1650,
-    createdAt: "2023-09-20",
-  },
-  {
-    id: "5",
-    title: "Literary Criticism Review",
-    className: "English 101",
-    dueDate: "2023-10-25",
-    totalStudents: 28,
-    studentsStarted: 28,
-    studentsSubmitted: 27,
-    averageTimeSpent: 175, // in minutes
-    averageWordCount: 1150,
-    createdAt: "2023-10-10",
-  }
 ];
 
 interface TeacherDashboardProps {

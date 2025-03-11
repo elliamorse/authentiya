@@ -1,15 +1,4 @@
-/**
- * This file provides the student assignments page where students can view their
- * assignments across classes, organized by status (in-progress, submitted, all).
- * 
- * Updates:
- * - Added "Submitted" tab to show completed assignments
- * - Enhanced assignment organization by due date
- * - Added ability to click assignments to open them in the document editor
- * - Uses shared assignment data store for consistency with editor
- * - Shows documents created in the editor in the assignments list
- * - Added navigation to the view-only component for submitted assignments
- */
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/layout/Header";
@@ -25,15 +14,75 @@ import {
   CheckCircle, 
   Clock, 
   GraduationCap, 
-  School,
-  FileText,
-  Plus
+  School 
 } from "lucide-react";
-import { useAssignments, Assignment, Class } from "@/lib/student-assignments";
+
+// Mock data for student classes and assignments
+const studentClasses = [
+  {
+    id: "c1",
+    name: "English 101",
+    teacherName: "Dr. Smith",
+    semester: "Fall 2023",
+    assignments: [
+      {
+        id: "1",
+        title: "Essay on American Literature",
+        dueDate: "2023-11-15",
+        status: "in_progress",
+        startedOn: "2023-11-02T14:30:00Z",
+        timeSpent: 120,
+        wordCount: 950,
+      },
+      {
+        id: "4",
+        title: "Poetry Analysis",
+        dueDate: "2023-12-05",
+        status: "not_started",
+        startedOn: null,
+        timeSpent: 0,
+        wordCount: 0,
+      }
+    ]
+  },
+  {
+    id: "c2",
+    name: "Physics 202",
+    teacherName: "Prof. Johnson",
+    semester: "Fall 2023",
+    assignments: [
+      {
+        id: "2",
+        title: "Physics Problem Set",
+        dueDate: "2023-11-18",
+        status: "in_progress",
+        startedOn: "2023-11-08T10:00:00Z",
+        timeSpent: 90,
+        wordCount: 580,
+      }
+    ]
+  },
+  {
+    id: "c3",
+    name: "History 105",
+    teacherName: "Dr. Williams",
+    semester: "Fall 2023",
+    assignments: [
+      {
+        id: "3",
+        title: "History Research Paper",
+        dueDate: "2023-11-20",
+        status: "not_started",
+        startedOn: null,
+        timeSpent: 0,
+        wordCount: 0,
+      }
+    ]
+  }
+];
 
 export default function StudentAssignments() {
   const navigate = useNavigate();
-  const { assignments } = useAssignments();
   const [activeTab, setActiveTab] = useState<string>("all");
   
   // Format date
@@ -46,30 +95,24 @@ export default function StudentAssignments() {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
   
+  // Get all assignments from all classes
+  const allAssignments = studentClasses.flatMap(cls => 
+    cls.assignments.map(assignment => ({
+      ...assignment,
+      className: cls.name,
+      teacherName: cls.teacherName
+    }))
+  );
+  
   // Filter assignments based on tab
-  const filteredAssignments = assignments.filter(assignment => {
+  const filteredAssignments = allAssignments.filter(assignment => {
     if (activeTab === "all") return true;
     if (activeTab === "active") return assignment.status === "in_progress";
     if (activeTab === "pending") return assignment.status === "not_started";
-    if (activeTab === "submitted") return assignment.status === "submitted";
     return false;
   });
   
-  // Open assignment in editor or view component
-  const handleOpenAssignment = (assignmentId: string) => {
-    // Get the assignment to check its status
-    const assignment = assignments.find(a => a.id === assignmentId);
-    
-    if (assignment && assignment.status === "submitted") {
-      // For submitted assignments, navigate to the view-only component
-      navigate(`/student/view?id=${assignmentId}`);
-    } else {
-      // For other assignments, open in the editor
-      navigate(`/student/editor?id=${assignmentId}`);
-    }
-  };
-  
-  // Group assignments by due date (today, this week, future, past)
+  // Group assignments by due date (today, this week, future)
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
@@ -90,36 +133,12 @@ export default function StudentAssignments() {
     future: filteredAssignments.filter(a => {
       const dueDate = new Date(a.dueDate);
       dueDate.setHours(0, 0, 0, 0);
-      return dueDate > endOfWeek && a.status !== "submitted";
-    }),
-    past: filteredAssignments.filter(a => {
-      const dueDate = new Date(a.dueDate);
-      dueDate.setHours(0, 0, 0, 0);
-      return dueDate < today && a.status === "submitted";
+      return dueDate > endOfWeek;
     })
   };
   
-  // Create a map of classes for display
-  const classesMap: Record<string, { name: string, teacher: string }> = {};
-  assignments.forEach(assignment => {
-    if (!classesMap[assignment.className]) {
-      classesMap[assignment.className] = {
-        name: assignment.className,
-        teacher: assignment.teacherName
-      };
-    }
-  });
-  
-  const studentClasses = Object.keys(classesMap).map(className => ({
-    id: className.toLowerCase().replace(/\s+/g, '-'),
-    name: className,
-    teacherName: classesMap[className].teacher,
-    semester: "Fall 2023",
-    assignments: assignments.filter(a => a.className === className)
-  }));
-  
   // Render badge for assignment status
-  const renderStatusBadge = (status: string, grade?: string) => {
+  const renderStatusBadge = (status: string) => {
     switch (status) {
       case "in_progress":
         return (
@@ -133,12 +152,6 @@ export default function StudentAssignments() {
             <AlertTriangle className="h-3 w-3" /> Not Started
           </Badge>
         );
-      case "submitted":
-        return (
-          <Badge variant="success" className="flex items-center gap-1">
-            <CheckCircle className="h-3 w-3" /> {grade ? `Grade: ${grade}` : "Submitted"}
-          </Badge>
-        );
       default:
         return (
           <Badge variant="success" className="flex items-center gap-1">
@@ -149,7 +162,7 @@ export default function StudentAssignments() {
   };
   
   // Render a section of assignments
-  const renderAssignmentSection = (title: string, assignments: Assignment[]) => {
+  const renderAssignmentSection = (title: string, assignments: any[]) => {
     if (assignments.length === 0) return null;
     
     return (
@@ -162,7 +175,7 @@ export default function StudentAssignments() {
               <CardContent className="p-4">
                 <div className="flex justify-between items-start mb-2">
                   <h4 className="font-medium text-lg font-playfair">{assignment.title}</h4>
-                  {renderStatusBadge(assignment.status, assignment.grade)}
+                  {renderStatusBadge(assignment.status)}
                 </div>
                 
                 <div className="text-sm text-muted-foreground flex gap-1 items-center mb-1">
@@ -193,28 +206,13 @@ export default function StudentAssignments() {
                   </div>
                 )}
                 
-                {assignment.status === "submitted" && (
-                  <div className="mt-2 p-2 bg-green-50/50 dark:bg-green-900/20 rounded border border-green-100 dark:border-green-900/30 text-xs">
-                    <div className="flex justify-between mb-1">
-                      <span>Submitted on:</span>
-                      <span className="font-medium">{formatDate(assignment.submittedOn || '')}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Word count:</span>
-                      <span className="font-medium">{assignment.wordCount}</span>
-                    </div>
-                  </div>
-                )}
-                
                 <Button 
                   variant="default" 
                   size="sm" 
                   className="w-full mt-3 academic-btn-primary"
-                  onClick={() => handleOpenAssignment(assignment.id)}
-                  disabled={false}
+                  onClick={() => navigate("/dashboard")}
                 >
-                  {assignment.status === "not_started" ? "Start Assignment" : 
-                   assignment.status === "submitted" ? "View Submission" : "Continue Working"}
+                  {assignment.status === "not_started" ? "Start Assignment" : "Continue Working"}
                 </Button>
               </CardContent>
             </Card>
@@ -282,28 +280,17 @@ export default function StudentAssignments() {
       />
       
       <main className="flex-1 container py-6 space-y-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold font-playfair text-authentiya-charcoal-darkest dark:text-authentiya-accent-cream">
-              My Assignments
-            </h1>
-            <p className="text-muted-foreground">
-              View and manage all your assignments across classes
-            </p>
-          </div>
-          
-          <Button 
-            onClick={() => navigate("/student/editor")}
-            className="academic-btn-primary gap-2"
-          >
-            <FileText className="h-4 w-4" />
-            <span className="hidden sm:inline">Open Document Editor</span>
-            <span className="sm:hidden">Editor</span>
-          </Button>
+        <div>
+          <h1 className="text-3xl font-bold font-playfair text-authentiya-charcoal-darkest dark:text-authentiya-accent-cream">
+            My Assignments
+          </h1>
+          <p className="text-muted-foreground">
+            View and manage all your assignments across classes
+          </p>
         </div>
         
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4 max-w-md">
+          <TabsList className="grid w-full grid-cols-3 max-w-md">
             <TabsTrigger value="all" className="flex items-center gap-1">
               <BookOpen className="h-4 w-4" />
               <span>All</span>
@@ -316,29 +303,12 @@ export default function StudentAssignments() {
               <AlertTriangle className="h-4 w-4" />
               <span>Not Started</span>
             </TabsTrigger>
-            <TabsTrigger value="submitted" className="flex items-center gap-1">
-              <CheckCircle className="h-4 w-4" />
-              <span>Submitted</span>
-            </TabsTrigger>
           </TabsList>
           
           <TabsContent value="all" className="animate-fade-in">
-            <div className="flex justify-end mb-4">
-              <Button 
-                variant="outline" 
-                size="sm"
-                className="gap-2"
-                onClick={() => navigate("/student/editor")}
-              >
-                <Plus className="h-4 w-4" />
-                New Document
-              </Button>
-            </div>
-            
             {renderAssignmentSection("Due Today", groupedAssignments.today)}
             {renderAssignmentSection("Due This Week", groupedAssignments.thisWeek)}
             {renderAssignmentSection("Future Assignments", groupedAssignments.future)}
-            {renderAssignmentSection("Completed Assignments", groupedAssignments.past)}
             
             {filteredAssignments.length === 0 && (
               <div className="py-12 text-center">
@@ -349,11 +319,11 @@ export default function StudentAssignments() {
           </TabsContent>
           
           <TabsContent value="active" className="animate-fade-in">
-            {renderAssignmentSection("Due Today", groupedAssignments.today.filter(a => a.status === "in_progress"))}
-            {renderAssignmentSection("Due This Week", groupedAssignments.thisWeek.filter(a => a.status === "in_progress"))}
-            {renderAssignmentSection("Future Assignments", groupedAssignments.future.filter(a => a.status === "in_progress"))}
+            {renderAssignmentSection("Due Today", groupedAssignments.today)}
+            {renderAssignmentSection("Due This Week", groupedAssignments.thisWeek)}
+            {renderAssignmentSection("Future Assignments", groupedAssignments.future)}
             
-            {filteredAssignments.filter(a => a.status === "in_progress").length === 0 && (
+            {filteredAssignments.length === 0 && (
               <div className="py-12 text-center">
                 <Clock className="h-12 w-12 mx-auto text-muted-foreground/50" />
                 <p className="mt-4 text-muted-foreground">No active assignments</p>
@@ -362,26 +332,14 @@ export default function StudentAssignments() {
           </TabsContent>
           
           <TabsContent value="pending" className="animate-fade-in">
-            {renderAssignmentSection("Due Today", groupedAssignments.today.filter(a => a.status === "not_started"))}
-            {renderAssignmentSection("Due This Week", groupedAssignments.thisWeek.filter(a => a.status === "not_started"))}
-            {renderAssignmentSection("Future Assignments", groupedAssignments.future.filter(a => a.status === "not_started"))}
+            {renderAssignmentSection("Due Today", groupedAssignments.today)}
+            {renderAssignmentSection("Due This Week", groupedAssignments.thisWeek)}
+            {renderAssignmentSection("Future Assignments", groupedAssignments.future)}
             
-            {filteredAssignments.filter(a => a.status === "not_started").length === 0 && (
+            {filteredAssignments.length === 0 && (
               <div className="py-12 text-center">
                 <AlertTriangle className="h-12 w-12 mx-auto text-muted-foreground/50" />
                 <p className="mt-4 text-muted-foreground">No pending assignments</p>
-              </div>
-            )}
-          </TabsContent>
-          
-          <TabsContent value="submitted" className="animate-fade-in">
-            {renderAssignmentSection("Recently Submitted", groupedAssignments.thisWeek.filter(a => a.status === "submitted"))}
-            {renderAssignmentSection("Past Submissions", groupedAssignments.past)}
-            
-            {filteredAssignments.filter(a => a.status === "submitted").length === 0 && (
-              <div className="py-12 text-center">
-                <CheckCircle className="h-12 w-12 mx-auto text-muted-foreground/50" />
-                <p className="mt-4 text-muted-foreground">No submitted assignments</p>
               </div>
             )}
           </TabsContent>

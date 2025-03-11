@@ -1,15 +1,4 @@
 
-/**
- * This file provides the main dashboard page that serves as a container for either
- * the student or teacher dashboard based on the user's role. It handles role selection,
- * authentication simulation, and logout functionality.
- * 
- * Key features:
- * - Role-based dashboard rendering (student/teacher)
- * - Mock authentication for demo purposes
- * - Role switching functionality
- * - Seamless integration with respective dashboard components
- */
 import { useState, useEffect } from "react";
 import Header from "../components/layout/Header";
 import StudentDashboard from "../components/student/StudentDashboard";
