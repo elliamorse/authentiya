@@ -1,4 +1,12 @@
 
+/**
+ * File: WordCountChart.tsx
+ * 
+ * Description: This component displays a bar chart showing the distribution of word counts
+ * across student assignments. It helps teachers identify patterns in assignment length
+ * and potential areas where students might need support with content development.
+ */
+
 import React from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Card, CardContent } from "@/components/common/Card";
@@ -36,7 +44,6 @@ export function WordCountChart({ data }: WordCountChartProps) {
                 color: '#1F2937'
               }}
               formatter={(value) => [`${value} students`, 'Count']}
-              wrapperStyle={{ zIndex: 1000 }}
             />
             <Bar dataKey="count" fill="#10B981" radius={[4, 4, 0, 0]} />
           </BarChart>

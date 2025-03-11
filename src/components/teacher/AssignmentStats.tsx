@@ -1,4 +1,12 @@
 
+/**
+ * File: AssignmentStats.tsx
+ * 
+ * Description: This component manages and displays various statistics for assignments,
+ * including time distribution, word count distribution, start time patterns, and 
+ * submission status. It processes raw student data into visualizable formats.
+ */
+
 import React, { useMemo } from "react";
 import { Assignment, StudentAssignment } from "@/lib/teacher-data";
 import { TimeDistributionChart } from "./stats/TimeDistributionChart";
@@ -18,11 +26,6 @@ export default function AssignmentStats({ assignment, students = [] }: Assignmen
     // Filter out students with no words written
     const activeStudents = students.filter(s => s.wordCount > 0);
     
-    // Calculate average word count from active students only
-    const avgWordCount = activeStudents.length > 0 
-      ? Math.round(activeStudents.reduce((acc, s) => acc + s.wordCount, 0) / activeStudents.length) 
-      : 0;
-    
     // Group students by their time spent for time distribution
     const timeDistribution = [
       { range: "<30m", count: 0 },
@@ -33,7 +36,7 @@ export default function AssignmentStats({ assignment, students = [] }: Assignmen
     ];
     
     activeStudents.forEach(student => {
-      const mins = student.timeSpent;
+      const mins = student.timeSpent || 0;
       if (mins < 30) timeDistribution[0].count++;
       else if (mins < 60) timeDistribution[1].count++;
       else if (mins < 120) timeDistribution[2].count++;
@@ -51,7 +54,7 @@ export default function AssignmentStats({ assignment, students = [] }: Assignmen
     ];
     
     activeStudents.forEach(student => {
-      const words = student.wordCount;
+      const words = student.wordCount || 0;
       if (words < 500) wordCountDistribution[0].count++;
       else if (words < 750) wordCountDistribution[1].count++;
       else if (words < 1000) wordCountDistribution[2].count++;
@@ -86,7 +89,6 @@ export default function AssignmentStats({ assignment, students = [] }: Assignmen
       .sort((a, b) => a.hour - b.hour);
     
     return {
-      avgWordCount,
       timeDistribution,
       wordCountDistribution,
       statusCounts,
