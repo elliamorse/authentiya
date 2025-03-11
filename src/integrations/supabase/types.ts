@@ -241,6 +241,7 @@ export type Database = {
           content: string | null
           copy_paste_count: number | null
           created_at: string
+          document_name: string | null
           id: string
           last_active: string | null
           start_time: string | null
@@ -257,6 +258,7 @@ export type Database = {
           content?: string | null
           copy_paste_count?: number | null
           created_at?: string
+          document_name?: string | null
           id?: string
           last_active?: string | null
           start_time?: string | null
@@ -273,6 +275,7 @@ export type Database = {
           content?: string | null
           copy_paste_count?: number | null
           created_at?: string
+          document_name?: string | null
           id?: string
           last_active?: string | null
           start_time?: string | null

@@ -58,7 +58,7 @@ export const supabase = createClient<Database>(
   }
 );
 
-// Helper to safely check if a query result has data
+// Helper to safely check if a query result has error
 export const hasError = (
   result: { error: any } | null | undefined
 ): boolean => {
@@ -71,3 +71,11 @@ export function isDataNotError<T>(
 ): data is T {
   return !hasError(data as any);
 }
+
+// Safe accessor for student assignment data
+export const safeStudentAssignment = (assignment: any) => {
+  if (!assignment || hasError(assignment)) {
+    return null;
+  }
+  return assignment;
+};

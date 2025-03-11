@@ -21,13 +21,16 @@ const Dashboard = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center">
-        <p>Loading...</p>
+        <p className="text-lg">Loading...</p>
       </div>
     );
   }
   
-  // Fix: Make sure we render the dashboard even if profile is not fully loaded yet
-  // This prevents getting stuck in a loading state
+  // Don't render anything until authentication is completed
+  if (!isAuthenticated) {
+    return null;
+  }
+  
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
