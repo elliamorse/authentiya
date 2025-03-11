@@ -163,13 +163,9 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
         
         // Show autosaving indicator
         setIsAutoSaving(true);
+        setTimeout(() => setIsAutoSaving(false), 2000);
         
-        // Hide autosaving indicator after 2 seconds
-        setTimeout(() => {
-          setIsAutoSaving(false);
-        }, 2000);
-        
-        // Update assignment in store
+        // Only update if we have a valid currentDocId
         if (currentDocId) {
           const assignment = getAssignment(currentDocId);
           if (assignment) {
@@ -184,7 +180,7 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
           }
         }
       }
-    }, 3000); // Auto-save every 3 seconds
+    }, 3000);
     
     return () => clearInterval(saveInterval);
   }, [content, currentDocId, wordCount]);

@@ -9,8 +9,9 @@
  * - Assignment status tracking
  * 
  * Updates:
- * - Added citationCount and lastActive to Assignment interface
- * - Ensured proper typing for assignment status
+ * - Fixed issue with duplicate assignments being created on auto-save
+ * - Ensured createDocument only creates new documents when necessary
+ * - Added proper type checking for assignment status
  */
 
 import { useState, useEffect } from "react";
@@ -231,30 +232,42 @@ export const useAssignments = () => {
   
   // Function to create a new document/assignment
   const createDocument = (title: string = "Untitled Document", linkedAssignmentId: string | null = null): Assignment => {
-    let newAssignment: Assignment;
-    
+    // If linking to existing assignment, just return that
     if (linkedAssignmentId) {
-      // If linking to existing assignment, update its status
       const existingAssignment = assignments.find(a => a.id === linkedAssignmentId);
       if (existingAssignment) {
-        newAssignment = {
-          ...existingAssignment,
-          status: "in_progress",
-          startedOn: existingAssignment.startedOn || new Date().toISOString(),
-        };
-        updateAssignment(newAssignment);
-        return newAssignment;
+        if (existingAssignment.status !== "in_progress") {
+          const updatedAssignment: Assignment = {
+            ...existingAssignment,
+            status: "in_progress" as AssignmentStatus,
+            startedOn: existingAssignment.startedOn || new Date().toISOString(),
+          };
+          updateAssignment(updatedAssignment);
+          return updatedAssignment;
+        }
+        return existingAssignment;
       }
     }
     
-    // Create a new unlinked document
-    newAssignment = {
+    // Check if we already have a document with this title and no class
+    const existingDoc = assignments.find(a => 
+      a.title === title && 
+      a.className === "Personal Documents" &&
+      !linkedAssignmentId
+    );
+    
+    if (existingDoc) {
+      return existingDoc;
+    }
+    
+    // Create new document only if it doesn't exist
+    const newAssignment: Assignment = {
       id: `new-${Date.now()}`,
       title,
       className: "Personal Documents",
       teacherName: "N/A",
-      dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(), // 2 weeks from now
-      status: "in_progress",
+      dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+      status: "in_progress" as AssignmentStatus,
       startedOn: new Date().toISOString(),
       timeSpent: 0,
       wordCount: 0,
