@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ClipboardCheck, LogOut, Settings, User } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { ThemeToggle } from "../theme/ThemeToggle";
 
 interface HeaderProps {
   userEmail?: string;
@@ -42,7 +43,7 @@ export default function Header({ userEmail, userRole, onLogout }: HeaderProps) {
         <div className="flex gap-6 items-center">
           <Link to="/" className="flex items-center gap-2">
             <ClipboardCheck className="h-6 w-6 text-primary" />
-            <span className="font-bold text-xl hidden sm:inline-block">Authentiya</span>
+            <span className="font-bold text-xl hidden sm:inline-block font-playfair">Authentiya</span>
           </Link>
           
           {userEmail && !isMobile && (
@@ -51,11 +52,11 @@ export default function Header({ userEmail, userRole, onLogout }: HeaderProps) {
                 Dashboard
               </Link>
               {userRole === "student" ? (
-                <Link to="/assignments" className="text-sm font-medium transition-colors hover:text-primary">
+                <Link to="/student/assignments" className="text-sm font-medium transition-colors hover:text-primary">
                   My Assignments
                 </Link>
               ) : (
-                <Link to="/classes" className="text-sm font-medium transition-colors hover:text-primary">
+                <Link to="/teacher" className="text-sm font-medium transition-colors hover:text-primary">
                   My Classes
                 </Link>
               )}
@@ -64,6 +65,8 @@ export default function Header({ userEmail, userRole, onLogout }: HeaderProps) {
         </div>
         
         <div className="flex items-center gap-2">
+          <ThemeToggle />
+          
           {userEmail ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

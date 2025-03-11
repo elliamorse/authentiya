@@ -8,28 +8,33 @@ import Dashboard from "./pages/Dashboard";
 import TeacherClasses from "./pages/teacher/TeacherClasses";
 import TeacherAssignments from "./pages/teacher/TeacherAssignments";
 import TeacherStudentView from "./pages/teacher/TeacherStudentView";
+import StudentAssignments from "./pages/student/StudentAssignments";
 import NotFound from "./pages/NotFound";
+import { ThemeProvider } from "./components/theme/ThemeProvider";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/teacher" element={<TeacherClasses />} />
-          <Route path="/teacher/class/:classId" element={<TeacherAssignments />} />
-          <Route path="/teacher/assignment/:assignmentId" element={<TeacherAssignments />} />
-          <Route path="/teacher/student/:studentId/assignment/:assignmentId" element={<TeacherStudentView />} />
-          <Route path="/assignments" element={<Dashboard />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <ThemeProvider>
+      <TooltipProvider>
+        <Toaster />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/teacher" element={<TeacherClasses />} />
+            <Route path="/teacher/class/:classId" element={<TeacherAssignments />} />
+            <Route path="/teacher/assignment/:assignmentId" element={<TeacherAssignments />} />
+            <Route path="/teacher/student/:studentId/assignment/:assignmentId" element={<TeacherStudentView />} />
+            <Route path="/student/assignments" element={<StudentAssignments />} />
+            <Route path="/assignments" element={<Dashboard />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 

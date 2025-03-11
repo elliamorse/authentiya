@@ -73,8 +73,12 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
     font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply tracking-tight;
   }
 }
 
@@ -108,11 +112,11 @@
   }
 
   .authentiya-heading {
-    @apply text-2xl font-bold text-authentiya-charcoal-dark dark:text-authentiya-accent-gray;
+    @apply text-2xl font-bold text-authentiya-charcoal-dark dark:text-authentiya-accent-gray font-playfair;
   }
 
   .authentiya-subheading {
-    @apply text-lg font-medium text-authentiya-charcoal dark:text-authentiya-accent-cream;
+    @apply text-lg font-medium text-authentiya-charcoal dark:text-authentiya-accent-cream font-playfair;
   }
 
   .authentiya-text {
