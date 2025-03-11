@@ -6,7 +6,8 @@
  * across student assignments. It helps teachers identify patterns in assignment length
  * and potential areas where students might need support with content development.
  * 
- * Update: Fixed data display issues and added better handling for empty data scenarios.
+ * Update: Enhanced visualization with better styling and added support for dark mode.
+ * Improved handling for empty data scenarios and tooltips.
  */
 
 import React from "react";
@@ -40,7 +41,7 @@ export function WordCountChart({ data }: WordCountChartProps) {
                 fontSize={12}
                 tick={{ fill: '#6B7280' }}
                 axisLine={{ stroke: '#4B5563' }}
-                domain={[0, 'auto']}
+                domain={[0, 'dataMax']}
               />
               <Tooltip
                 contentStyle={{ 
@@ -56,7 +57,7 @@ export function WordCountChart({ data }: WordCountChartProps) {
             </BarChart>
           </ResponsiveContainer>
         ) : (
-          <div className="flex items-center justify-center h-[200px] text-muted-foreground">
+          <div className="flex items-center justify-center h-[200px] text-muted-foreground dark:text-gray-400">
             <p>No word count data available</p>
           </div>
         )}

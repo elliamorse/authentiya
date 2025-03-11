@@ -6,7 +6,8 @@
  * using a pie chart. It provides a quick overview of how many students have started,
  * completed, or not yet begun their assignments.
  * 
- * Update: Improved chart rendering and handling of empty data scenarios.
+ * Update: Enhanced visualization with better styling and improved handling of empty data.
+ * Added support for dark mode and improved tooltips.
  */
 
 import React from "react";
@@ -66,7 +67,7 @@ export function StatusPieChart({ notStarted, inProgress, submitted }: StatusPieC
             </ResponsiveContainer>
           </div>
         ) : (
-          <div className="flex items-center justify-center h-[200px] text-muted-foreground">
+          <div className="flex items-center justify-center h-[200px] text-muted-foreground dark:text-gray-400">
             <p>No status data available</p>
           </div>
         )}

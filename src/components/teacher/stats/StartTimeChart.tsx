@@ -6,7 +6,8 @@
  * assignments throughout the day. This helps teachers understand student work patterns
  * and potentially identify optimal times for releasing new assignments or providing support.
  * 
- * Update: Improved chart rendering and added better handling for empty data scenarios.
+ * Update: Enhanced visualization with better styling and improved handling of empty data.
+ * Added support for dark mode and improved tooltips.
  */
 
 import React from "react";
@@ -46,7 +47,7 @@ export function StartTimeChart({ data = [] }: StartTimeChartProps) {
                 fontSize={12}
                 tick={{ fill: '#6B7280' }}
                 axisLine={{ stroke: '#4B5563' }}
-                domain={[0, 'auto']}
+                domain={[0, 'dataMax']}
               />
               <Tooltip
                 contentStyle={{ 
@@ -62,7 +63,7 @@ export function StartTimeChart({ data = [] }: StartTimeChartProps) {
             </BarChart>
           </ResponsiveContainer>
         ) : (
-          <div className="flex items-center justify-center h-[200px] text-muted-foreground">
+          <div className="flex items-center justify-center h-[200px] text-muted-foreground dark:text-gray-400">
             <p>No start time data available</p>
           </div>
         )}

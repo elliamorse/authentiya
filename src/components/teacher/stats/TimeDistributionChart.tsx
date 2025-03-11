@@ -6,13 +6,13 @@
  * spent by students on assignments. The data is grouped into time ranges (e.g., <30m, 30m-1h, etc.)
  * to provide teachers with insights into student work patterns.
  * 
- * Update: Added better handling for empty data scenarios and improved chart display.
+ * Update: Enhanced visualization with better styling and improved handling of empty data.
+ * Added support for dark mode and improved tooltips.
  */
 
 import React from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Card, CardContent } from "@/components/common/Card";
-import { StudentAssignment } from "@/lib/teacher-data";
 
 interface TimeDistributionChartProps {
   data: { range: string; count: number }[];
@@ -41,7 +41,7 @@ export function TimeDistributionChart({ data }: TimeDistributionChartProps) {
                 fontSize={12}
                 tick={{ fill: '#6B7280' }}
                 axisLine={{ stroke: '#4B5563' }}
-                domain={[0, 'auto']}
+                domain={[0, 'dataMax']}
               />
               <Tooltip
                 contentStyle={{ 
@@ -58,7 +58,7 @@ export function TimeDistributionChart({ data }: TimeDistributionChartProps) {
             </BarChart>
           </ResponsiveContainer>
         ) : (
-          <div className="flex items-center justify-center h-[200px] text-muted-foreground">
+          <div className="flex items-center justify-center h-[200px] text-muted-foreground dark:text-gray-400">
             <p>No time distribution data available</p>
           </div>
         )}

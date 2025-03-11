@@ -14,6 +14,8 @@ interface StatisticsCardProps {
 }
 
 export function StatisticsCard({ assignment, students, onViewStudent }: StatisticsCardProps) {
+  console.log("StatisticsCard received students:", students.length);
+  
   return (
     <Card className="md:col-span-2">
       <CardHeader className="pb-2">
@@ -35,7 +37,7 @@ export function StatisticsCard({ assignment, students, onViewStudent }: Statisti
             </TabsTrigger>
           </TabsList>
           <TabsContent value="stats" className="animate-fade-in">
-            <AssignmentStats assignment={assignment} />
+            <AssignmentStats assignment={assignment} students={students} />
           </TabsContent>
           <TabsContent value="students" className="animate-fade-in">
             <StudentList students={students} onViewStudent={onViewStudent} />
