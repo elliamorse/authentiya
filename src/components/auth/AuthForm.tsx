@@ -8,84 +8,41 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { UserCheck, UserPlus, GraduationCap, Briefcase } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 
 type UserRole = "student" | "teacher";
 
 interface AuthFormProps {
   onComplete: (data: { email: string; role: UserRole }) => void;
-  defaultEmail?: string;
 }
 
-export default function AuthForm({ onComplete, defaultEmail = "" }: AuthFormProps) {
+export default function AuthForm({ onComplete }: AuthFormProps) {
   const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
-  const [email, setEmail] = useState(defaultEmail);
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<UserRole>("student");
-  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     
-    try {
-      // Simple validation
-      if (!email || !password) {
-        toast({
-          title: "Error",
-          description: "Please fill in all fields",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      if (activeTab === "login") {
-        // Login with Supabase
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        
-        if (error) throw error;
-        
-        toast({
-          title: "Logged in",
-          description: "Welcome back to Authentiya",
-        });
-        
-      } else {
-        // Sign up with Supabase
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              role: role,
-            },
-          },
-        });
-        
-        if (error) throw error;
-        
-        toast({
-          title: "Account created",
-          description: "Welcome to Authentiya, your account has been created",
-        });
-      }
-      
-      // Pass data to parent component
-      onComplete({ email, role });
-    } catch (error) {
-      console.error("Authentication error:", error);
+    // Simple validation
+    if (!email || !password) {
       toast({
-        title: "Authentication failed",
-        description: error instanceof Error ? error.message : "An unknown error occurred",
+        title: "Error",
+        description: "Please fill in all fields",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
+      return;
     }
+    
+    // Mock authentication - in a real app, this would call an API
+    toast({
+      title: activeTab === "login" ? "Logged in" : "Account created",
+      description: `Welcome to Authentiya${activeTab === "signup" ? ", your account has been created" : ""}`,
+    });
+    
+    // Pass data to parent component
+    onComplete({ email, role });
   };
 
   return (
@@ -136,9 +93,7 @@ export default function AuthForm({ onComplete, defaultEmail = "" }: AuthFormProp
               </div>
             </CardContent>
             <CardFooter>
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Logging in..." : "Login"}
-              </Button>
+              <Button type="submit" className="w-full">Login</Button>
             </CardFooter>
           </form>
         </TabsContent>
@@ -196,9 +151,7 @@ export default function AuthForm({ onComplete, defaultEmail = "" }: AuthFormProp
               </div>
             </CardContent>
             <CardFooter>
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Creating Account..." : "Create Account"}
-              </Button>
+              <Button type="submit" className="w-full">Create Account</Button>
             </CardFooter>
           </form>
         </TabsContent>

@@ -1,20 +1,15 @@
 
-import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase, isDataNotError } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
+import { useState } from "react";
 import { Button } from "@/components/common/Button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/common/Card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/common/Badge";
 import { GraduationCap, BookOpen, Calendar, X } from "lucide-react";
-import { toast } from "sonner";
 
 interface Assignment {
   id: string;
   title: string;
   class: string;
-  class_id: string;
   dueDate: string;
 }
 
@@ -23,122 +18,21 @@ interface AssignmentPromptProps {
   onDismiss: () => void;
 }
 
+const mockAssignments: Assignment[] = [
+  { id: '1', title: 'Essay on American Literature', class: 'English 101', dueDate: '2023-11-15' },
+  { id: '2', title: 'Physics Problem Set', class: 'Physics 202', dueDate: '2023-11-18' },
+  { id: '3', title: 'History Research Paper', class: 'History 105', dueDate: '2023-11-20' },
+];
+
 export default function AssignmentPrompt({ onSelect, onDismiss }: AssignmentPromptProps) {
-  const { user } = useAuth();
   const [selectedClass, setSelectedClass] = useState<string | undefined>();
   const [selectedAssignment, setSelectedAssignment] = useState<string | undefined>();
   
-  // Fetch classes the student is enrolled in
-  const { data: classes, isLoading: classesLoading } = useQuery({
-    queryKey: ["studentClasses"],
-    queryFn: async () => {
-      if (!user) return [];
-      
-      try {
-        const { data, error } = await supabase
-          .from("class_students")
-          .select(`
-            class_id,
-            classes(id, name)
-          `)
-          .eq("student_id", user.id);
-        
-        if (error) throw error;
-        
-        if (!data || data.length === 0) {
-          return [];
-        }
-        
-        return data.map(item => {
-          if (item.classes) {
-            return {
-              id: item.classes.id,
-              name: item.classes.name
-            };
-          }
-          return null;
-        }).filter(Boolean);
-      } catch (error) {
-        console.error("Error fetching classes:", error);
-        toast.error("Failed to load classes");
-        return [];
-      }
-    },
-    enabled: !!user
-  });
+  const filteredAssignments = selectedClass 
+    ? mockAssignments.filter(a => a.class === selectedClass)
+    : mockAssignments;
   
-  // Fetch assignments for the selected class
-  const { data: assignments, isLoading: assignmentsLoading } = useQuery({
-    queryKey: ["classAssignments", selectedClass],
-    queryFn: async () => {
-      if (!selectedClass) return [];
-      
-      try {
-        const { data, error } = await supabase
-          .from("assignments")
-          .select(`
-            id,
-            title,
-            due_date,
-            class_id,
-            classes(name)
-          `)
-          .eq("class_id", selectedClass);
-        
-        if (error) throw error;
-        
-        if (!data || data.length === 0) {
-          return [];
-        }
-        
-        return data.map(item => {
-          if (item && item.classes) {
-            return {
-              id: item.id,
-              title: item.title,
-              class: item.classes.name,
-              class_id: item.class_id,
-              dueDate: item.due_date
-            };
-          }
-          return null;
-        }).filter(Boolean);
-      } catch (error) {
-        console.error("Error fetching assignments:", error);
-        toast.error("Failed to load assignments");
-        return [];
-      }
-    },
-    enabled: !!selectedClass
-  });
-  
-  // Format date
-  const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric' 
-    };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-  };
-  
-  // If no real data, show mock data for demonstration
-  const mockClasses = [
-    { id: 'c1', name: 'English 101' },
-    { id: 'c2', name: 'Physics 202' },
-    { id: 'c3', name: 'History 105' },
-  ];
-  
-  const mockAssignments = [
-    { id: '1', title: 'Essay on American Literature', class: 'English 101', class_id: 'c1', dueDate: '2023-11-15' },
-    { id: '2', title: 'Physics Problem Set', class: 'Physics 202', class_id: 'c2', dueDate: '2023-11-18' },
-    { id: '3', title: 'History Research Paper', class: 'History 105', class_id: 'c3', dueDate: '2023-11-20' },
-  ];
-  
-  // Use real data if available, otherwise use mock data
-  const displayClasses = classes && classes.length > 0 ? classes : mockClasses;
-  const displayAssignments = assignments && assignments.length > 0 ? assignments : 
-                           (selectedClass ? mockAssignments.filter(a => a.class_id === selectedClass) : []);
+  const classes = Array.from(new Set(mockAssignments.map(a => a.class)));
   
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in">
@@ -160,11 +54,11 @@ export default function AssignmentPrompt({ onSelect, onDismiss }: AssignmentProm
                 <SelectValue placeholder="Select a class" />
               </SelectTrigger>
               <SelectContent>
-                {displayClasses.map(c => (
-                  <SelectItem key={c.id} value={c.id}>
+                {classes.map(c => (
+                  <SelectItem key={c} value={c}>
                     <div className="flex items-center gap-2">
                       <GraduationCap className="h-4 w-4 text-muted-foreground" />
-                      {c.name}
+                      {c}
                     </div>
                   </SelectItem>
                 ))}
@@ -183,7 +77,7 @@ export default function AssignmentPrompt({ onSelect, onDismiss }: AssignmentProm
                 <SelectValue placeholder={selectedClass ? "Select an assignment" : "Select a class first"} />
               </SelectTrigger>
               <SelectContent>
-                {displayAssignments.map(a => (
+                {filteredAssignments.map(a => (
                   <SelectItem key={a.id} value={a.id}>
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-2">
@@ -192,7 +86,7 @@ export default function AssignmentPrompt({ onSelect, onDismiss }: AssignmentProm
                       </div>
                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
                         <Calendar className="h-3 w-3" />
-                        Due: {formatDate(a.dueDate)}
+                        Due: {new Date(a.dueDate).toLocaleDateString()}
                       </div>
                     </div>
                   </SelectItem>
@@ -205,12 +99,12 @@ export default function AssignmentPrompt({ onSelect, onDismiss }: AssignmentProm
             <div className="p-3 bg-secondary rounded-md">
               <div className="flex items-center justify-between">
                 <h4 className="font-medium">
-                  {displayAssignments.find(a => a.id === selectedAssignment)?.title}
+                  {mockAssignments.find(a => a.id === selectedAssignment)?.title}
                 </h4>
                 <Badge variant="info">Selected</Badge>
               </div>
               <p className="text-sm text-muted-foreground mt-1">
-                {displayAssignments.find(a => a.id === selectedAssignment)?.class}
+                {mockAssignments.find(a => a.id === selectedAssignment)?.class}
               </p>
             </div>
           )}

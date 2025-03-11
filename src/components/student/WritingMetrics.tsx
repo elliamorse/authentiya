@@ -8,19 +8,15 @@ import { formatDistance } from "date-fns";
 interface WritingMetricsProps {
   startTime: Date;
   wordCount: number;
-  wpm: number;
   copyPasteCount: number;
   citationCount: number;
-  isTyping?: boolean;
 }
 
 export default function WritingMetrics({ 
   startTime, 
-  wordCount,
-  wpm,
+  wordCount, 
   copyPasteCount, 
-  citationCount,
-  isTyping = false
+  citationCount 
 }: WritingMetricsProps) {
   const [elapsedTime, setElapsedTime] = useState<string>("");
   const [totalSeconds, setTotalSeconds] = useState<number>(0);
@@ -45,6 +41,11 @@ export default function WritingMetrics({
     return () => clearInterval(interval);
   }, [startTime]);
   
+  // Calculate words per minute (only if elapsed time > 1 minute)
+  const wordsPerMinute = totalSeconds > 60 
+    ? Math.round((wordCount / (totalSeconds / 60)) * 10) / 10
+    : 0;
+  
   return (
     <div className="space-y-4 animate-fade-in">
       <Card>
@@ -68,15 +69,12 @@ export default function WritingMetrics({
               <Edit3 className="h-4 w-4" />
               <span>Words</span>
             </div>
-            <div className="text-xl font-semibold flex items-center gap-2">
-              {wordCount}
-              {isTyping && (
-                <Badge variant="success" className="animate-pulse">Typing</Badge>
-              )}
-            </div>
-            <div className="text-xs text-muted-foreground mt-1">
-              {wpm > 0 && `${wpm} words/min`}
-            </div>
+            <div className="text-xl font-semibold">{wordCount}</div>
+            {wordsPerMinute > 0 && (
+              <div className="text-xs text-muted-foreground mt-1">
+                {wordsPerMinute} words/min
+              </div>
+            )}
           </div>
           
           <div className="flex flex-col items-center justify-center p-2">

@@ -1,3 +1,4 @@
+
 import { useParams, useNavigate } from "react-router-dom";
 import Header from "../../components/layout/Header";
 import { Button } from "@/components/ui/button";
@@ -26,7 +27,11 @@ export default function TeacherStudentView() {
   if (!studentAssignment || !assignment) {
     return (
       <div className="min-h-screen flex flex-col bg-background">
-        <Header />
+        <Header 
+          userEmail="teacher@example.com" 
+          userRole="teacher" 
+          onLogout={() => navigate("/")} 
+        />
         
         <main className="flex-1 container py-6 space-y-6">
           <Button 
@@ -49,7 +54,11 @@ export default function TeacherStudentView() {
   
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
+      <Header 
+        userEmail="teacher@example.com" 
+        userRole="teacher" 
+        onLogout={() => navigate("/")} 
+      />
       
       <main className="flex-1 container py-6 space-y-6">
         <div className="flex flex-col space-y-6">

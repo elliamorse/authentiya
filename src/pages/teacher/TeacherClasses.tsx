@@ -7,12 +7,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { getClassesForTeacher, ClassInfo } from "@/lib/teacher-data";
 import { Award, BookOpen, Clock, FileText, GraduationCap, Search, Users } from "lucide-react";
-import AddStudentForm from "@/components/teacher/AddStudentForm";
 
 export default function TeacherClasses() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedClass, setSelectedClass] = useState<ClassInfo | null>(null);
   
   // Get classes for this teacher
   const classes = getClassesForTeacher();
@@ -25,7 +23,11 @@ export default function TeacherClasses() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
+      <Header 
+        userEmail="teacher@example.com" 
+        userRole="teacher" 
+        onLogout={() => navigate("/")} 
+      />
       
       <main className="flex-1 container py-6 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -49,23 +51,6 @@ export default function TeacherClasses() {
           </div>
         </div>
         
-        {selectedClass && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Add Students to {selectedClass.name}</CardTitle>
-              <CardDescription>
-                Invite students to join this class
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <AddStudentForm 
-                classId={selectedClass.id} 
-                className={selectedClass.name} 
-              />
-            </CardContent>
-          </Card>
-        )}
-        
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {filteredClasses.length === 0 ? (
             <div className="md:col-span-2 lg:col-span-3 text-center py-12">
@@ -78,8 +63,7 @@ export default function TeacherClasses() {
               <ClassCard 
                 key={classInfo.id} 
                 classInfo={classInfo} 
-                onClick={() => navigate(`/teacher/class/${classInfo.id}`)}
-                onAddStudents={() => setSelectedClass(classInfo)}
+                onClick={() => navigate(`/teacher/class/${classInfo.id}`)} 
               />
             ))
           )}
@@ -92,10 +76,9 @@ export default function TeacherClasses() {
 interface ClassCardProps {
   classInfo: ClassInfo;
   onClick: () => void;
-  onAddStudents: () => void;
 }
 
-function ClassCard({ classInfo, onClick, onAddStudents }: ClassCardProps) {
+function ClassCard({ classInfo, onClick }: ClassCardProps) {
   const subjectIconMap = {
     "English": BookOpen,
     "Math": FileText,
@@ -136,26 +119,13 @@ function ClassCard({ classInfo, onClick, onAddStudents }: ClassCardProps) {
             </span>
           </div>
         </div>
-        <div className="flex flex-col sm:flex-row gap-2">
-          <Button 
-            variant="default" 
-            className="w-full academic-btn-primary"
-            onClick={onClick}
-          >
-            View Class
-          </Button>
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={(e) => {
-              e.stopPropagation();
-              onAddStudents();
-            }}
-          >
-            <Users className="h-4 w-4 mr-2" />
-            Add Students
-          </Button>
-        </div>
+        <Button 
+          variant="default" 
+          className="w-full academic-btn-primary"
+          onClick={onClick}
+        >
+          View Class
+        </Button>
       </CardContent>
     </Card>
   );
