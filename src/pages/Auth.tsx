@@ -1,19 +1,29 @@
 
+/**
+ * Auth.tsx
+ * 
+ * This file contains the authentication page component that handles user login,
+ * registration, and processing invitation links for classes.
+ */
+
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { AuthForm } from '../components/auth/AuthForm';
+import AuthForm from '../components/auth/AuthForm';  // Corrected import statement
 import { supabase } from '../integrations/supabase/client';
 import { toast } from 'sonner';
+
+// Define an interface for invitation data 
+interface InvitationData {
+  invitation_id: string;
+  class_id: string;
+  class_name: string;
+}
 
 const Auth = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(true);
-  const [invitation, setInvitation] = useState<{
-    invitation_id: string;
-    class_id: string;
-    class_name: string;
-  } | null>(null);
+  const [invitation, setInvitation] = useState<InvitationData | null>(null);
 
   const searchParams = new URLSearchParams(location.search);
   const inviteCode = searchParams.get('invite');
@@ -57,11 +67,7 @@ const Auth = () => {
   const checkInvitation = async (studentEmail: string, code: string) => {
     try {
       // Check if invitation is valid
-      const { data, error } = await supabase.rpc<{
-        invitation_id: string;
-        class_id: string;
-        class_name: string;
-      }>('check_student_invitation', {
+      const { data, error } = await supabase.rpc<InvitationData[]>('check_student_invitation', {
         student_email: studentEmail,
         invite_code: code
       });
@@ -81,11 +87,7 @@ const Auth = () => {
   const processInvitation = async (userId: string, studentEmail: string, code: string) => {
     try {
       // Check if invitation is valid
-      const { data, error } = await supabase.rpc<{
-        invitation_id: string;
-        class_id: string;
-        class_name: string;
-      }>('check_student_invitation', {
+      const { data, error } = await supabase.rpc<InvitationData[]>('check_student_invitation', {
         student_email: studentEmail,
         invite_code: code
       });
