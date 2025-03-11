@@ -14,6 +14,11 @@
  * - Theme provider for dark/light mode
  * - Toast notifications
  * - Tooltips
+ * 
+ * Updates:
+ * - Improved routing for student editor with ID parameter
+ * - Fixed path for student assignments
+ * - Added route for editor with assignment ID parameter
  */
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";

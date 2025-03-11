@@ -1,4 +1,14 @@
 
+/**
+ * This file provides a component for viewing a student's work on an assignment.
+ * It displays the content of a student's submission with options to filter by 
+ * different content types (all content, paragraphs, citations).
+ * 
+ * Updates:
+ * - Added dummy content display
+ * - Improved the empty state messaging
+ * - Fixed formatting of student work content
+ */
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Clock, Filter } from "lucide-react";
@@ -24,6 +34,36 @@ export const StudentWorkView: React.FC<StudentWorkViewProps> = ({ studentAssignm
     };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
+
+  // Generate dummy content if none exists
+  const getDisplayContent = () => {
+    // If there's no content and assignment is not started
+    if (!studentAssignment.content && studentAssignment.status === "not_started") {
+      return null;
+    }
+    
+    // If there's no content but assignment is in progress or submitted
+    if (!studentAssignment.content && (studentAssignment.status === "in_progress" || studentAssignment.status === "submitted")) {
+      return "The student has started this assignment but has not added any content yet.";
+    }
+    
+    // Mock content for demo purposes if none provided
+    const content = studentAssignment.content || `
+      This is a sample essay on the assigned topic.
+      
+      The introduction provides context and establishes the main thesis. This paragraph outlines the key arguments that will be developed in the body of the essay.
+      
+      The first body paragraph presents evidence supporting the first main point. The student has included a quote from a relevant source and provided analysis to connect it to the thesis.
+      
+      The second body paragraph explores a counterargument, demonstrating critical thinking and engagement with multiple perspectives on the topic.
+      
+      The conclusion summarizes the key points and restates the thesis in light of the evidence presented. The student ends with a thought-provoking final statement that invites further reflection.
+    `;
+    
+    return content;
+  };
+
+  const displayContent = getDisplayContent();
 
   return (
     <Card>
@@ -60,8 +100,8 @@ export const StudentWorkView: React.FC<StudentWorkViewProps> = ({ studentAssignm
             </div>
             
             <div className="min-h-[300px] max-h-[500px] overflow-y-auto border rounded-md p-4 bg-background">
-              {studentAssignment.content ? (
-                <p className="whitespace-pre-line">{studentAssignment.content}</p>
+              {displayContent ? (
+                <div className="whitespace-pre-line">{displayContent}</div>
               ) : (
                 <p className="text-muted-foreground italic">No content yet</p>
               )}

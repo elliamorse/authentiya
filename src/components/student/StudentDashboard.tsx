@@ -8,7 +8,8 @@
  * - Default document name comes from linked assignment
  * - Improved session time tracking to only show active typing time
  * - Implemented autosaving with visual indicator
- * - Removed manual save and simulate paste buttons
+ * - New documents are added to My Assignments page
+ * - Documents use the shared assignment data store
  */
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
@@ -25,22 +26,17 @@ import {
   Quote, 
   SendHorizontal
 } from "lucide-react";
+import { useAssignments, mockAssignments } from "@/lib/student-assignments";
 
 interface StudentDashboardProps {
   userEmail: string | null;
   onLogout: () => void;
 }
 
-// Mock assignments data for demo purposes
-const mockAssignments = [
-  { id: '1', title: 'Essay on American Literature', class: 'English 101', dueDate: '2023-11-15' },
-  { id: '2', title: 'Physics Problem Set', class: 'Physics 202', dueDate: '2023-11-18' },
-  { id: '3', title: 'History Research Paper', class: 'History 105', dueDate: '2023-11-20' },
-];
-
 export default function StudentDashboard({ userEmail, onLogout }: StudentDashboardProps) {
   const navigate = useNavigate();
   const editorRef = useRef<HTMLDivElement>(null);
+  const { assignments, updateAssignment, getAssignment, createDocument } = useAssignments();
   
   const [showAssignmentPrompt, setShowAssignmentPrompt] = useState(false);
   const [linkedAssignment, setLinkedAssignment] = useState<string | null>(null);
@@ -57,6 +53,7 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
   const [documentName, setDocumentName] = useState("Untitled Document");
   const [showSubmitDialog, setShowSubmitDialog] = useState(false);
   const [isAutoSaving, setIsAutoSaving] = useState(false);
+  const [currentDocId, setCurrentDocId] = useState<string | null>(null);
   
   // Prompt for assignment linking on first load if no assignment is linked
   useEffect(() => {
@@ -64,22 +61,72 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
     const savedDocumentName = window.localStorage.getItem("documentName");
     const savedContent = window.localStorage.getItem("documentContent");
     
+    // Check if we're editing an existing assignment from URL params
+    const urlParams = new URLSearchParams(window.location.search);
+    const assignmentId = urlParams.get('id');
+    
+    if (assignmentId) {
+      // Load the assignment from our store
+      const assignment = getAssignment(assignmentId);
+      if (assignment) {
+        setLinkedAssignment(assignmentId);
+        setAssignmentDetails({ id: assignmentId, title: assignment.title });
+        setDocumentName(assignment.title);
+        setContent(assignment.content || '');
+        setCopyPasteCount(assignment.copyPasteCount || 0);
+        setWordCount(assignment.wordCount);
+        setCurrentDocId(assignmentId);
+        
+        // Initialize editor with content
+        if (editorRef.current && assignment.content) {
+          editorRef.current.innerHTML = assignment.content;
+        }
+        
+        // Update localStorage
+        window.localStorage.setItem("linkedAssignment", assignmentId);
+        window.localStorage.setItem("documentName", assignment.title);
+        window.localStorage.setItem("documentContent", assignment.content || '');
+        
+        // Mark as in progress if it wasn't already
+        if (assignment.status === "not_started") {
+          const updatedAssignment = {
+            ...assignment,
+            status: "in_progress",
+            startedOn: new Date().toISOString()
+          };
+          updateAssignment(updatedAssignment);
+        }
+        
+        return;
+      }
+    }
+    
     if (savedLinkedAssignment) {
       setLinkedAssignment(savedLinkedAssignment);
       
       // Find assignment details to set document name
-      const assignment = mockAssignments.find(a => a.id === savedLinkedAssignment);
+      const assignment = assignments.find(a => a.id === savedLinkedAssignment);
       if (assignment) {
-        setAssignmentDetails(assignment);
+        setAssignmentDetails({ id: savedLinkedAssignment, title: assignment.title });
+        setCurrentDocId(savedLinkedAssignment);
+        
         // Only use assignment title if no custom document name was saved
         if (!savedDocumentName) {
           setDocumentName(assignment.title);
           window.localStorage.setItem("documentName", assignment.title);
         }
+      } else {
+        // Create a new document and link it to this ID
+        const newDoc = createDocument(savedDocumentName || "Untitled Document", null);
+        setCurrentDocId(newDoc.id);
       }
     } else {
       // Show assignment prompt immediately if no assignment is linked
       setShowAssignmentPrompt(true);
+      
+      // Create a new unlinked document
+      const newDoc = createDocument("Untitled Document", null);
+      setCurrentDocId(newDoc.id);
     }
     
     // Load saved document name if exists
@@ -99,7 +146,7 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
     
     // Initialize start time
     setStartTime(new Date());
-  }, []);
+  }, [assignments]);
   
   // Auto-save effect
   useEffect(() => {
@@ -117,11 +164,25 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
         setTimeout(() => {
           setIsAutoSaving(false);
         }, 2000);
+        
+        // Update assignment in our store
+        if (currentDocId) {
+          const assignment = getAssignment(currentDocId);
+          if (assignment) {
+            updateAssignment({
+              ...assignment,
+              content: newContent,
+              wordCount,
+              timeSpent: assignment.timeSpent + 1,
+              lastActive: new Date().toISOString()
+            });
+          }
+        }
       }
     }, 3000); // Auto-save every 3 seconds
     
     return () => clearInterval(saveInterval);
-  }, [content]);
+  }, [content, currentDocId, wordCount]);
   
   // Add event listeners for copy-paste detection
   useEffect(() => {
@@ -143,6 +204,17 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
           toast.info("Content pasted", {
             description: "Please cite your source"
           });
+          
+          // Update assignment in store
+          if (currentDocId) {
+            const assignment = getAssignment(currentDocId);
+            if (assignment) {
+              updateAssignment({
+                ...assignment,
+                copyPasteCount: (assignment.copyPasteCount || 0) + 1
+              });
+            }
+          }
         }
       }
     };
@@ -159,7 +231,7 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
         editor.removeEventListener('paste', handlePasteEvent);
       }
     };
-  }, [linkedAssignment, editorRef]);
+  }, [linkedAssignment, editorRef, currentDocId]);
   
   // Track word count
   useEffect(() => {
@@ -169,7 +241,19 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
         const text = editorRef.current?.textContent || "";
         // Count words (split by whitespace)
         const words = text.trim().split(/\s+/);
-        setWordCount(text.trim() === "" ? 0 : words.length);
+        const newWordCount = text.trim() === "" ? 0 : words.length;
+        setWordCount(newWordCount);
+        
+        // Update assignment in store if word count changed
+        if (currentDocId && newWordCount !== wordCount) {
+          const assignment = getAssignment(currentDocId);
+          if (assignment) {
+            updateAssignment({
+              ...assignment,
+              wordCount: newWordCount
+            });
+          }
+        }
       };
       
       // Initial calculation
@@ -185,20 +269,44 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
       
       return () => observer.disconnect();
     }
-  }, []);
+  }, [currentDocId]);
   
   const handleLinkAssignment = (assignmentId: string) => {
     setLinkedAssignment(assignmentId);
     
     // Find assignment details
-    const assignment = mockAssignments.find(a => a.id === assignmentId);
+    const assignment = assignments.find(a => a.id === assignmentId);
     if (assignment) {
-      setAssignmentDetails(assignment);
+      setAssignmentDetails({ id: assignmentId, title: assignment.title });
+      
       // Only set document name if it's still the default
       if (documentName === "Untitled Document") {
         setDocumentName(assignment.title);
         window.localStorage.setItem("documentName", assignment.title);
       }
+      
+      // Update the assignment status to in_progress
+      const updatedAssignment = {
+        ...assignment,
+        status: "in_progress",
+        startedOn: assignment.startedOn || new Date().toISOString()
+      };
+      updateAssignment(updatedAssignment);
+      
+      // Set current document to this assignment
+      setCurrentDocId(assignmentId);
+      
+      // Update content if empty
+      if (content === "" && assignment.content) {
+        setContent(assignment.content);
+        if (editorRef.current) {
+          editorRef.current.innerHTML = assignment.content;
+        }
+      }
+    } else {
+      // Create a new document linked to this assignment ID
+      const newDoc = createDocument(documentName, assignmentId);
+      setCurrentDocId(newDoc.id);
     }
     
     window.localStorage.setItem("linkedAssignment", assignmentId);
@@ -210,11 +318,25 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
   };
   
   const handleDocumentNameChange = (name: string) => {
-    setDocumentName(name);
-    window.localStorage.setItem("documentName", name);
-    toast.success("Document renamed", {
-      description: `Document is now named "${name}"`
-    });
+    if (name !== documentName) {
+      setDocumentName(name);
+      window.localStorage.setItem("documentName", name);
+      
+      // Update assignment in store
+      if (currentDocId) {
+        const assignment = getAssignment(currentDocId);
+        if (assignment) {
+          updateAssignment({
+            ...assignment,
+            title: name
+          });
+        }
+      }
+      
+      toast.success("Document renamed", {
+        description: `Document is now named "${name}"`
+      });
+    }
   };
   
   const handleFormatCommand = (command: string, value?: string) => {
@@ -237,6 +359,17 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
       setTimeout(() => {
         setIsAutoSaving(false);
       }, 2000);
+      
+      // Update assignment in store
+      if (currentDocId) {
+        const assignment = getAssignment(currentDocId);
+        if (assignment) {
+          updateAssignment({
+            ...assignment,
+            content: editorRef.current.innerHTML
+          });
+        }
+      }
     }
   };
   
@@ -293,6 +426,18 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
       setTimeout(() => {
         setIsAutoSaving(false);
       }, 2000);
+      
+      // Update assignment in store
+      if (currentDocId) {
+        const assignment = getAssignment(currentDocId);
+        if (assignment) {
+          updateAssignment({
+            ...assignment,
+            content: editorRef.current.innerHTML,
+            citationCount: (assignment.citationCount || 0) + 1
+          });
+        }
+      }
     }
     
     toast.success("Citation added", {
@@ -301,14 +446,30 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
   };
   
   const handleSubmitAssignment = (classId: string, assignmentId: string) => {
-    // In a real app, this would make an API call
+    // Update the assignment status to submitted
+    if (currentDocId) {
+      const assignment = getAssignment(currentDocId);
+      if (assignment) {
+        const updatedAssignment = {
+          ...assignment,
+          status: "submitted" as const,
+          submittedOn: new Date().toISOString()
+        };
+        updateAssignment(updatedAssignment);
+      }
+    }
+    
+    // Clear localStorage
+    window.localStorage.removeItem("linkedAssignment");
+    window.localStorage.removeItem("documentName");
+    window.localStorage.removeItem("documentContent");
+    
     toast.success("Assignment submitted", {
       description: "Your assignment has been successfully submitted"
     });
     
-    // Reset state if needed
-    setLinkedAssignment(null);
-    window.localStorage.removeItem("linkedAssignment");
+    // Navigate to assignments page
+    navigate("/student/assignments");
   };
   
   return (
@@ -384,6 +545,18 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
               className="gap-1"
               onClick={() => {
                 setCitationCount(prev => prev + 1);
+                
+                // Update assignment in store
+                if (currentDocId) {
+                  const assignment = getAssignment(currentDocId);
+                  if (assignment) {
+                    updateAssignment({
+                      ...assignment,
+                      citationCount: (assignment.citationCount || 0) + 1
+                    });
+                  }
+                }
+                
                 toast.success("Citation added", {
                   description: "Manual citation added"
                 });

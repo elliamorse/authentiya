@@ -7,7 +7,9 @@
  * - Added "Submitted" tab to show completed assignments
  * - Enhanced assignment organization by due date
  * - Added ability to click assignments to open them in the document editor
- * - Added dummy data for all assignment states
+ * - Uses shared assignment data store for consistency with editor
+ * - Shows documents created in the editor in the assignments list
+ * - Added dummy content for all assignment states
  */
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -28,117 +30,11 @@ import {
   FileText,
   Plus
 } from "lucide-react";
-
-// Mock data for student classes and assignments with various statuses
-const studentClasses = [
-  {
-    id: "c1",
-    name: "English 101",
-    teacherName: "Dr. Smith",
-    semester: "Fall 2023",
-    assignments: [
-      {
-        id: "1",
-        title: "Essay on American Literature",
-        dueDate: "2023-11-15",
-        status: "in_progress",
-        startedOn: "2023-11-02T14:30:00Z",
-        timeSpent: 120,
-        wordCount: 950,
-      },
-      {
-        id: "4",
-        title: "Poetry Analysis",
-        dueDate: "2023-12-05",
-        status: "not_started",
-        startedOn: null,
-        timeSpent: 0,
-        wordCount: 0,
-      },
-      {
-        id: "5",
-        title: "Literary Criticism Review",
-        dueDate: "2023-10-25",
-        status: "submitted",
-        startedOn: "2023-10-15T09:20:00Z",
-        submittedOn: "2023-10-23T16:45:00Z",
-        timeSpent: 180,
-        wordCount: 1200,
-        grade: "A-"
-      },
-      {
-        id: "6",
-        title: "Short Story Analysis",
-        dueDate: "2023-09-18",
-        status: "submitted",
-        startedOn: "2023-09-10T11:30:00Z",
-        submittedOn: "2023-09-17T14:20:00Z",
-        timeSpent: 150,
-        wordCount: 800,
-        grade: "B+"
-      }
-    ]
-  },
-  {
-    id: "c2",
-    name: "Physics 202",
-    teacherName: "Prof. Johnson",
-    semester: "Fall 2023",
-    assignments: [
-      {
-        id: "2",
-        title: "Physics Problem Set",
-        dueDate: "2023-11-18",
-        status: "in_progress",
-        startedOn: "2023-11-08T10:00:00Z",
-        timeSpent: 90,
-        wordCount: 580,
-      },
-      {
-        id: "7",
-        title: "Lab Report: Pendulum Motion",
-        dueDate: "2023-10-10",
-        status: "submitted",
-        startedOn: "2023-10-02T13:15:00Z",
-        submittedOn: "2023-10-09T15:30:00Z",
-        timeSpent: 200,
-        wordCount: 1500,
-        grade: "A"
-      }
-    ]
-  },
-  {
-    id: "c3",
-    name: "History 105",
-    teacherName: "Dr. Williams",
-    semester: "Fall 2023",
-    assignments: [
-      {
-        id: "3",
-        title: "History Research Paper",
-        dueDate: "2023-11-20",
-        status: "not_started",
-        startedOn: null,
-        timeSpent: 0,
-        wordCount: 0,
-      },
-      {
-        id: "8",
-        title: "World War II Analysis",
-        dueDate: "2023-09-30",
-        status: "submitted",
-        startedOn: "2023-09-20T08:45:00Z",
-        submittedOn: "2023-09-29T17:10:00Z",
-        timeSpent: 240,
-        wordCount: 1800,
-        grade: "A+"
-      }
-    ]
-  }
-];
+import { useAssignments, Assignment, Class } from "@/lib/student-assignments";
 
 export default function StudentAssignments() {
   const navigate = useNavigate();
+  const { assignments } = useAssignments();
   const [activeTab, setActiveTab] = useState<string>("all");
   
   // Format date
@@ -151,17 +47,8 @@ export default function StudentAssignments() {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
   
-  // Get all assignments from all classes
-  const allAssignments = studentClasses.flatMap(cls => 
-    cls.assignments.map(assignment => ({
-      ...assignment,
-      className: cls.name,
-      teacherName: cls.teacherName
-    }))
-  );
-  
   // Filter assignments based on tab
-  const filteredAssignments = allAssignments.filter(assignment => {
+  const filteredAssignments = assignments.filter(assignment => {
     if (activeTab === "all") return true;
     if (activeTab === "active") return assignment.status === "in_progress";
     if (activeTab === "pending") return assignment.status === "not_started";
@@ -169,13 +56,9 @@ export default function StudentAssignments() {
     return false;
   });
   
-  // Open assignment in editor and store assignment ID
+  // Open assignment in editor
   const handleOpenAssignment = (assignmentId: string) => {
-    // Save assignment ID to localStorage to link it in the editor
-    window.localStorage.setItem("linkedAssignment", assignmentId);
-    
-    // Navigate to editor
-    navigate("/student/editor");
+    navigate(`/student/editor?id=${assignmentId}`);
   };
   
   // Group assignments by due date (today, this week, future, past)
@@ -208,6 +91,25 @@ export default function StudentAssignments() {
     })
   };
   
+  // Create a map of classes for display
+  const classesMap: Record<string, { name: string, teacher: string }> = {};
+  assignments.forEach(assignment => {
+    if (!classesMap[assignment.className]) {
+      classesMap[assignment.className] = {
+        name: assignment.className,
+        teacher: assignment.teacherName
+      };
+    }
+  });
+  
+  const studentClasses = Object.keys(classesMap).map(className => ({
+    id: className.toLowerCase().replace(/\s+/g, '-'),
+    name: className,
+    teacherName: classesMap[className].teacher,
+    semester: "Fall 2023",
+    assignments: assignments.filter(a => a.className === className)
+  }));
+  
   // Render badge for assignment status
   const renderStatusBadge = (status: string, grade?: string) => {
     switch (status) {
@@ -239,7 +141,7 @@ export default function StudentAssignments() {
   };
   
   // Render a section of assignments
-  const renderAssignmentSection = (title: string, assignments: any[]) => {
+  const renderAssignmentSection = (title: string, assignments: Assignment[]) => {
     if (assignments.length === 0) return null;
     
     return (
@@ -287,7 +189,7 @@ export default function StudentAssignments() {
                   <div className="mt-2 p-2 bg-green-50/50 dark:bg-green-900/20 rounded border border-green-100 dark:border-green-900/30 text-xs">
                     <div className="flex justify-between mb-1">
                       <span>Submitted on:</span>
-                      <span className="font-medium">{formatDate(assignment.submittedOn)}</span>
+                      <span className="font-medium">{formatDate(assignment.submittedOn || '')}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Word count:</span>
@@ -442,7 +344,7 @@ export default function StudentAssignments() {
             {renderAssignmentSection("Due This Week", groupedAssignments.thisWeek.filter(a => a.status === "in_progress"))}
             {renderAssignmentSection("Future Assignments", groupedAssignments.future.filter(a => a.status === "in_progress"))}
             
-            {filteredAssignments.length === 0 && (
+            {filteredAssignments.filter(a => a.status === "in_progress").length === 0 && (
               <div className="py-12 text-center">
                 <Clock className="h-12 w-12 mx-auto text-muted-foreground/50" />
                 <p className="mt-4 text-muted-foreground">No active assignments</p>
@@ -455,7 +357,7 @@ export default function StudentAssignments() {
             {renderAssignmentSection("Due This Week", groupedAssignments.thisWeek.filter(a => a.status === "not_started"))}
             {renderAssignmentSection("Future Assignments", groupedAssignments.future.filter(a => a.status === "not_started"))}
             
-            {filteredAssignments.length === 0 && (
+            {filteredAssignments.filter(a => a.status === "not_started").length === 0 && (
               <div className="py-12 text-center">
                 <AlertTriangle className="h-12 w-12 mx-auto text-muted-foreground/50" />
                 <p className="mt-4 text-muted-foreground">No pending assignments</p>
