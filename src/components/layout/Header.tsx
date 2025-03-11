@@ -13,6 +13,7 @@ import {
 import { ClipboardCheck, LogOut, Settings, User } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ThemeToggle } from "../theme/ThemeToggle";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface HeaderProps {
   userEmail?: string;
@@ -23,6 +24,11 @@ interface HeaderProps {
 export default function Header({ userEmail, userRole, onLogout }: HeaderProps) {
   const isMobile = useIsMobile();
   const [scrolled, setScrolled] = useState(false);
+  const auth = useAuth();
+  
+  // Use context auth if available, otherwise use props (for backward compatibility)
+  const email = auth.user?.email || userEmail;
+  const handleLogout = onLogout || auth.signOut;
   
   // Add scroll effect
   if (typeof window !== 'undefined') {
@@ -46,7 +52,7 @@ export default function Header({ userEmail, userRole, onLogout }: HeaderProps) {
             <span className="font-bold text-xl hidden sm:inline-block font-playfair">Authentiya</span>
           </Link>
           
-          {userEmail && !isMobile && (
+          {email && !isMobile && (
             <nav className="flex items-center gap-6">
               <Link to="/dashboard" className="text-sm font-medium transition-colors hover:text-primary">
                 Dashboard
@@ -67,12 +73,12 @@ export default function Header({ userEmail, userRole, onLogout }: HeaderProps) {
         <div className="flex items-center gap-2">
           <ThemeToggle />
           
-          {userEmail ? (
+          {email ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="gap-2">
                   <User className="h-4 w-4" />
-                  <span className="hidden sm:inline">{userEmail}</span>
+                  <span className="hidden sm:inline">{email}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
@@ -91,7 +97,7 @@ export default function Header({ userEmail, userRole, onLogout }: HeaderProps) {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem 
-                  onClick={onLogout}
+                  onClick={handleLogout}
                   className="text-destructive focus:text-destructive cursor-pointer"
                 >
                   <LogOut className="mr-2 h-4 w-4" />
@@ -100,7 +106,7 @@ export default function Header({ userEmail, userRole, onLogout }: HeaderProps) {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Link to="/login">
+            <Link to="/auth">
               <Button variant="default" size="sm">Sign In</Button>
             </Link>
           )}

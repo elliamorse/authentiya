@@ -11,10 +11,14 @@
 import HeroSection from '@/components/landing/HeroSection';
 import FeaturesSection from '@/components/landing/FeaturesSection';
 import Footer from '@/components/landing/Footer';
+import Header from '@/components/layout/Header';
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-authentiya-accent-cream to-white dark:from-authentiya-charcoal-dark dark:to-authentiya-charcoal-darkest">
+      {/* Header */}
+      <Header />
+      
       {/* Hero Section */}
       <HeroSection />
       
