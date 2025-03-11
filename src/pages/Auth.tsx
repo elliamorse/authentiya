@@ -72,17 +72,21 @@ const Auth = () => {
   const checkInvitation = async (studentEmail: string, code: string) => {
     try {
       // Check if invitation is valid
-      const { data, error } = await supabase.rpc<InvitationData[]>('check_student_invitation', {
-        student_email: studentEmail,
-        invite_code: code
-      });
+      const { data, error } = await supabase.rpc<{ invitation_id: string; class_id: string; class_name: string; }[]>(
+        'check_student_invitation',
+        { student_email: studentEmail, invite_code: code }
+      );
       
       if (error) throw error;
       
       if (data && data.length > 0) {
         // Get the first item from the array
         const invitationData = data[0];
-        setInvitation(invitationData);
+        setInvitation({
+          invitation_id: invitationData.invitation_id,
+          class_id: invitationData.class_id,
+          class_name: invitationData.class_name
+        });
         toast.info(`You've been invited to join ${invitationData.class_name}`);
       }
     } catch (error) {
@@ -94,10 +98,10 @@ const Auth = () => {
   const processInvitation = async (userId: string, studentEmail: string, code: string) => {
     try {
       // Check if invitation is valid
-      const { data, error } = await supabase.rpc<InvitationData[]>('check_student_invitation', {
-        student_email: studentEmail,
-        invite_code: code
-      });
+      const { data, error } = await supabase.rpc<{ invitation_id: string; class_id: string; class_name: string; }[]>(
+        'check_student_invitation',
+        { student_email: studentEmail, invite_code: code }
+      );
       
       if (error) throw error;
       
@@ -116,10 +120,13 @@ const Auth = () => {
         if (enrollError) throw enrollError;
         
         // Update invitation status to 'accepted'
-        const { error: updateError } = await supabase.rpc('update_invitation_status', {
-          invitation_identifier: invitationData.invitation_id,
-          new_status: 'accepted'
-        });
+        const { error: updateError } = await supabase.rpc(
+          'update_invitation_status',
+          { 
+            invitation_identifier: invitationData.invitation_id,
+            new_status: 'accepted'
+          }
+        );
         
         if (updateError) throw updateError;
         
@@ -167,3 +174,4 @@ const Auth = () => {
 };
 
 export default Auth;
+
