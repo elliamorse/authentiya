@@ -5,6 +5,8 @@
  * including submission statistics, AI usage risk indicators, and time-related metrics.
  * The component serves as a key part of the teacher dashboard, providing at-a-glance
  * information about student progress and potential academic integrity concerns.
+ * 
+ * Updates: Now uses actual calculated statistics from the student data instead of hardcoded values.
  */
 
 import React from "react";
@@ -19,7 +21,7 @@ interface AssignmentOverviewProps {
 }
 
 export function AssignmentOverview({ assignment }: AssignmentOverviewProps) {
-  // Calculate completion percentage
+  // Calculate completion percentage based on actual student data
   const startedPercentage = Math.round((assignment.studentsStarted / assignment.totalStudents) * 100);
   const submittedPercentage = Math.round((assignment.studentsSubmitted / assignment.totalStudents) * 100);
   
@@ -107,7 +109,7 @@ export function AssignmentOverview({ assignment }: AssignmentOverviewProps) {
           <Progress value={submittedPercentage} className="h-2 dark:bg-gray-700" />
         </div>
         
-        {/* New Authentiya AI Usage Risk Metrics Section */}
+        {/* Authentiya AI Usage Risk Metrics Section */}
         <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
           <h4 className="text-sm font-medium mb-2 flex items-center gap-1.5">
             <BarChart className="h-4 w-4 text-authentiya-maroon" />

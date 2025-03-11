@@ -1,6 +1,6 @@
 
 import React from "react";
-import { getStudentsByAssignment } from "@/lib/teacherData";
+import { getAssignmentById, getStudentsByAssignment } from "@/lib/teacherData";
 import { AssignmentOverview } from "./dashboard/AssignmentOverview";
 import { AssignmentSelector } from "./dashboard/AssignmentSelector";
 import { StatisticsCard } from "./dashboard/StatisticsCard";
@@ -54,7 +54,8 @@ export default function TeacherDashboard({
   selectedAssignmentId = "1",
   onAssignmentSelect 
 }: TeacherDashboardProps) {
-  const selectedAssignment = mockAssignments.find(a => a.id === selectedAssignmentId) || mockAssignments[0];
+  // Get the actual assignment data with calculated statistics
+  const selectedAssignment = getAssignmentById(selectedAssignmentId);
   
   // Get students for the selected assignment
   const students = getStudentsByAssignment(selectedAssignmentId);
@@ -63,6 +64,11 @@ export default function TeacherDashboard({
   const handleViewStudent = (studentId: string) => {
     window.location.href = `/teacher/student/${studentId}?assignment=${selectedAssignmentId}`;
   };
+  
+  // If the assignment doesn't exist, show a fallback
+  if (!selectedAssignment) {
+    return <div>Assignment not found</div>;
+  }
   
   return (
     <div className="space-y-6 animate-fade-in">

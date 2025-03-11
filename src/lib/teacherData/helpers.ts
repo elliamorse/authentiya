@@ -25,7 +25,42 @@ export function getAssignmentsForClass(classId: string): Assignment[] {
 
 // Helper function to get a specific assignment by ID
 export function getAssignmentById(assignmentId: string): Assignment | undefined {
-  return mockAssignments.find(assignment => assignment.id === assignmentId);
+  const assignment = mockAssignments.find(assignment => assignment.id === assignmentId);
+  
+  if (assignment) {
+    // Get actual student data for this assignment
+    const studentAssignments = getStudentsByAssignment(assignmentId);
+    
+    // Calculate actual statistics from student data
+    const totalStudents = studentAssignments.length;
+    const studentsStarted = studentAssignments.filter(s => s.status !== 'not_started').length;
+    const studentsSubmitted = studentAssignments.filter(s => s.status === 'submitted').length;
+    
+    // Calculate average time spent (only for students who have started)
+    const startedAssignments = studentAssignments.filter(s => s.status !== 'not_started');
+    const totalTimeSpent = startedAssignments.reduce((sum, s) => sum + s.timeSpent, 0);
+    const averageTimeSpent = startedAssignments.length > 0 
+      ? Math.round(totalTimeSpent / startedAssignments.length) 
+      : 0;
+    
+    // Calculate average word count (only for students who have started)
+    const totalWordCount = startedAssignments.reduce((sum, s) => sum + s.wordCount, 0);
+    const averageWordCount = startedAssignments.length > 0 
+      ? Math.round(totalWordCount / startedAssignments.length) 
+      : 0;
+    
+    // Return assignment with updated statistics
+    return {
+      ...assignment,
+      totalStudents,
+      studentsStarted,
+      studentsSubmitted,
+      averageTimeSpent,
+      averageWordCount
+    };
+  }
+  
+  return assignment;
 }
 
 // Helper function to get classes for the teacher
