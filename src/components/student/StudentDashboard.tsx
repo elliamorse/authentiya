@@ -1,6 +1,9 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import AssignmentPrompt from "./AssignmentPrompt";
 import WritingMetrics from "./WritingMetrics";
 import CitationPrompt from "./CitationPrompt";
@@ -14,45 +17,138 @@ import {
   SendHorizontal 
 } from "lucide-react";
 
-interface StudentDashboardProps {
-  userEmail: string | null;
-  onLogout: () => void;
-}
-
-export default function StudentDashboard({ userEmail, onLogout }: StudentDashboardProps) {
+export default function StudentDashboard() {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   
   const [showAssignmentPrompt, setShowAssignmentPrompt] = useState(false);
-  const [linkedAssignment, setLinkedAssignment] = useState<string | null>(null);
-  const [startTime, setStartTime] = useState<Date | null>(null);
-  const [wordCount, setWordCount] = useState(0);
-  const [copyPasteCount, setCopyPasteCount] = useState(0);
-  const [citationCount, setCitationCount] = useState(0);
+  const [linkedAssignmentId, setLinkedAssignmentId] = useState<string | null>(null);
   const [showCitationPrompt, setShowCitationPrompt] = useState(false);
   const [copiedText, setCopiedText] = useState("");
   const [content, setContent] = useState("");
+  
+  // Get the linked student assignment
+  const { data: studentAssignment, refetch: refetchAssignment } = useQuery({
+    queryKey: ["studentAssignment", linkedAssignmentId],
+    queryFn: async () => {
+      if (!linkedAssignmentId || !user) return null;
+      
+      try {
+        // First check if this student assignment already exists
+        const { data: existing, error } = await supabase
+          .from("student_assignments")
+          .select(`
+            id, 
+            status, 
+            start_time, 
+            submission_time,
+            time_spent,
+            word_count,
+            copy_paste_count,
+            citation_count,
+            content,
+            assignment_id,
+            assignments(title, due_date, classes(name))
+          `)
+          .eq("student_id", user.id)
+          .eq("assignment_id", linkedAssignmentId)
+          .single();
+        
+        if (error && error.code !== "PGRST116") {
+          throw error;
+        }
+        
+        if (existing) {
+          // If there's content, set it
+          if (existing.content) {
+            setContent(existing.content);
+          }
+          
+          return existing;
+        }
+        
+        // If it doesn't exist, create it
+        const now = new Date().toISOString();
+        const { data: created, error: createError } = await supabase
+          .from("student_assignments")
+          .insert({
+            student_id: user.id,
+            assignment_id: linkedAssignmentId,
+            status: "in_progress",
+            start_time: now,
+            last_active: now
+          })
+          .select()
+          .single();
+        
+        if (createError) throw createError;
+        
+        return created;
+      } catch (error) {
+        console.error("Error fetching student assignment:", error);
+        toast.error("Failed to load assignment");
+        return null;
+      }
+    },
+    enabled: !!linkedAssignmentId && !!user,
+  });
+  
+  // Get assignment details
+  const { data: assignment } = useQuery({
+    queryKey: ["assignment", studentAssignment?.assignment_id],
+    queryFn: async () => {
+      if (!studentAssignment?.assignment_id) return null;
+      
+      try {
+        const { data, error } = await supabase
+          .from("assignments")
+          .select(`
+            id,
+            title,
+            due_date,
+            classes(name)
+          `)
+          .eq("id", studentAssignment.assignment_id)
+          .single();
+        
+        if (error) throw error;
+        
+        return data;
+      } catch (error) {
+        console.error("Error fetching assignment details:", error);
+        return null;
+      }
+    },
+    enabled: !!studentAssignment?.assignment_id,
+  });
   
   // Check for saved linked assignment
   useEffect(() => {
     const savedLinkedAssignment = window.localStorage.getItem("linkedAssignment");
     if (savedLinkedAssignment) {
-      setLinkedAssignment(savedLinkedAssignment);
-      setStartTime(new Date());
+      setLinkedAssignmentId(savedLinkedAssignment);
     } else {
       setShowAssignmentPrompt(true);
     }
+    
+    // Cleanup function to update time spent
+    return () => {
+      if (studentAssignment?.id) {
+        updateTimeSpent();
+      }
+    };
   }, []);
   
   // Add event listeners for copy-paste detection
   useEffect(() => {
     const handlePasteEvent = (e: ClipboardEvent) => {
       // Only proceed if we have an active assignment
-      if (linkedAssignment) {
+      if (studentAssignment?.id) {
         const pastedText = e.clipboardData?.getData('text') || "";
         if (pastedText.trim()) {
           setCopiedText(pastedText);
-          setCopyPasteCount(prev => prev + 1);
+          incrementCopyPasteCount();
           setShowCitationPrompt(true);
           
           // Log the paste event
@@ -76,11 +172,75 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
         textarea.removeEventListener('paste', handlePasteEvent);
       }
     };
-  }, [linkedAssignment, textareaRef]);
+  }, [studentAssignment?.id, textareaRef]);
+  
+  // Mutation to update the student assignment
+  const updateAssignmentMutation = useMutation({
+    mutationFn: async (data: any) => {
+      if (!studentAssignment?.id) throw new Error("No assignment linked");
+      
+      const { error } = await supabase
+        .from("student_assignments")
+        .update(data)
+        .eq("id", studentAssignment.id);
+      
+      if (error) throw error;
+      
+      return true;
+    },
+    onSuccess: () => {
+      refetchAssignment();
+    },
+    onError: (error) => {
+      console.error("Error updating assignment:", error);
+      toast.error("Failed to update assignment");
+    }
+  });
+  
+  // Function to update time spent
+  const updateTimeSpent = () => {
+    if (!studentAssignment?.id) return;
+    
+    // Calculate time spent
+    const startTime = studentAssignment.start_time ? new Date(studentAssignment.start_time) : new Date();
+    const now = new Date();
+    const diffMinutes = Math.round((now.getTime() - startTime.getTime()) / (1000 * 60));
+    
+    // Add to the existing time spent
+    const totalTimeSpent = (studentAssignment.time_spent || 0) + diffMinutes;
+    
+    updateAssignmentMutation.mutate({
+      time_spent: totalTimeSpent,
+      last_active: now.toISOString()
+    });
+  };
+  
+  // Increment copy paste count
+  const incrementCopyPasteCount = () => {
+    if (!studentAssignment?.id) return;
+    
+    const newCount = (studentAssignment.copy_paste_count || 0) + 1;
+    updateAssignmentMutation.mutate({
+      copy_paste_count: newCount
+    });
+  };
+  
+  // Save content periodically
+  useEffect(() => {
+    if (!studentAssignment?.id || !content) return;
+    
+    const saveTimer = setTimeout(() => {
+      updateAssignmentMutation.mutate({
+        content,
+        last_active: new Date().toISOString()
+      });
+    }, 3000);
+    
+    return () => clearTimeout(saveTimer);
+  }, [content, studentAssignment?.id]);
   
   const handleLinkAssignment = (assignmentId: string) => {
-    setLinkedAssignment(assignmentId);
-    setStartTime(new Date());
+    setLinkedAssignmentId(assignmentId);
     setShowAssignmentPrompt(false);
     
     window.localStorage.setItem("linkedAssignment", assignmentId);
@@ -96,46 +256,86 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
     
     // Count words (simple splitting by spaces)
     const words = newContent.trim().split(/\s+/);
-    setWordCount(newContent.trim() === "" ? 0 : words.length);
+    const wordCount = newContent.trim() === "" ? 0 : words.length;
+    
+    updateAssignmentMutation.mutate({
+      word_count: wordCount
+    });
   };
   
   // Simulate copy/paste detection
   const handleManualPaste = () => {
-    setCopyPasteCount(prev => prev + 1);
+    incrementCopyPasteCount();
     // Get clipboard text (in a real app, this would access navigator.clipboard)
     // For demo, we'll just simulate it
     setCopiedText("This is a simulated copied text from an external source...");
     setShowCitationPrompt(true);
   };
   
-  const handleAddCitation = (citation: {
+  const handleAddCitation = async (citation: {
     type: "website" | "book" | "ai";
     source: string;
     details?: string;
   }) => {
-    setCitationCount(prev => prev + 1);
-    setShowCitationPrompt(false);
+    if (!studentAssignment?.id || !user) return;
     
-    toast.success("Citation added", {
-      description: `Added citation from ${citation.source}`
-    });
+    try {
+      // Create the citation
+      await supabase
+        .from("citations")
+        .insert({
+          student_assignment_id: studentAssignment.id,
+          type: citation.type,
+          source: citation.source,
+          details: citation.details
+        });
+      
+      // Update citation count
+      const newCount = (studentAssignment.citation_count || 0) + 1;
+      updateAssignmentMutation.mutate({
+        citation_count: newCount
+      });
+      
+      setShowCitationPrompt(false);
+      
+      toast.success("Citation added", {
+        description: `Added citation from ${citation.source}`
+      });
+    } catch (error) {
+      console.error("Error adding citation:", error);
+      toast.error("Failed to add citation");
+    }
   };
   
-  const handleSubmitAssignment = () => {
-    toast.success("Assignment submitted", {
-      description: "Your assignment has been successfully submitted"
-    });
+  const handleSubmitAssignment = async () => {
+    if (!studentAssignment?.id) return;
     
-    // In a real app, this would make an API call to Canvas or similar
-    // Reset state
-    setLinkedAssignment(null);
-    setStartTime(null);
-    setWordCount(0);
-    setCopyPasteCount(0);
-    setCitationCount(0);
-    setContent("");
-    
-    window.localStorage.removeItem("linkedAssignment");
+    try {
+      await supabase
+        .from("student_assignments")
+        .update({
+          status: "submitted",
+          submission_time: new Date().toISOString(),
+          content: content
+        })
+        .eq("id", studentAssignment.id);
+      
+      toast.success("Assignment submitted", {
+        description: "Your assignment has been successfully submitted"
+      });
+      
+      // Reset state
+      setLinkedAssignmentId(null);
+      setContent("");
+      
+      window.localStorage.removeItem("linkedAssignment");
+      
+      // Refetch to get updated data
+      refetchAssignment();
+    } catch (error) {
+      console.error("Error submitting assignment:", error);
+      toast.error("Failed to submit assignment");
+    }
   };
   
   return (
@@ -147,7 +347,7 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
         </div>
         
         <div className="flex items-center gap-2">
-          {linkedAssignment ? (
+          {linkedAssignmentId ? (
             <>
               <div className="bg-authentiya-maroon/10 text-authentiya-maroon px-3 py-1 rounded-full font-medium text-sm flex items-center">
                 <BookOpen className="h-3 w-3 mr-1" />
@@ -174,12 +374,12 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
         </div>
       </div>
       
-      {startTime && (
+      {studentAssignment?.start_time && (
         <WritingMetrics 
-          startTime={startTime} 
-          wordCount={wordCount} 
-          copyPasteCount={copyPasteCount}
-          citationCount={citationCount}
+          startTime={new Date(studentAssignment.start_time)} 
+          wordCount={studentAssignment.word_count || 0} 
+          copyPasteCount={studentAssignment.copy_paste_count || 0}
+          citationCount={studentAssignment.citation_count || 0}
         />
       )}
       
@@ -191,7 +391,7 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
               <h2 className="text-xl font-semibold text-authentiya-charcoal-darkest dark:text-authentiya-accent-cream">My Document</h2>
             </div>
             
-            {startTime && (
+            {studentAssignment?.id && (
               <div className="flex items-center gap-2">
                 <Button 
                   variant="outline" 
@@ -207,10 +407,7 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
                   size="sm" 
                   className="gap-2"
                   onClick={() => {
-                    setCitationCount(prev => prev + 1);
-                    toast.success("Citation added", {
-                      description: "Manual citation added"
-                    });
+                    setShowCitationPrompt(true);
                   }}
                 >
                   <Quote className="h-4 w-4" />
@@ -220,7 +417,7 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
                   size="sm" 
                   className="gap-2 academic-btn-primary"
                   onClick={handleSubmitAssignment}
-                  disabled={!linkedAssignment || wordCount === 0}
+                  disabled={!studentAssignment || studentAssignment.word_count === 0}
                 >
                   <SendHorizontal className="h-4 w-4" />
                   <span className="hidden sm:inline">Submit</span>
@@ -235,6 +432,7 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
             placeholder="Start typing your document here..."
             value={content}
             onChange={handleTextAreaChange}
+            disabled={!studentAssignment?.id}
           ></textarea>
         </div>
       </div>

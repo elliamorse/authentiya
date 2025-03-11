@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/common/Button";
 import { 
   DropdownMenu,
@@ -13,14 +13,12 @@ import {
 import { ClipboardCheck, LogOut, Settings, User } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ThemeToggle } from "../theme/ThemeToggle";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
-interface HeaderProps {
-  userEmail?: string;
-  userRole?: "student" | "teacher";
-  onLogout?: () => void;
-}
-
-export default function Header({ userEmail, userRole, onLogout }: HeaderProps) {
+export default function Header() {
+  const { profile, isAuthenticated, signOut } = useAuth();
+  const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [scrolled, setScrolled] = useState(false);
   
@@ -35,6 +33,16 @@ export default function Header({ userEmail, userRole, onLogout }: HeaderProps) {
     });
   }
   
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      toast.success("Logged out successfully");
+      navigate("/");
+    } catch (error) {
+      toast.error("Error signing out");
+    }
+  };
+  
   return (
     <header className={`sticky top-0 z-40 w-full transition-all duration-300 ${
       scrolled ? "bg-background/80 backdrop-blur-md shadow-sm" : "bg-transparent"
@@ -46,12 +54,12 @@ export default function Header({ userEmail, userRole, onLogout }: HeaderProps) {
             <span className="font-bold text-xl hidden sm:inline-block font-playfair">Authentiya</span>
           </Link>
           
-          {userEmail && !isMobile && (
+          {isAuthenticated && !isMobile && (
             <nav className="flex items-center gap-6">
               <Link to="/dashboard" className="text-sm font-medium transition-colors hover:text-primary">
                 Dashboard
               </Link>
-              {userRole === "student" ? (
+              {profile?.role === "student" ? (
                 <Link to="/student/assignments" className="text-sm font-medium transition-colors hover:text-primary">
                   My Assignments
                 </Link>
@@ -67,12 +75,12 @@ export default function Header({ userEmail, userRole, onLogout }: HeaderProps) {
         <div className="flex items-center gap-2">
           <ThemeToggle />
           
-          {userEmail ? (
+          {isAuthenticated ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="gap-2">
                   <User className="h-4 w-4" />
-                  <span className="hidden sm:inline">{userEmail}</span>
+                  <span className="hidden sm:inline">{profile?.email}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
@@ -91,7 +99,7 @@ export default function Header({ userEmail, userRole, onLogout }: HeaderProps) {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem 
-                  onClick={onLogout}
+                  onClick={handleLogout}
                   className="text-destructive focus:text-destructive cursor-pointer"
                 >
                   <LogOut className="mr-2 h-4 w-4" />
@@ -100,7 +108,7 @@ export default function Header({ userEmail, userRole, onLogout }: HeaderProps) {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Link to="/login">
+            <Link to="/auth">
               <Button variant="default" size="sm">Sign In</Button>
             </Link>
           )}
