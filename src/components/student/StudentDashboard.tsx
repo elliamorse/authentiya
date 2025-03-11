@@ -1,4 +1,12 @@
 
+/**
+ * StudentDashboard.tsx
+ * 
+ * This component renders the main student dashboard including the document editor.
+ * It allows students to write and edit documents, link to assignments, and track metrics.
+ * Document names can be edited with confirmation popups only when actually changed.
+ */
+
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import AssignmentPrompt from "./AssignmentPrompt";
@@ -37,6 +45,7 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
   const [content, setContent] = useState("");
   const [documentName, setDocumentName] = useState("Untitled Document");
   const [isEditingName, setIsEditingName] = useState(false);
+  const [originalDocumentName, setOriginalDocumentName] = useState("Untitled Document");
   
   // Check for saved linked assignment
   useEffect(() => {
@@ -48,6 +57,7 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
       if (savedLinkedAssignmentTitle) {
         setLinkedAssignmentTitle(savedLinkedAssignmentTitle);
         setDocumentName(savedLinkedAssignmentTitle);
+        setOriginalDocumentName(savedLinkedAssignmentTitle);
       }
       setStartTime(new Date());
     } else {
@@ -68,6 +78,7 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
     const savedDocumentName = window.localStorage.getItem("documentName");
     if (savedDocumentName) {
       setDocumentName(savedDocumentName);
+      setOriginalDocumentName(savedDocumentName);
     }
   }, []);
   
@@ -125,6 +136,7 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
     if (assignmentTitle) {
       setLinkedAssignmentTitle(assignmentTitle);
       setDocumentName(assignmentTitle);
+      setOriginalDocumentName(assignmentTitle);
       window.localStorage.setItem("linkedAssignmentTitle", assignmentTitle);
     }
     
@@ -174,6 +186,7 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
     setCitationCount(0);
     setContent("");
     setDocumentName("Untitled Document");
+    setOriginalDocumentName("Untitled Document");
     
     // Clear local storage
     window.localStorage.removeItem("linkedAssignment");
@@ -187,6 +200,10 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
   
   const toggleEditName = () => {
     setIsEditingName(!isEditingName);
+    if (!isEditingName) {
+      // Starting to edit - save the current name as original
+      setOriginalDocumentName(documentName);
+    }
   };
   
   const saveDocumentName = () => {
@@ -196,9 +213,13 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
       setDocumentName(linkedAssignmentTitle || "Untitled Document");
     }
     
-    toast.success("Document renamed", {
-      description: `Saved as "${documentName}"`
-    });
+    // Only show toast if the name actually changed
+    if (documentName !== originalDocumentName) {
+      toast.success("Document renamed", {
+        description: `Saved as "${documentName}"`
+      });
+      setOriginalDocumentName(documentName);
+    }
   };
   
   return (
@@ -258,6 +279,14 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
                     onChange={(e) => setDocumentName(e.target.value)}
                     className="h-8 w-64"
                     autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        saveDocumentName();
+                      } else if (e.key === "Escape") {
+                        setIsEditingName(false);
+                        setDocumentName(originalDocumentName);
+                      }
+                    }}
                   />
                   <Button 
                     variant="ghost" 
@@ -316,10 +345,15 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
           
           <textarea
             ref={textareaRef}
-            className="w-full min-h-[350px] p-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-authentiya-maroon/50 transition-all resize-y text-authentiya-charcoal-darkest dark:text-authentiya-charcoal-darkest bg-white"
+            className="w-full min-h-[350px] p-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-authentiya-maroon/50 transition-all resize-y text-authentiya-charcoal-darkest bg-white dark:bg-white"
             placeholder="Start typing your document here..."
             value={content}
             onChange={handleTextAreaChange}
+            style={{
+              fontFamily: 'serif',
+              fontSize: '16px',
+              lineHeight: '1.6'
+            }}
           ></textarea>
         </div>
       </div>
