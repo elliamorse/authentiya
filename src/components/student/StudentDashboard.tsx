@@ -1,4 +1,3 @@
-
 /**
  * StudentDashboard.tsx
  * 
@@ -6,7 +5,7 @@
  * It allows students to write and edit documents, link to assignments, and track metrics.
  * Document names can be edited with confirmation popups only when actually changed.
  * Now uses a WordProcessor component for a more robust document editing experience.
- * Refactored into smaller components for better maintainability.
+ * No longer shows assignment prompt for already linked assignments.
  */
 
 import { useState, useEffect, useRef } from "react";
@@ -157,6 +156,20 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
   };
   
   const handleSubmitAssignment = () => {
+    const updatedDocuments = window.localStorage.getItem("studentDocuments");
+    if (updatedDocuments) {
+      const documents = JSON.parse(updatedDocuments);
+      const documentIndex = documents.findIndex((doc: any) => 
+        doc.assignmentId === linkedAssignment
+      );
+      
+      if (documentIndex !== -1) {
+        documents[documentIndex].status = "completed";
+        documents[documentIndex].content = content;
+        window.localStorage.setItem("studentDocuments", JSON.stringify(documents));
+      }
+    }
+    
     toast.success("Assignment submitted", {
       description: "Your assignment has been successfully submitted"
     });

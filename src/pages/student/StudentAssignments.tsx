@@ -3,7 +3,8 @@
  * StudentAssignments.tsx
  * 
  * This component displays a list of student assignments and documents.
- * It allows filtering by status and provides navigation to work on assignments.
+ * It allows filtering by status (all, in progress, submitted, not started) and provides navigation to work on assignments.
+ * Updated to properly categorize assignments by status and handle submitted assignments differently.
  */
 
 import React, { useState } from "react";
@@ -63,12 +64,12 @@ export default function StudentAssignments() {
   const filteredAssignments = allAssignments.filter(assignment => {
     if (activeTab === "all") return true;
     if (activeTab === "active") return assignment.status === "in_progress";
+    if (activeTab === "submitted") return assignment.status === "completed";
     if (activeTab === "pending") return assignment.status === "not_started";
     return false;
   });
   
   const filteredDocuments = documents.filter(doc => {
-    if (activeTab !== "documents") return false;
     if (documentStatus === "all") return true;
     return doc.status === documentStatus;
   });
@@ -109,7 +110,12 @@ export default function StudentAssignments() {
       window.localStorage.removeItem("linkedAssignmentTitle");
     }
     
-    navigate("/dashboard");
+    // If it's a completed assignment, show the submission view instead
+    if (doc.status === "completed") {
+      navigate(`/student/submission/${doc.id}`);
+    } else {
+      navigate("/dashboard");
+    }
   };
   
   const renderStatusBadge = (status: string) => {
@@ -135,7 +141,7 @@ export default function StudentAssignments() {
       case "completed":
         return (
           <Badge variant="success" className="flex items-center gap-1">
-            <CheckCircle className="h-3 w-3" /> Complete
+            <CheckCircle className="h-3 w-3" /> Submitted
           </Badge>
         );
       default:
@@ -185,9 +191,9 @@ export default function StudentAssignments() {
               <AlertTriangle className="h-4 w-4" />
               <span>Not Started</span>
             </TabsTrigger>
-            <TabsTrigger value="documents" className="flex items-center gap-1">
-              <FileText className="h-4 w-4" />
-              <span>Documents</span>
+            <TabsTrigger value="submitted" className="flex items-center gap-1">
+              <CheckCircle className="h-4 w-4" />
+              <span>Submitted</span>
             </TabsTrigger>
           </TabsList>
           
@@ -299,18 +305,22 @@ export default function StudentAssignments() {
             )}
           </TabsContent>
           
-          <TabsContent value="documents" className="animate-fade-in">
-            <DocumentsSection
-              documentStatus={documentStatus}
-              setDocumentStatus={setDocumentStatus}
-              filteredDocuments={filteredDocuments}
-              renderStatusBadge={renderStatusBadge}
+          <TabsContent value="submitted" className="animate-fade-in">
+            <AssignmentSection 
+              title="Submitted Assignments" 
+              assignments={filteredAssignments}
               formatDate={formatDate}
-              formatDateTime={formatDateTime}
               onOpenDocument={handleOpenDocument}
               documents={documents}
               setDocuments={setDocuments}
             />
+            
+            {filteredAssignments.length === 0 && (
+              <EmptyState 
+                icon={CheckCircle}
+                message="No submitted assignments"
+              />
+            )}
           </TabsContent>
         </Tabs>
       </main>
