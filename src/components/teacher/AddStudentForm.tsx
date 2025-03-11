@@ -117,9 +117,8 @@ export default function AddStudentForm({ classId, className }: AddStudentFormPro
       // Generate a unique invite code
       const inviteCode = Math.random().toString(36).substring(2, 15);
       
-      // Store invitation in database
-      // Using executeRaw method to work around the type issue
-      const { error } = await supabase.rpc('create_invitation', {
+      // Store invitation in database using the RPC function
+      const { error } = await supabase.rpc("create_invitation", {
         student_email: inviteEmail.toLowerCase().trim(),
         class_identifier: classId,
         invitation_code: inviteCode,

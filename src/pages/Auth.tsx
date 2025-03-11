@@ -1,352 +1,156 @@
-/**
- * Auth.tsx
- * 
- * This page handles authentication flows for the application, including sign-in, sign-up,
- * and processing student invitations from teachers. It supports both standard authentication
- * and invitation-based registration.
- */
 
-import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { toast } from "sonner";
-import { ClipboardCheck, Info } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { AuthForm } from '../components/auth/AuthForm';
+import { supabase } from '../integrations/supabase/client';
+import { toast } from 'sonner';
 
-interface InvitationData {
-  invitation_id: string;
-  class_id: string;
-  class_name: string;
-}
-
-export default function Auth() {
+const Auth = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [role, setRole] = useState<"student" | "teacher">("student");
-  const [activeTab, setActiveTab] = useState("signin");
-  const [inviteInfo, setInviteInfo] = useState<{
-    code: string;
-    email: string;
-    className: string;
+  const [loading, setLoading] = useState(true);
+  const [invitation, setInvitation] = useState<{
+    invitation_id: string;
+    class_id: string;
+    class_name: string;
   } | null>(null);
 
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const inviteCode = params.get('invite');
-    const inviteEmail = params.get('email');
-    const className = params.get('class');
-    
-    if (inviteCode && inviteEmail) {
-      setInviteInfo({
-        code: inviteCode,
-        email: inviteEmail,
-        className: className || "a class"
-      });
-      setEmail(inviteEmail);
-      setActiveTab("signup");
-    }
-  }, [location]);
+  const searchParams = new URLSearchParams(location.search);
+  const inviteCode = searchParams.get('invite');
+  const email = searchParams.get('email');
 
   useEffect(() => {
-    const handleAuthRedirect = async () => {
-      const { data, error } = await supabase.auth.getSession();
-      
-      if (data.session) {
-        navigate("/dashboard");
-      }
-    };
-
-    handleAuthRedirect();
-
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN" && session) {
-        navigate("/dashboard");
-      }
-    });
-
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
-  }, [navigate]);
-
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!email || !password || !firstName || !lastName) {
-      toast.error("Please fill out all fields");
-      return;
-    }
-    
-    try {
+    // Check if user is already authenticated
+    const checkAuth = async () => {
       setLoading(true);
       
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            first_name: firstName,
-            last_name: lastName,
-            role: role
-          }
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session) {
+        // User is already logged in
+        // If there's an invite code and email, process the invitation
+        if (inviteCode && email) {
+          // Accept the invitation
+          await processInvitation(session.user.id, email, inviteCode);
         }
+        
+        // Redirect to dashboard
+        const { data } = await supabase.rpc('get_current_user_role');
+        if (data === 'teacher') {
+          navigate('/teacher/classes');
+        } else {
+          navigate('/dashboard');
+        }
+      } else {
+        // If there's an invite code and email, check the invitation
+        if (inviteCode && email) {
+          await checkInvitation(email, inviteCode);
+        }
+        
+        setLoading(false);
+      }
+    };
+    
+    checkAuth();
+  }, [navigate, inviteCode, email]);
+
+  const checkInvitation = async (studentEmail: string, code: string) => {
+    try {
+      // Check if invitation is valid
+      const { data, error } = await supabase.rpc<{
+        invitation_id: string;
+        class_id: string;
+        class_name: string;
+      }>('check_student_invitation', {
+        student_email: studentEmail,
+        invite_code: code
       });
       
       if (error) throw error;
       
-      if (data.user) {
-        if (inviteInfo && inviteInfo.code) {
-          try {
-            await processInvitation(data.user.id, inviteInfo.code);
-          } catch (inviteError) {
-            console.error("Error processing invitation:", inviteError);
-            toast.error("An error occurred during sign up");
-          }
-        }
-        
-        toast.success("Registration successful! Please check your email for verification");
+      if (data && data.length > 0) {
+        setInvitation(data[0]);
+        toast.info(`You've been invited to join ${data[0].class_name}`);
       }
-    } catch (error: any) {
-      toast.error(error.message || "An error occurred during sign up");
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      console.error('Error checking invitation:', error);
+      toast.error('Invalid invitation code');
     }
   };
 
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!email || !password) {
-      toast.error("Please provide both email and password");
-      return;
-    }
-    
+  const processInvitation = async (userId: string, studentEmail: string, code: string) => {
     try {
-      setLoading(true);
-      
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
+      // Check if invitation is valid
+      const { data, error } = await supabase.rpc<{
+        invitation_id: string;
+        class_id: string;
+        class_name: string;
+      }>('check_student_invitation', {
+        student_email: studentEmail,
+        invite_code: code
       });
       
       if (error) throw error;
       
-      if (data.session) {
-        toast.success("Login successful!");
-        navigate("/dashboard");
-      }
-    } catch (error: any) {
-      toast.error(error.message || "Invalid login credentials");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const processInvitation = async (userId: string, inviteCode: string) => {
-    try {
-      const { data: inviteData, error: inviteError } = await supabase
-        .rpc<InvitationData[]>('check_student_invitation', {
-          student_email: email.toLowerCase().trim(),
-          invite_code: inviteCode
-        });
-      
-      if (inviteError) throw inviteError;
-      
-      if (!inviteData || inviteData.length === 0) {
-        throw new Error("Invalid invitation");
-      }
-      
-      const invitation = inviteData[0];
-      
-      const { error: enrollError } = await supabase
-        .from("class_students")
-        .insert({
-          student_id: userId,
-          class_id: invitation.class_id
-        });
+      if (data && data.length > 0) {
+        const invitationData = data[0];
         
-      if (enrollError) throw enrollError;
-      
-      const { error: updateError } = await supabase
-        .rpc('update_invitation_status', {
-          invitation_identifier: invitation.invitation_id,
+        // Add student to class
+        const { error: enrollError } = await supabase
+          .from('class_students')
+          .insert({
+            student_id: userId,
+            class_id: invitationData.class_id
+          });
+          
+        if (enrollError) throw enrollError;
+        
+        // Update invitation status to 'accepted'
+        const { error: updateError } = await supabase.rpc('update_invitation_status', {
+          invitation_identifier: invitationData.invitation_id,
           new_status: 'accepted'
         });
         
-      if (updateError) throw updateError;
-      
-      return true;
+        if (updateError) throw updateError;
+        
+        toast.success(`You've been added to ${invitationData.class_name}`);
+      }
     } catch (error) {
-      console.error("Error processing invitation:", error);
-      throw error;
+      console.error('Error processing invitation:', error);
+      toast.error('Failed to process invitation');
     }
   };
 
+  const handleSignUpSuccess = async (userId: string, email: string) => {
+    // If there was an invitation, process it
+    if (inviteCode && email && invitation) {
+      await processInvitation(userId, email, inviteCode);
+    }
+    
+    // Redirect to dashboard
+    navigate('/dashboard');
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="loader"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-white to-gray-100 px-4 dark:from-gray-900 dark:to-gray-800">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1 text-center">
-          <div className="flex justify-center mb-2">
-            <ClipboardCheck className="h-12 w-12 text-authentiya-maroon" />
-          </div>
-          <CardTitle className="text-2xl font-bold font-playfair">Authentiya</CardTitle>
-          <CardDescription>Academic integrity tracking application</CardDescription>
-          
-          {inviteInfo && (
-            <Alert className="mt-4 bg-authentiya-maroon/10 text-authentiya-maroon border-authentiya-maroon/20">
-              <Info className="h-4 w-4" />
-              <AlertDescription>
-                You've been invited to join <strong>{inviteInfo.className}</strong>. Create an account to accept the invitation.
-              </AlertDescription>
-            </Alert>
-          )}
-        </CardHeader>
-        
-        <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="signin">Sign In</TabsTrigger>
-            <TabsTrigger value="signup">Sign Up</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="signin">
-            <form onSubmit={handleSignIn}>
-              <CardContent className="space-y-4 pt-4">
-                <div className="space-y-2">
-                  <Label htmlFor="signin-email">Email</Label>
-                  <Input 
-                    id="signin-email" 
-                    type="email" 
-                    placeholder="your@email.com" 
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signin-password">Password</Label>
-                  <Input 
-                    id="signin-password" 
-                    type="password" 
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button 
-                  type="submit" 
-                  className="w-full academic-btn-primary" 
-                  disabled={loading}
-                >
-                  {loading ? "Signing in..." : "Sign In"}
-                </Button>
-              </CardFooter>
-            </form>
-          </TabsContent>
-          
-          <TabsContent value="signup">
-            <form onSubmit={handleSignUp}>
-              <CardContent className="space-y-4 pt-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="first-name">First Name</Label>
-                    <Input 
-                      id="first-name" 
-                      placeholder="John" 
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="last-name">Last Name</Label>
-                    <Input 
-                      id="last-name" 
-                      placeholder="Doe" 
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                      required
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
-                  <Input 
-                    id="signup-email" 
-                    type="email" 
-                    placeholder="your@email.com" 
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={!!inviteInfo}
-                    required
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
-                  <Input 
-                    id="signup-password" 
-                    type="password" 
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>I am a:</Label>
-                  <div className="flex space-x-4">
-                    <div className="flex items-center">
-                      <input
-                        type="radio"
-                        id="role-student"
-                        name="role"
-                        className="mr-2"
-                        checked={role === "student"}
-                        onChange={() => setRole("student")}
-                      />
-                      <Label htmlFor="role-student">Student</Label>
-                    </div>
-                    <div className="flex items-center">
-                      <input
-                        type="radio"
-                        id="role-teacher"
-                        name="role"
-                        className="mr-2"
-                        checked={role === "teacher"}
-                        onChange={() => setRole("teacher")}
-                        disabled={!!inviteInfo}
-                      />
-                      <Label htmlFor="role-teacher">Teacher</Label>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button 
-                  type="submit" 
-                  className="w-full academic-btn-primary" 
-                  disabled={loading}
-                >
-                  {loading ? "Creating Account..." : "Create Account"}
-                </Button>
-              </CardFooter>
-            </form>
-          </TabsContent>
-        </Tabs>
-      </Card>
+    <div className="flex items-center justify-center min-h-screen bg-gray-50 auth-container">
+      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
+        <AuthForm 
+          redirectTo="/dashboard" 
+          defaultEmail={email || ''} 
+          onSignUpSuccess={handleSignUpSuccess}
+          invitation={invitation}
+        />
+      </div>
     </div>
   );
-}
+};
+
+export default Auth;

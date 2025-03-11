@@ -360,9 +360,25 @@ export type Database = {
           class_name: string
         }[]
       }
+      create_invitation: {
+        Args: {
+          student_email: string
+          class_identifier: string
+          invitation_code: string
+          invitation_message?: string
+        }
+        Returns: undefined
+      }
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      update_invitation_status: {
+        Args: {
+          invitation_identifier: string
+          new_status: string
+        }
+        Returns: undefined
       }
     }
     Enums: {
