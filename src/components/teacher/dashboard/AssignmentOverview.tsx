@@ -43,7 +43,7 @@ export function AssignmentOverview({ assignment }: AssignmentOverviewProps) {
             Inactive
           </Badge>
         ) : (
-          <Badge variant="primary" className="flex items-center gap-1 dark:bg-emerald-800 dark:text-emerald-100">
+          <Badge variant="default" className="flex items-center gap-1 dark:bg-emerald-800 dark:text-emerald-100">
             <Clock className="h-3 w-3" />
             Active
           </Badge>
