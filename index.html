@@ -1,27 +1,22 @@
 
-<!DOCTYPE html>
-<html lang="en" class="dark">
+<!doctype html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Authentiya - Academic integrity tracking application" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <title>Authentiya</title>
-    <script>
-      // Check for dark mode preference
-      if (localStorage.getItem('authentiya-theme') === 'dark' ||
-          (!localStorage.getItem('authentiya-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    </script>
+    <title>Authentiya - Academic Integrity Platform</title>
+    <meta name="description" content="Authentiya - A seamless academic integrity browser extension that works in the background, with real-time tracking and reporting at scale.">
+    <meta property="og:title" content="Authentiya" />
+    <meta property="og:description" content="A seamless academic integrity browser extension that works in the background, with real-time tracking and reporting at scale." />
+    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:url" content="https://authentiya.com" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
   </head>
-  <body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+  <body>
     <div id="root"></div>
+    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
