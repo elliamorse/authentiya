@@ -2,12 +2,13 @@
 /**
  * DashboardHeader.tsx
  * 
- * This component displays the dashboard header with title, description,
- * and assignment linking controls.
+ * This component displays the header for the student dashboard.
+ * It has been updated to remove the "Dashboard" title and only shows 
+ * linked assignment information or the option to link an assignment.
  */
 
 import { Button } from "@/components/ui/button";
-import { BookOpen } from "lucide-react";
+import { Link2 } from "lucide-react";
 
 interface DashboardHeaderProps {
   linkedAssignment: string | null;
@@ -19,38 +20,31 @@ export default function DashboardHeader({
   onShowAssignmentPrompt
 }: DashboardHeaderProps) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-      <div>
-        <h1 className="text-3xl font-bold text-authentiya-charcoal-darkest dark:text-authentiya-accent-cream">Student Dashboard</h1>
-        <p className="text-muted-foreground">Track your writing progress and assignments</p>
-      </div>
-      
-      <div className="flex items-center gap-2">
-        {linkedAssignment ? (
-          <>
-            <div className="bg-authentiya-maroon/10 text-authentiya-maroon px-3 py-1 rounded-full font-medium text-sm flex items-center">
-              <BookOpen className="h-3 w-3 mr-1" />
-              Assignment Linked
-            </div>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={onShowAssignmentPrompt}
-            >
-              Change
-            </Button>
-          </>
-        ) : (
-          <Button 
-            variant="default" 
-            size="sm"
-            className="academic-btn-primary"
+    <div className="flex justify-between items-center mb-6">
+      {!linkedAssignment && (
+        <div className="flex gap-4 items-center">
+          <Button
             onClick={onShowAssignmentPrompt}
+            variant="outline"
+            className="gap-2"
           >
+            <Link2 className="h-4 w-4" />
             Link to Assignment
           </Button>
-        )}
-      </div>
+          <span className="text-sm text-muted-foreground">
+            Linking to an assignment will enable tracking features
+          </span>
+        </div>
+      )}
+      
+      {linkedAssignment && (
+        <div className="flex gap-4 items-center">
+          <div className="text-sm px-3 py-1 bg-amber-100 text-amber-800 rounded-full dark:bg-amber-900/30 dark:text-amber-400 flex items-center gap-1">
+            <Link2 className="h-3 w-3" />
+            Assignment Linked
+          </div>
+        </div>
+      )}
     </div>
   );
 }

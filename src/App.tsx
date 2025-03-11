@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
-import Dashboard from "./pages/Dashboard";
+import Editor from "./pages/Dashboard"; // Renamed but kept file the same
 import TeacherClasses from "./pages/teacher/TeacherClasses";
 import TeacherAssignments from "./pages/teacher/TeacherAssignments";
 import TeacherStudentView from "./pages/teacher/TeacherStudentView";
@@ -22,13 +22,13 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/editor" element={<Editor />} />
             <Route path="/teacher" element={<TeacherClasses />} />
             <Route path="/teacher/class/:classId" element={<TeacherAssignments />} />
             <Route path="/teacher/assignment/:assignmentId" element={<TeacherAssignments />} />
             <Route path="/teacher/student/:studentId/assignment/:assignmentId" element={<TeacherStudentView />} />
             <Route path="/student/assignments" element={<StudentAssignments />} />
-            <Route path="/assignments" element={<Dashboard />} />
+            <Route path="/assignments" element={<Editor />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

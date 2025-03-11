@@ -4,7 +4,7 @@ import Header from "../components/layout/Header";
 import StudentDashboard from "../components/student/StudentDashboard";
 import TeacherDashboardWrapper from "../components/teacher/TeacherDashboardWrapper";
 
-const Dashboard = () => {
+const Editor = () => {
   // User state
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<"student" | "teacher" | null>(null);
@@ -84,4 +84,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default Editor;

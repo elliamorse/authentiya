@@ -6,12 +6,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { X, BookOpen, MessageSquare, Link2 } from "lucide-react";
+import { X, BookOpen, MessageSquare, Link2, Archive } from "lucide-react";
 
 interface CitationPromptProps {
   copiedText: string;
   onSubmit: (citation: {
-    type: "website" | "book" | "ai";
+    type: "website" | "book" | "ai" | "other";
     source: string;
     details?: string;
   }) => void;
@@ -19,12 +19,14 @@ interface CitationPromptProps {
 }
 
 export default function CitationPrompt({ copiedText, onSubmit, onDismiss }: CitationPromptProps) {
-  const [activeTab, setActiveTab] = useState<"website" | "book" | "ai">("website");
+  const [activeTab, setActiveTab] = useState<"website" | "book" | "ai" | "other">("website");
   const [website, setWebsite] = useState("");
   const [bookTitle, setBookTitle] = useState("");
   const [bookAuthor, setBookAuthor] = useState("");
   const [aiModel, setAiModel] = useState("ChatGPT");
   const [aiPrompt, setAiPrompt] = useState("");
+  const [otherSource, setOtherSource] = useState("");
+  const [otherDetails, setOtherDetails] = useState("");
   
   const handleSubmit = () => {
     if (activeTab === "website" && website) {
@@ -40,6 +42,12 @@ export default function CitationPrompt({ copiedText, onSubmit, onDismiss }: Cita
         type: "ai", 
         source: aiModel, 
         details: aiPrompt ? `Prompt: ${aiPrompt}` : undefined 
+      });
+    } else if (activeTab === "other" && otherSource) {
+      onSubmit({
+        type: "other",
+        source: otherSource,
+        details: otherDetails || undefined
       });
     }
   };
@@ -63,10 +71,10 @@ export default function CitationPrompt({ copiedText, onSubmit, onDismiss }: Cita
           
           <Tabs 
             value={activeTab} 
-            onValueChange={(v) => setActiveTab(v as "website" | "book" | "ai")}
+            onValueChange={(v) => setActiveTab(v as "website" | "book" | "ai" | "other")}
             className="w-full"
           >
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="website" className="flex items-center gap-1">
                 <Link2 className="h-4 w-4" />
                 Website
@@ -78,6 +86,10 @@ export default function CitationPrompt({ copiedText, onSubmit, onDismiss }: Cita
               <TabsTrigger value="ai" className="flex items-center gap-1">
                 <MessageSquare className="h-4 w-4" />
                 AI
+              </TabsTrigger>
+              <TabsTrigger value="other" className="flex items-center gap-1">
+                <Archive className="h-4 w-4" />
+                Other
               </TabsTrigger>
             </TabsList>
             
@@ -132,6 +144,28 @@ export default function CitationPrompt({ copiedText, onSubmit, onDismiss }: Cita
                   placeholder="Enter the prompt you used"
                   value={aiPrompt}
                   onChange={(e) => setAiPrompt(e.target.value)}
+                  rows={3}
+                />
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="other" className="space-y-4 animate-fade-in">
+              <div className="space-y-2">
+                <Label htmlFor="other-source">Source</Label>
+                <Input
+                  id="other-source"
+                  placeholder="Interview, Lecture, etc."
+                  value={otherSource}
+                  onChange={(e) => setOtherSource(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="other-details">Details (optional)</Label>
+                <Textarea
+                  id="other-details"
+                  placeholder="Additional details about the source"
+                  value={otherDetails}
+                  onChange={(e) => setOtherDetails(e.target.value)}
                   rows={3}
                 />
               </div>
