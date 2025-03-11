@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/layout/Header";
@@ -273,11 +272,7 @@ export default function StudentAssignments() {
   
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header 
-        userEmail="student@example.com" 
-        userRole="student" 
-        onLogout={() => navigate("/")} 
-      />
+      <Header />
       
       <main className="flex-1 container py-6 space-y-6">
         <div>

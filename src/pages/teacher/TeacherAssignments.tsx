@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Header from "../../components/layout/Header";
@@ -57,11 +56,7 @@ export default function TeacherAssignments() {
   
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header 
-        userEmail="teacher@example.com" 
-        userRole="teacher" 
-        onLogout={() => navigate("/")} 
-      />
+      <Header />
       
       <main className="flex-1 container py-6 space-y-6">
         {/* Back button */}
@@ -163,7 +158,7 @@ export default function TeacherAssignments() {
               <TabsContent value="students" className="mt-6">
                 <StudentList 
                   students={students} 
-                  onViewStudent={handleViewStudentAssignment} // Fix: Use this for navigation!
+                  onViewStudent={handleViewStudentAssignment}
                 />
               </TabsContent>
               

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/layout/Header";
@@ -23,11 +22,7 @@ export default function TeacherClasses() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header 
-        userEmail="teacher@example.com" 
-        userRole="teacher" 
-        onLogout={() => navigate("/")} 
-      />
+      <Header />
       
       <main className="flex-1 container py-6 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
