@@ -3,7 +3,7 @@
  * AddStudentForm.tsx
  * 
  * This component allows teachers to add students to their classes either by adding existing
- * students or by sending invitations to students who don't have accounts yet.
+ * students or by generating signup links.
  */
 
 import React, { useState } from "react";
@@ -11,7 +11,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -22,7 +21,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Check, Mail, Send, UserPlus } from "lucide-react";
+import { ClipboardCopy, Link, Mail, UserPlus } from "lucide-react";
+import StudentSearch from "./StudentSearch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface AddStudentFormProps {
   classId: string;
@@ -30,192 +31,115 @@ interface AddStudentFormProps {
 }
 
 export default function AddStudentForm({ classId, className }: AddStudentFormProps) {
-  const [studentEmail, setStudentEmail] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [isInviteOpen, setIsInviteOpen] = useState(false);
-  const [inviteEmail, setInviteEmail] = useState("");
-  const [inviteMessage, setInviteMessage] = useState(
-    `Hello,\n\nYou have been invited to join ${className} on Authentiya - an academic integrity tracking application. \n\nPlease click the link below to create an account and join the class:\n\n[Link will be automatically generated]\n\nBest regards,\nYour Instructor`
-  );
-  
+  const [isOpen, setIsOpen] = useState(false);
+  const [generatedLink, setGeneratedLink] = useState("");
   const queryClient = useQueryClient();
   
-  const handleAddStudentSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!studentEmail) {
-      toast.error("Please enter a student email");
-      return;
-    }
-    
-    setIsLoading(true);
-    
+  const generateInviteLink = async () => {
     try {
-      // Check if the user exists
-      const { data: existingUser, error: userError } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("email", studentEmail.toLowerCase().trim())
-        .maybeSingle();
-        
-      if (userError) throw userError;
-      
-      if (!existingUser) {
-        // User doesn't exist, show invite form
-        setInviteEmail(studentEmail);
-        setIsInviteOpen(true);
-        setIsLoading(false);
-        return;
-      }
-      
-      // Check if student is already in class
-      const { data: existingEnrollment, error: enrollmentError } = await supabase
-        .from("class_students")
-        .select("id")
-        .eq("student_id", existingUser.id)
-        .eq("class_id", classId)
-        .maybeSingle();
-        
-      if (enrollmentError) throw enrollmentError;
-      
-      if (existingEnrollment) {
-        toast.info("This student is already enrolled in this class");
-        setIsLoading(false);
-        return;
-      }
-      
-      // Add student to class
-      const { error: addError } = await supabase
-        .from("class_students")
-        .insert({
-          student_id: existingUser.id,
-          class_id: classId
-        });
-        
-      if (addError) throw addError;
-      
-      toast.success(`Added ${studentEmail} to ${className}`, {
-        description: "The student has been added to your class"
-      });
-      
-      // Refresh student list
-      queryClient.invalidateQueries({ queryKey: ["classStudents", classId] });
-      setStudentEmail("");
-      
-    } catch (error: any) {
-      console.error("Error adding student:", error);
-      toast.error("Failed to add student");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  const sendInvitation = async () => {
-    setIsLoading(true);
-    
-    try {
-      // Generate a unique invite code
       const inviteCode = Math.random().toString(36).substring(2, 15);
+      const { error } = await supabase.rpc(
+        'create_invitation',
+        { 
+          student_email: '',
+          class_identifier: classId,
+          invitation_code: inviteCode,
+          invitation_message: null
+        }
+      );
       
-      // Store invitation in database using the RPC function
-      const { error } = await supabase.rpc("create_invitation", {
-        student_email: inviteEmail.toLowerCase().trim(),
-        class_identifier: classId,
-        invitation_code: inviteCode,
-        invitation_message: inviteMessage
-      });
-        
       if (error) throw error;
       
-      // In a real app, we would send an email here
-      // For now, we'll just show a success message
+      const link = `${window.location.origin}/auth?invite=${inviteCode}`;
+      setGeneratedLink(link);
+      toast.success("Invitation link generated successfully");
       
-      toast.success(`Invitation sent to ${inviteEmail}`, {
-        description: "They'll receive an email with instructions to join"
-      });
-      
-      setIsInviteOpen(false);
-      setStudentEmail("");
-      setInviteEmail("");
-      
-    } catch (error: any) {
-      console.error("Error sending invitation:", error);
-      toast.error("Failed to send invitation");
-    } finally {
-      setIsLoading(false);
+    } catch (error) {
+      console.error('Error generating invitation link:', error);
+      toast.error("Failed to generate invitation link");
     }
   };
-  
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(generatedLink);
+      toast.success("Link copied to clipboard");
+    } catch (error) {
+      console.error('Error copying to clipboard:', error);
+      toast.error("Failed to copy link");
+    }
+  };
+
+  const handleStudentAdded = () => {
+    queryClient.invalidateQueries({ queryKey: ["classStudents", classId] });
+    queryClient.invalidateQueries({ queryKey: ["available-students", classId] });
+  };
+
   return (
-    <>
-      <form onSubmit={handleAddStudentSubmit} className="flex items-end gap-2">
-        <div className="flex-1">
-          <label htmlFor="student-email" className="text-sm font-medium mb-1 block">
-            Add Student by Email
-          </label>
-          <Input
-            id="student-email"
-            type="email"
-            placeholder="student@example.com"
-            value={studentEmail}
-            onChange={(e) => setStudentEmail(e.target.value)}
-            className="w-full"
-          />
-        </div>
-        <Button type="submit" disabled={isLoading || !studentEmail} className="academic-btn-primary">
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <Button className="academic-btn-primary">
           <UserPlus className="h-4 w-4 mr-2" />
           Add Student
         </Button>
-      </form>
+      </DialogTrigger>
       
-      <Dialog open={isInviteOpen} onOpenChange={setIsInviteOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Invite Student</DialogTitle>
-            <DialogDescription>
-              This student doesn't have an account yet. Send them an invitation to join.
-            </DialogDescription>
-          </DialogHeader>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Add Students to {className}</DialogTitle>
+          <DialogDescription>
+            Add existing students or generate a signup link
+          </DialogDescription>
+        </DialogHeader>
+        
+        <Tabs defaultValue="existing" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="existing">Existing Students</TabsTrigger>
+            <TabsTrigger value="link">Generate Link</TabsTrigger>
+          </TabsList>
           
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Email</label>
-              <Input 
-                value={inviteEmail} 
-                onChange={(e) => setInviteEmail(e.target.value)} 
-                disabled 
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Invitation Message</label>
-              <Textarea 
-                value={inviteMessage} 
-                onChange={(e) => setInviteMessage(e.target.value)} 
-                rows={8}
-              />
-            </div>
-          </div>
+          <TabsContent value="existing" className="mt-4">
+            <StudentSearch classId={classId} onStudentAdded={handleStudentAdded} />
+          </TabsContent>
           
-          <DialogFooter className="flex justify-between">
-            <Button
-              variant="outline"
-              onClick={() => setIsInviteOpen(false)}
-              disabled={isLoading}
-            >
-              Cancel
-            </Button>
-            <Button 
-              className="academic-btn-primary"
-              onClick={sendInvitation} 
-              disabled={isLoading || !inviteEmail}
-            >
-              <Mail className="h-4 w-4 mr-2" />
-              Send Invitation
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </>
+          <TabsContent value="link" className="mt-4">
+            <div className="space-y-4">
+              <Button
+                onClick={generateInviteLink}
+                className="w-full academic-btn-primary"
+              >
+                <Link className="h-4 w-4 mr-2" />
+                Generate Signup Link
+              </Button>
+              
+              {generatedLink && (
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Share this link with students:</p>
+                  <div className="flex gap-2">
+                    <Input value={generatedLink} readOnly />
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={copyToClipboard}
+                    >
+                      <ClipboardCopy className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
+        
+        <DialogFooter className="sm:justify-start">
+          <Button
+            variant="outline"
+            onClick={() => setIsOpen(false)}
+          >
+            Close
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -211,6 +211,7 @@ export type Database = {
           created_at: string
           email: string
           id: string
+          invitation_type: string
           message: string | null
           status: string
           updated_at: string
@@ -221,6 +222,7 @@ export type Database = {
           created_at?: string
           email: string
           id?: string
+          invitation_type?: string
           message?: string | null
           status?: string
           updated_at?: string
@@ -231,6 +233,7 @@ export type Database = {
           created_at?: string
           email?: string
           id?: string
+          invitation_type?: string
           message?: string | null
           status?: string
           updated_at?: string
@@ -349,6 +352,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_student_to_class: {
+        Args: {
+          student_identifier: string
+          class_identifier: string
+        }
+        Returns: undefined
+      }
       check_student_invitation: {
         Args: {
           student_email: string
@@ -368,6 +378,17 @@ export type Database = {
           invitation_message?: string
         }
         Returns: undefined
+      }
+      get_available_students: {
+        Args: {
+          class_identifier: string
+        }
+        Returns: {
+          student_id: string
+          email: string
+          first_name: string
+          last_name: string
+        }[]
       }
       get_current_user_role: {
         Args: Record<PropertyKey, never>
