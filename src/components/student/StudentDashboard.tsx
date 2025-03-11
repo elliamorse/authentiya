@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase, isDataNotError } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -27,6 +27,12 @@ export default function StudentDashboard() {
   const [showCitationPrompt, setShowCitationPrompt] = useState(false);
   const [copiedText, setCopiedText] = useState("");
   const [content, setContent] = useState("");
+  
+  // Stats tracking
+  const [lastTypingTime, setLastTypingTime] = useState<number | null>(null);
+  const [typedCharacters, setTypedCharacters] = useState(0);
+  const [typingTime, setTypingTime] = useState(0);
+  const [wpm, setWpm] = useState(0);
   
   // Get the linked student assignment
   const { data: studentAssignment, refetch: refetchAssignment } = useQuery({
@@ -71,7 +77,7 @@ export default function StudentDashboard() {
         
         // If it doesn't exist, create it
         const now = new Date().toISOString();
-        const result = await supabase
+        const { data: newData, error: insertError } = await supabase
           .from("student_assignments")
           .insert({
             student_id: user.id,
@@ -83,12 +89,12 @@ export default function StudentDashboard() {
           .select()
           .single();
         
-        if (result.error) {
-          console.error("Error creating assignment:", result.error);
+        if (insertError) {
+          console.error("Error creating assignment:", insertError);
           return null;
         }
         
-        return result.data;
+        return newData;
       } catch (error) {
         console.error("Error fetching student assignment:", error);
         toast.error("Failed to load assignment");
@@ -143,6 +149,23 @@ export default function StudentDashboard() {
       }
     };
   }, []);
+  
+  // Calculate WPM based on typing activity
+  const calculateWPM = useCallback(() => {
+    if (typingTime === 0) return 0;
+    
+    // Standard WPM calculation - 5 characters = 1 word
+    const words = typedCharacters / 5;
+    // Convert milliseconds to minutes
+    const minutes = typingTime / 60000;
+    
+    return Math.round(words / Math.max(minutes, 0.01));
+  }, [typedCharacters, typingTime]);
+  
+  // Update WPM when typing metrics change
+  useEffect(() => {
+    setWpm(calculateWPM());
+  }, [typedCharacters, typingTime, calculateWPM]);
   
   // Add event listeners for copy-paste detection
   useEffect(() => {
@@ -254,8 +277,28 @@ export default function StudentDashboard() {
     });
   };
   
+  // Enhanced text area change handler that tracks typing metrics
   const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newContent = e.target.value;
+    const oldContent = content;
+    
+    // Check if characters were added (not deleted or pasted)
+    if (newContent.length > oldContent.length) {
+      // Increment typed characters by the difference
+      const newChars = newContent.length - oldContent.length;
+      setTypedCharacters(prev => prev + newChars);
+      
+      // Track typing time
+      const now = Date.now();
+      if (lastTypingTime) {
+        // Only count as typing if it's within a short time window (3 seconds)
+        if (now - lastTypingTime < 3000) {
+          setTypingTime(prev => prev + (now - lastTypingTime));
+        }
+      }
+      setLastTypingTime(now);
+    }
+    
     setContent(newContent);
     
     // Count words (simple splitting by spaces)
@@ -267,7 +310,7 @@ export default function StudentDashboard() {
     });
   };
   
-  // Simulate copy/paste detection
+  // Simulate copy/paste detection for demo purposes
   const handleManualPaste = () => {
     incrementCopyPasteCount();
     // Get clipboard text (in a real app, this would access navigator.clipboard)
@@ -385,7 +428,8 @@ export default function StudentDashboard() {
       {studentAssignment?.start_time && (
         <WritingMetrics 
           startTime={new Date(studentAssignment.start_time)} 
-          wordCount={studentAssignment.word_count || 0} 
+          wordCount={studentAssignment.word_count || 0}
+          wpm={wpm}
           copyPasteCount={studentAssignment.copy_paste_count || 0}
           citationCount={studentAssignment.citation_count || 0}
         />
@@ -425,7 +469,7 @@ export default function StudentDashboard() {
                   size="sm" 
                   className="gap-2 academic-btn-primary"
                   onClick={handleSubmitAssignment}
-                  disabled={!studentAssignment || studentAssignment.word_count === 0}
+                  disabled={!studentAssignment || !studentAssignment.word_count || studentAssignment.word_count === 0}
                 >
                   <SendHorizontal className="h-4 w-4" />
                   <span className="hidden sm:inline">Submit</span>
@@ -441,6 +485,7 @@ export default function StudentDashboard() {
             value={content}
             onChange={handleTextAreaChange}
             disabled={!studentAssignment?.id}
+            autoFocus
           ></textarea>
         </div>
       </div>
