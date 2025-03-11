@@ -51,23 +51,19 @@ interface Citation {
 // Quill toolbar configuration
 const modules = {
   toolbar: [
-    ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+    ['bold', 'italic', 'underline', 'strike'],
     ['blockquote', 'code-block'],
-
-    [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+    [{ 'header': 1 }, { 'header': 2 }],
     [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-    [{ 'script': 'sub' }, { 'script': 'super' }],      // superscript/subscript
-    [{ 'indent': '-1' }, { 'indent': '+1' }],          // outdent/indent
-    [{ 'direction': 'rtl' }],                         // text direction
-
-    [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+    [{ 'script': 'sub' }, { 'script': 'super' }],
+    [{ 'indent': '-1' }, { 'indent': '+1' }],
+    [{ 'direction': 'rtl' }],
+    [{ 'size': ['small', false, 'large', 'huge'] }],
     [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-
-    [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+    [{ 'color': [] }, { 'background': [] }],
     [{ 'font': [] }],
     [{ 'align': [] }],
-
-    ['clean'],                                         // remove formatting button
+    ['clean'],
   ],
 };
 
@@ -247,14 +243,6 @@ export default function TextEditor({
     onChange(value);
   };
 
-  // Handle paste event
-  const handlePaste = (e: React.ClipboardEvent) => {
-    if (onPaste) {
-      const text = e.clipboardData.getData('text/plain');
-      onPaste(text);
-    }
-  };
-
   // Handle citation dialog open
   const handleCitationDialogOpen = (citationId: string) => {
     const citation = citations.find(c => c.id === citationId);
@@ -269,6 +257,14 @@ export default function TextEditor({
     }
     setSelectedCitationId(citationId);
     setIsCitationDialogOpen(true);
+  };
+
+  // Handle paste events manually since ReactQuill doesn't expose onPaste as a prop
+  const handlePasteEvent = (e: React.ClipboardEvent) => {
+    if (onPaste) {
+      const text = e.clipboardData.getData('text/plain');
+      onPaste(text);
+    }
   };
 
   // Proper toggle group implementation
@@ -301,17 +297,18 @@ export default function TextEditor({
       </div>
 
       {mode === "edit" ? (
-        <ReactQuill
-          ref={quillRef}
-          value={content}
-          onChange={handleChange}
-          onPaste={handlePaste}
-          modules={modules}
-          formats={formats}
-          placeholder="Start writing here..."
-          className="bg-white"
-          readOnly={readOnly}
-        />
+        <div onPaste={handlePasteEvent}>
+          <ReactQuill
+            ref={quillRef}
+            value={content}
+            onChange={handleChange}
+            modules={modules}
+            formats={formats}
+            placeholder="Start writing here..."
+            className="bg-white"
+            readOnly={readOnly}
+          />
+        </div>
       ) : (
         <div
           className="prose bg-white p-4 rounded"

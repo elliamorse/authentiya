@@ -8,7 +8,7 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import AuthForm from '../components/auth/AuthForm';  // Corrected import statement
+import AuthForm from '../components/auth/AuthForm';
 import { supabase } from '../integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -72,16 +72,18 @@ const Auth = () => {
   const checkInvitation = async (studentEmail: string, code: string) => {
     try {
       // Check if invitation is valid
-      const { data, error } = await supabase.rpc<InvitationData>('check_student_invitation', {
+      const { data, error } = await supabase.rpc<InvitationData[]>('check_student_invitation', {
         student_email: studentEmail,
         invite_code: code
       });
       
       if (error) throw error;
       
-      if (data) {
-        setInvitation(data as InvitationData);
-        toast.info(`You've been invited to join ${data.class_name}`);
+      if (data && data.length > 0) {
+        // Get the first item from the array
+        const invitationData = data[0];
+        setInvitation(invitationData);
+        toast.info(`You've been invited to join ${invitationData.class_name}`);
       }
     } catch (error) {
       console.error('Error checking invitation:', error);
@@ -92,15 +94,16 @@ const Auth = () => {
   const processInvitation = async (userId: string, studentEmail: string, code: string) => {
     try {
       // Check if invitation is valid
-      const { data, error } = await supabase.rpc<InvitationData>('check_student_invitation', {
+      const { data, error } = await supabase.rpc<InvitationData[]>('check_student_invitation', {
         student_email: studentEmail,
         invite_code: code
       });
       
       if (error) throw error;
       
-      if (data) {
-        const invitationData = data as InvitationData;
+      if (data && data.length > 0) {
+        // Get the first item from the array
+        const invitationData = data[0];
         
         // Add student to class
         const { error: enrollError } = await supabase
