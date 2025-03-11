@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -19,12 +18,27 @@ export default function Auth() {
   const [lastName, setLastName] = useState("");
   const [role, setRole] = useState<"student" | "teacher">("student");
 
-  // Check if user is already logged in
-  supabase.auth.onAuthStateChange((event, session) => {
-    if (event === "SIGNED_IN" && session) {
-      navigate("/dashboard");
-    }
-  });
+  useEffect(() => {
+    const handleAuthRedirect = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      
+      if (data.session) {
+        navigate("/dashboard");
+      }
+    };
+
+    handleAuthRedirect();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" && session) {
+        navigate("/dashboard");
+      }
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, [navigate]);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
