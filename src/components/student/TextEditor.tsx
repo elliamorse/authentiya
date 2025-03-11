@@ -1,4 +1,12 @@
 
+/**
+ * TextEditor.tsx
+ * 
+ * This component provides a rich text editor with formatting options for students to 
+ * write their assignments. It includes various text formatting options and tracks
+ * user actions like pasting content.
+ */
+
 import React, { useEffect, useRef, useState } from "react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -294,7 +302,7 @@ export default function TextEditor({
             
             <TabsContent value="view" className="m-0">
               <div className="flex gap-1">
-                <ToggleGroup type="single" value={[viewMode]}>
+                <ToggleGroup type="single" value={viewMode}>
                   <ToggleGroupItem 
                     value="edit" 
                     onClick={() => setViewMode("edit")}

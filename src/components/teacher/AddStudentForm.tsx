@@ -1,4 +1,11 @@
 
+/**
+ * AddStudentForm.tsx
+ * 
+ * This component allows teachers to add students to their classes either by adding existing
+ * students or by sending invitations to students who don't have accounts yet.
+ */
+
 import React, { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -111,15 +118,13 @@ export default function AddStudentForm({ classId, className }: AddStudentFormPro
       const inviteCode = Math.random().toString(36).substring(2, 15);
       
       // Store invitation in database
-      const { error } = await supabase
-        .from("invitations")
-        .insert({
-          email: inviteEmail.toLowerCase().trim(),
-          class_id: classId,
-          code: inviteCode,
-          message: inviteMessage,
-          status: "pending"
-        });
+      const { error } = await supabase.from("invitations").insert({
+        email: inviteEmail.toLowerCase().trim(),
+        class_id: classId,
+        code: inviteCode,
+        message: inviteMessage,
+        status: "pending"
+      });
         
       if (error) throw error;
       

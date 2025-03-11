@@ -1,4 +1,12 @@
 
+/**
+ * Dashboard.tsx
+ * 
+ * This is the main dashboard page that serves as a wrapper component to render
+ * the appropriate dashboard based on the user's role (teacher or student).
+ * It handles authentication checks and redirects unauthorized users.
+ */
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/layout/Header";

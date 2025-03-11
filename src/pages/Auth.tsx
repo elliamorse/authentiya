@@ -1,4 +1,12 @@
 
+/**
+ * Auth.tsx
+ * 
+ * This page handles authentication flows for the application, including sign-in, sign-up,
+ * and processing student invitations from teachers. It supports both standard authentication
+ * and invitation-based registration.
+ */
+
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -157,12 +165,15 @@ export default function Auth() {
         throw new Error("Invalid invitation");
       }
       
+      // Get the first result (should only be one matching invitation)
+      const invitation = inviteData[0];
+      
       // Add the student to the class
       const { error: enrollError } = await supabase
         .from("class_students")
         .insert({
           student_id: userId,
-          class_id: inviteData[0].class_id
+          class_id: invitation.class_id
         });
         
       if (enrollError) throw enrollError;
@@ -171,7 +182,7 @@ export default function Auth() {
       const { error: updateError } = await supabase
         .from("invitations")
         .update({ status: "accepted" })
-        .eq("id", inviteData[0].invitation_id);
+        .eq("id", invitation.invitation_id);
         
       if (updateError) throw updateError;
       
