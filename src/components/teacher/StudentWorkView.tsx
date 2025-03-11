@@ -1,4 +1,12 @@
 
+/**
+ * StudentWorkView.tsx
+ * 
+ * This component displays a student's submitted work for a specific assignment.
+ * It provides options to filter content view and shows metadata about the student's
+ * activity, such as when they were last active.
+ */
+
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Clock, Filter } from "lucide-react";

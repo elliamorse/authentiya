@@ -1,4 +1,12 @@
 
+/**
+ * Dashboard.tsx
+ * 
+ * This component implements the main teacher dashboard interface, displaying
+ * assignment statistics and student metrics. It allows teachers to select
+ * different assignments and view detailed data visualizations.
+ */
+
 import React from "react";
 import { getAssignmentById, getStudentsByAssignment } from "@/lib/teacherData";
 import { AssignmentOverview } from "./dashboard/AssignmentOverview";

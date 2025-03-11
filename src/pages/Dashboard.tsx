@@ -1,9 +1,13 @@
+
 /**
  * Dashboard.tsx
  * 
- * This file has been repurposed as the main Editor page that hosts both
- * the student editor and teacher dashboard depending on the user's role.
- * Previously called "Dashboard", now conceptually serves as an "Editor" for students.
+ * This file serves as the main entry point for the application's dashboard functionality.
+ * It determines whether to render the student or teacher dashboard based on the user's role,
+ * and provides role-switching capabilities for demonstration purposes.
+ * 
+ * The file has been repurposed from its original "Dashboard" concept to now serve
+ * as an "Editor" for students while maintaining the teacher dashboard functionality.
  */
 
 import { useState, useEffect } from "react";

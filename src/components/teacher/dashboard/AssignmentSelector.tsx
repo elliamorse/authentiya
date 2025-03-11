@@ -1,3 +1,12 @@
+
+/**
+ * AssignmentSelector.tsx
+ * 
+ * This component provides a UI for selecting different assignments to view
+ * in the teacher dashboard. It renders a series of buttons for each assignment,
+ * highlighting the currently selected one.
+ */
+
 import React from "react";
 import { Button } from "@/components/common/Button";
 import { BookOpen } from "lucide-react";

@@ -1,4 +1,13 @@
 
+/**
+ * TeacherDashboardWrapper.tsx
+ * 
+ * This component serves as a container for the teacher dashboard, providing
+ * navigation controls and state management for assignment selection.
+ * It acts as a bridge between the main application routing and the teacher-specific
+ * dashboard functionality.
+ */
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import TeacherDashboard from "./Dashboard";
