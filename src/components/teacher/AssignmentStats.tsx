@@ -5,6 +5,9 @@
  * Description: This component manages and displays various statistics for assignments,
  * including time distribution, word count distribution, start time patterns, and 
  * submission status. It processes raw student data into visualizable formats.
+ * 
+ * Update: Fixed data processing logic to correctly populate charts and added better
+ * handling for edge cases.
  */
 
 import React, { useMemo } from "react";
@@ -23,8 +26,7 @@ interface AssignmentStatsProps {
 export default function AssignmentStats({ assignment, students = [] }: AssignmentStatsProps) {  
   // Calculate statistics from actual student data
   const statsData = useMemo(() => {
-    // Filter out students with no words written
-    const activeStudents = students.filter(s => s.wordCount > 0);
+    console.log("Processing stats for students:", students.length);
     
     // Group students by their time spent for time distribution
     const timeDistribution = [
@@ -35,15 +37,6 @@ export default function AssignmentStats({ assignment, students = [] }: Assignmen
       { range: ">3h", count: 0 }
     ];
     
-    activeStudents.forEach(student => {
-      const mins = student.timeSpent || 0;
-      if (mins < 30) timeDistribution[0].count++;
-      else if (mins < 60) timeDistribution[1].count++;
-      else if (mins < 120) timeDistribution[2].count++;
-      else if (mins < 180) timeDistribution[3].count++;
-      else timeDistribution[4].count++;
-    });
-    
     // Create word count distribution
     const wordCountDistribution = [
       { name: "<500", count: 0 },
@@ -53,7 +46,17 @@ export default function AssignmentStats({ assignment, students = [] }: Assignmen
       { name: ">1250", count: 0 },
     ];
     
-    activeStudents.forEach(student => {
+    // Process each student's data
+    students.forEach(student => {
+      // Process time distribution
+      const mins = student.timeSpent || 0;
+      if (mins < 30) timeDistribution[0].count++;
+      else if (mins < 60) timeDistribution[1].count++;
+      else if (mins < 120) timeDistribution[2].count++;
+      else if (mins < 180) timeDistribution[3].count++;
+      else timeDistribution[4].count++;
+      
+      // Process word count distribution
       const words = student.wordCount || 0;
       if (words < 500) wordCountDistribution[0].count++;
       else if (words < 750) wordCountDistribution[1].count++;
@@ -61,6 +64,9 @@ export default function AssignmentStats({ assignment, students = [] }: Assignmen
       else if (words < 1250) wordCountDistribution[3].count++;
       else wordCountDistribution[4].count++;
     });
+    
+    console.log("Time distribution:", JSON.stringify(timeDistribution));
+    console.log("Word count distribution:", JSON.stringify(wordCountDistribution));
     
     // Calculate status counts
     const statusCounts = {
@@ -70,7 +76,7 @@ export default function AssignmentStats({ assignment, students = [] }: Assignmen
     };
     
     // Calculate start time distribution
-    const startTimeData = activeStudents
+    const startTimeData = students
       .filter(s => s.startTime)
       .map(s => {
         const date = new Date(s.startTime as string);
@@ -87,6 +93,8 @@ export default function AssignmentStats({ assignment, students = [] }: Assignmen
         return acc;
       }, [])
       .sort((a, b) => a.hour - b.hour);
+    
+    console.log("Start time data:", JSON.stringify(startTimeData));
     
     return {
       timeDistribution,
@@ -105,11 +113,13 @@ export default function AssignmentStats({ assignment, students = [] }: Assignmen
       
       <div className="grid gap-4 grid-cols-1 lg:grid-cols-3">
         <StartTimeChart data={statsData.startTimeData} />
-        <StatusPieChart 
-          notStarted={statsData.statusCounts.notStarted} 
-          inProgress={statsData.statusCounts.inProgress} 
-          submitted={statsData.statusCounts.submitted} 
-        />
+        <div className="lg:col-span-2">
+          <StatusPieChart 
+            notStarted={statsData.statusCounts.notStarted} 
+            inProgress={statsData.statusCounts.inProgress} 
+            submitted={statsData.statusCounts.submitted} 
+          />
+        </div>
       </div>
       
       <AttentionNeededSection assignment={assignment} students={students} />

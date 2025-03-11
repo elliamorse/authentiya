@@ -5,6 +5,8 @@
  * Description: This component visualizes when students typically start working on their
  * assignments throughout the day. This helps teachers understand student work patterns
  * and potentially identify optimal times for releasing new assignments or providing support.
+ * 
+ * Update: Improved chart rendering and added better handling for empty data scenarios.
  */
 
 import React from "react";
@@ -22,11 +24,14 @@ export function StartTimeChart({ data = [] }: StartTimeChartProps) {
     label: `${item.hour % 12 || 12}${item.hour < 12 ? 'am' : 'pm'}`
   }));
 
+  // Check if there's any data to display
+  const hasData = formattedData.length > 0;
+
   return (
     <Card className="shadow-md dark:bg-gray-800 dark:border-gray-700">
       <CardContent className="p-4">
         <h3 className="font-medium text-base font-playfair mb-4 dark:text-white">Start Time Distribution</h3>
-        {data.length > 0 ? (
+        {hasData ? (
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={formattedData}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
@@ -41,6 +46,7 @@ export function StartTimeChart({ data = [] }: StartTimeChartProps) {
                 fontSize={12}
                 tick={{ fill: '#6B7280' }}
                 axisLine={{ stroke: '#4B5563' }}
+                domain={[0, 'auto']}
               />
               <Tooltip
                 contentStyle={{ 
