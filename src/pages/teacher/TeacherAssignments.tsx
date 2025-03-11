@@ -10,7 +10,7 @@ import AssignmentStats from "../../components/teacher/AssignmentStats";
 import { 
   getAssignmentById, 
   getAssignmentsForClass,
-  getStudentAssignments
+  getStudentsByAssignment
 } from "@/lib/teacher-data";
 import { ArrowLeft, BookOpen, Calendar, Clock, FileText } from "lucide-react";
 
@@ -35,7 +35,7 @@ export default function TeacherAssignments() {
     
   // Get students for the current assignment if in assignment view
   const students = assignmentId
-    ? getStudentAssignments(assignmentId)
+    ? getStudentsByAssignment(assignmentId)
     : [];
     
   // Handle view student assignment - navigate to student view

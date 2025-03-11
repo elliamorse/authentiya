@@ -152,4 +152,4 @@ export const CommentsSection: React.FC<CommentsSectionProps> = ({
       </CardContent>
     </Card>
   );
-};
+}
