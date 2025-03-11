@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, isDataNotError } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/common/Button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/common/Card";
@@ -49,10 +49,15 @@ export default function AssignmentPrompt({ onSelect, onDismiss }: AssignmentProm
           return [];
         }
         
-        return data.map(item => ({
-          id: item.classes.id,
-          name: item.classes.name
-        }));
+        return data.map(item => {
+          if (item.classes) {
+            return {
+              id: item.classes.id,
+              name: item.classes.name
+            };
+          }
+          return null;
+        }).filter(Boolean);
       } catch (error) {
         console.error("Error fetching classes:", error);
         toast.error("Failed to load classes");
@@ -86,13 +91,18 @@ export default function AssignmentPrompt({ onSelect, onDismiss }: AssignmentProm
           return [];
         }
         
-        return data.map(item => ({
-          id: item.id,
-          title: item.title,
-          class: item.classes.name,
-          class_id: item.class_id,
-          dueDate: item.due_date
-        }));
+        return data.map(item => {
+          if (item && item.classes) {
+            return {
+              id: item.id,
+              title: item.title,
+              class: item.classes.name,
+              class_id: item.class_id,
+              dueDate: item.due_date
+            };
+          }
+          return null;
+        }).filter(Boolean);
       } catch (error) {
         console.error("Error fetching assignments:", error);
         toast.error("Failed to load assignments");

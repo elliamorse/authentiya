@@ -28,7 +28,46 @@ export const supabase = createClient<Database>(
       autoRefreshToken: true,
       detectSessionInUrl: true,
       persistSession: true,
-      redirectTo: `${getSiteUrl()}/auth`
+      storageKey: 'authentiya-auth-storage',
+      storage: {
+        getItem: (key) => {
+          try {
+            const value = window.localStorage.getItem(key);
+            return value ? JSON.parse(value) : null;
+          } catch (error) {
+            console.error('Error getting item from localStorage', error);
+            return null;
+          }
+        },
+        setItem: (key, value) => {
+          try {
+            window.localStorage.setItem(key, JSON.stringify(value));
+          } catch (error) {
+            console.error('Error setting item in localStorage', error);
+          }
+        },
+        removeItem: (key) => {
+          try {
+            window.localStorage.removeItem(key);
+          } catch (error) {
+            console.error('Error removing item from localStorage', error);
+          }
+        }
+      }
     }
   }
 );
+
+// Helper to safely check if a query result has data
+export const hasError = (
+  result: { error: any } | null | undefined
+): boolean => {
+  return !!(result && result.error);
+};
+
+// Type guard to check if data exists and is not an error
+export function isDataNotError<T>(
+  data: T | { error: any }
+): data is T {
+  return !hasError(data as any);
+}

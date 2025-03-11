@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, isDataNotError } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import AssignmentPrompt from "./AssignmentPrompt";
@@ -36,7 +36,7 @@ export default function StudentDashboard() {
       
       try {
         // First check if this student assignment already exists
-        const { data: existing, error } = await supabase
+        const { data, error } = await supabase
           .from("student_assignments")
           .select(`
             id, 
@@ -53,24 +53,25 @@ export default function StudentDashboard() {
           `)
           .eq("student_id", user.id)
           .eq("assignment_id", linkedAssignmentId)
-          .single();
+          .maybeSingle();
         
-        if (error && error.code !== "PGRST116") {
-          throw error;
+        if (error) {
+          console.error("Error checking for existing assignment:", error);
+          return null;
         }
         
-        if (existing) {
+        if (data) {
           // If there's content, set it
-          if (existing.content) {
-            setContent(existing.content);
+          if (data.content) {
+            setContent(data.content);
           }
           
-          return existing;
+          return data;
         }
         
         // If it doesn't exist, create it
         const now = new Date().toISOString();
-        const { data: created, error: createError } = await supabase
+        const result = await supabase
           .from("student_assignments")
           .insert({
             student_id: user.id,
@@ -82,9 +83,12 @@ export default function StudentDashboard() {
           .select()
           .single();
         
-        if (createError) throw createError;
+        if (result.error) {
+          console.error("Error creating assignment:", result.error);
+          return null;
+        }
         
-        return created;
+        return result.data;
       } catch (error) {
         console.error("Error fetching student assignment:", error);
         toast.error("Failed to load assignment");
@@ -281,14 +285,16 @@ export default function StudentDashboard() {
     
     try {
       // Create the citation
-      await supabase
+      const { error } = await supabase
         .from("citations")
         .insert({
           student_assignment_id: studentAssignment.id,
           type: citation.type,
           source: citation.source,
-          details: citation.details
+          details: citation.details || null
         });
+        
+      if (error) throw error;
       
       // Update citation count
       const newCount = (studentAssignment.citation_count || 0) + 1;
@@ -301,7 +307,7 @@ export default function StudentDashboard() {
       toast.success("Citation added", {
         description: `Added citation from ${citation.source}`
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error adding citation:", error);
       toast.error("Failed to add citation");
     }
@@ -311,7 +317,7 @@ export default function StudentDashboard() {
     if (!studentAssignment?.id) return;
     
     try {
-      await supabase
+      const { error } = await supabase
         .from("student_assignments")
         .update({
           status: "submitted",
@@ -319,6 +325,8 @@ export default function StudentDashboard() {
           content: content
         })
         .eq("id", studentAssignment.id);
+        
+      if (error) throw error;
       
       toast.success("Assignment submitted", {
         description: "Your assignment has been successfully submitted"

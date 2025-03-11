@@ -51,6 +51,8 @@ export default function TeacherDashboardWrapper() {
         // For each assignment, get student metrics
         const assignmentsWithMetrics = await Promise.all(
           data.map(async (assignment) => {
+            if (!assignment || !assignment.id) return null;
+            
             const { data: studentAssignments, error: studentError } = await supabase
               .from("student_assignments")
               .select(`
@@ -66,10 +68,10 @@ export default function TeacherDashboardWrapper() {
             }
             
             const totalStudents = studentAssignments?.length || 0;
-            const studentsStarted = studentAssignments?.filter(sa => sa.status !== "not_started").length || 0;
-            const studentsSubmitted = studentAssignments?.filter(sa => sa.status === "submitted").length || 0;
-            const totalTimeSpent = studentAssignments?.reduce((acc, curr) => acc + (curr.time_spent || 0), 0) || 0;
-            const totalWordCount = studentAssignments?.reduce((acc, curr) => acc + (curr.word_count || 0), 0) || 0;
+            const studentsStarted = studentAssignments?.filter(sa => sa && sa.status !== "not_started").length || 0;
+            const studentsSubmitted = studentAssignments?.filter(sa => sa && sa.status === "submitted").length || 0;
+            const totalTimeSpent = studentAssignments?.reduce((acc, curr) => acc + (curr && curr.time_spent || 0), 0) || 0;
+            const totalWordCount = studentAssignments?.reduce((acc, curr) => acc + (curr && curr.word_count || 0), 0) || 0;
             
             return {
               id: assignment.id,
