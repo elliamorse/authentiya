@@ -26,7 +26,7 @@ Unlike competitors such as TurnItIn (which works after submission and has accura
 The website uses Open Graph metadata to control how the site appears when shared on social media:
 - Title: "Authentiya - Academic Integrity Solution"
 - Description: "A seamless browser extension that works in the background, detecting AI usage with real-time tracking and comprehensive reporting at scale."
-- Image: Professional image of a MacBook with code on the screen on a busy desk
+- Image: Custom Authentiya hero image showcasing the platform's tagline "Track, Verify, and Authenticate Student Writing"
 - Twitter Card: Large image summary
 
 ## Technical Details
