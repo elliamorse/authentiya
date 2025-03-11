@@ -20,6 +20,7 @@ Unlike competitors such as TurnItIn (which works after submission and has accura
 - **Document Editor**: Write with real-time tracking and citation support
 - **Teacher Dashboard**: Monitor student work and identify potential AI usage
 - **Assignment Management**: Create, track, and evaluate student assignments
+- **Contact Form**: Request pricing information and customize solutions for your institution
 
 ## Link Preview Information
 
@@ -62,3 +63,4 @@ npm run dev
 Open [Lovable](https://lovable.dev/projects/d4855ff7-0d76-4608-a6e3-33aaef944cce) and click on Share -> Publish to deploy the project.
 
 For custom domain deployment, we recommend using Netlify. See our [custom domains documentation](https://docs.lovable.dev/tips-tricks/custom-domain/) for more details.
+

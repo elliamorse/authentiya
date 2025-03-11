@@ -1,4 +1,13 @@
 
+/**
+ * Index.tsx
+ * 
+ * This component serves as the landing page for Authentiya. It showcases the main features
+ * of the application through a hero section, features section, and information about how
+ * the platform works. The page includes tabbed content for different user roles (students and teachers)
+ * and call-to-action buttons that guide users to either request pricing information or learn more.
+ */
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, BookOpen, Clock, Shield, ClipboardCheck, GraduationCap } from 'lucide-react';
@@ -9,7 +18,7 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState<'student' | 'teacher'>('student');
 
   const handleGetStarted = () => {
-    navigate('/dashboard');
+    navigate('/contact');
   };
 
   return (
