@@ -1,4 +1,3 @@
-
 /**
  * TextEditor.tsx
  * 
@@ -44,40 +43,32 @@ export default function TextEditor({
   const [activeFormats, setActiveFormats] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<"edit" | "preview">("edit");
   
-  // Initialize editor
   useEffect(() => {
     const editor = editorRef.current;
     if (!editor) return;
     
-    // Set initial content
     if (content) {
       editor.innerHTML = content;
     }
     
-    // Make it editable
     editor.contentEditable = readOnly ? "false" : "true";
     
-    // Handle paste event
     const handlePaste = (e: ClipboardEvent) => {
       if (readOnly) return;
       
-      // Get plain text from clipboard
       const pastedText = e.clipboardData?.getData('text/plain') || "";
       if (pastedText.trim()) {
         onPaste(pastedText);
       }
     };
     
-    // Add event listener
     editor.addEventListener('paste', handlePaste);
     
-    // Clean up
     return () => {
       editor.removeEventListener('paste', handlePaste);
     };
   }, [readOnly]);
   
-  // Update content on input
   useEffect(() => {
     const editor = editorRef.current;
     if (!editor) return;
@@ -95,7 +86,6 @@ export default function TextEditor({
     };
   }, [onChange]);
   
-  // Check active formats based on current selection
   const checkActiveFormats = () => {
     if (document.queryCommandState('bold')) {
       setActiveFormats(prev => prev.includes('bold') ? prev : [...prev, 'bold']);
@@ -116,20 +106,17 @@ export default function TextEditor({
     }
   };
   
-  // Apply format
   const applyFormat = (command: string, value: string = '') => {
     if (readOnly) return;
     
     document.execCommand(command, false, value);
     checkActiveFormats();
     
-    // Update content
     if (editorRef.current) {
       onChange(editorRef.current.innerHTML);
     }
   };
   
-  // Handle selection change to update active formats
   useEffect(() => {
     const handleSelectionChange = () => {
       checkActiveFormats();
@@ -142,7 +129,6 @@ export default function TextEditor({
     };
   }, []);
   
-  // Insert link
   const insertLink = () => {
     if (readOnly) return;
     
@@ -152,7 +138,6 @@ export default function TextEditor({
     }
   };
   
-  // Insert image
   const insertImage = () => {
     if (readOnly) return;
     
@@ -306,12 +291,14 @@ export default function TextEditor({
                   <ToggleGroupItem 
                     value="edit" 
                     onClick={() => setViewMode("edit")}
+                    className="data-[state=on]:bg-authentiya-maroon data-[state=on]:text-white"
                   >
                     Edit
                   </ToggleGroupItem>
                   <ToggleGroupItem 
                     value="preview" 
                     onClick={() => setViewMode("preview")}
+                    className="data-[state=on]:bg-authentiya-maroon data-[state=on]:text-white"
                   >
                     Preview
                   </ToggleGroupItem>

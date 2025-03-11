@@ -16,9 +16,7 @@ const getSiteUrl = () => {
   return url;
 };
 
-// Import the supabase client like this:
-// import { supabase } from "@/integrations/supabase/client";
-
+// Extended supabase client with custom types
 export const supabase = createClient<Database>(
   SUPABASE_URL, 
   SUPABASE_PUBLISHABLE_KEY,

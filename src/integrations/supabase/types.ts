@@ -204,6 +204,47 @@ export type Database = {
           },
         ]
       }
+      invitations: {
+        Row: {
+          class_id: string
+          code: string
+          created_at: string
+          email: string
+          id: string
+          message: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          class_id: string
+          code: string
+          created_at?: string
+          email: string
+          id?: string
+          message?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          class_id?: string
+          code?: string
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invitations_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -308,6 +349,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_student_invitation: {
+        Args: {
+          student_email: string
+          invite_code: string
+        }
+        Returns: {
+          invitation_id: string
+          class_id: string
+          class_name: string
+        }[]
+      }
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: string

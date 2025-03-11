@@ -1,4 +1,3 @@
-
 /**
  * Auth.tsx
  * 
@@ -19,6 +18,12 @@ import { toast } from "sonner";
 import { ClipboardCheck, Info } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
+interface InvitationData {
+  invitation_id: string;
+  class_id: string;
+  class_name: string;
+}
+
 export default function Auth() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -35,7 +40,6 @@ export default function Auth() {
     className: string;
   } | null>(null);
 
-  // Parse URL parameters for invitation
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const inviteCode = params.get('invite');
@@ -101,13 +105,12 @@ export default function Auth() {
       if (error) throw error;
       
       if (data.user) {
-        // If this was an invited student, process the invitation
         if (inviteInfo && inviteInfo.code) {
           try {
             await processInvitation(data.user.id, inviteInfo.code);
           } catch (inviteError) {
             console.error("Error processing invitation:", inviteError);
-            // Continue anyway, since the account creation was successful
+            toast.error("An error occurred during sign up");
           }
         }
         
@@ -148,13 +151,11 @@ export default function Auth() {
       setLoading(false);
     }
   };
-  
-  // Process the invitation after signup
+
   const processInvitation = async (userId: string, inviteCode: string) => {
     try {
-      // First, check if the invitation is valid
       const { data: inviteData, error: inviteError } = await supabase
-        .rpc('check_student_invitation', {
+        .rpc<InvitationData[]>('check_student_invitation', {
           student_email: email.toLowerCase().trim(),
           invite_code: inviteCode
         });
@@ -165,10 +166,8 @@ export default function Auth() {
         throw new Error("Invalid invitation");
       }
       
-      // Get the first result (should only be one matching invitation)
       const invitation = inviteData[0];
       
-      // Add the student to the class
       const { error: enrollError } = await supabase
         .from("class_students")
         .insert({
@@ -178,11 +177,11 @@ export default function Auth() {
         
       if (enrollError) throw enrollError;
       
-      // Update invitation status
       const { error: updateError } = await supabase
-        .from("invitations")
-        .update({ status: "accepted" })
-        .eq("id", invitation.invitation_id);
+        .rpc('update_invitation_status', {
+          invitation_identifier: invitation.invitation_id,
+          new_status: 'accepted'
+        });
         
       if (updateError) throw updateError;
       

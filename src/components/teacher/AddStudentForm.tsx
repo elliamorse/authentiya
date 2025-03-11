@@ -118,12 +118,12 @@ export default function AddStudentForm({ classId, className }: AddStudentFormPro
       const inviteCode = Math.random().toString(36).substring(2, 15);
       
       // Store invitation in database
-      const { error } = await supabase.from("invitations").insert({
-        email: inviteEmail.toLowerCase().trim(),
-        class_id: classId,
-        code: inviteCode,
-        message: inviteMessage,
-        status: "pending"
+      // Using executeRaw method to work around the type issue
+      const { error } = await supabase.rpc('create_invitation', {
+        student_email: inviteEmail.toLowerCase().trim(),
+        class_identifier: classId,
+        invitation_code: inviteCode,
+        invitation_message: inviteMessage
       });
         
       if (error) throw error;
