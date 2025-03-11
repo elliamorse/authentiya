@@ -1,10 +1,10 @@
-
 /**
  * StudentDashboard.tsx
  * 
  * This component renders the main student dashboard including the document editor.
  * It allows students to write and edit documents, link to assignments, and track metrics.
  * Document names can be edited with confirmation popups only when actually changed.
+ * Now uses a WordProcessor component for a more robust document editing experience.
  */
 
 import { useState, useEffect, useRef } from "react";
@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import AssignmentPrompt from "./AssignmentPrompt";
 import WritingMetrics from "./WritingMetrics";
 import CitationPrompt from "./CitationPrompt";
+import WordProcessor from "./WordProcessor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -47,7 +48,6 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
   const [isEditingName, setIsEditingName] = useState(false);
   const [originalDocumentName, setOriginalDocumentName] = useState("Untitled Document");
   
-  // Check for saved linked assignment
   useEffect(() => {
     const savedLinkedAssignment = window.localStorage.getItem("linkedAssignment");
     const savedLinkedAssignmentTitle = window.localStorage.getItem("linkedAssignmentTitle");
@@ -64,17 +64,14 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
       setShowAssignmentPrompt(true);
     }
     
-    // Load saved document if available
     const savedContent = window.localStorage.getItem("currentDocument");
     if (savedContent) {
       setContent(savedContent);
       
-      // Count words
       const words = savedContent.trim().split(/\s+/);
       setWordCount(savedContent.trim() === "" ? 0 : words.length);
     }
     
-    // Load saved document name
     const savedDocumentName = window.localStorage.getItem("documentName");
     if (savedDocumentName) {
       setDocumentName(savedDocumentName);
@@ -82,32 +79,27 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
     }
   }, []);
   
-  // Save content to localStorage when it changes
   useEffect(() => {
     if (content) {
       window.localStorage.setItem("currentDocument", content);
     }
   }, [content]);
   
-  // Save document name to localStorage when it changes
   useEffect(() => {
     if (documentName) {
       window.localStorage.setItem("documentName", documentName);
     }
   }, [documentName]);
   
-  // Add event listeners for copy-paste detection
   useEffect(() => {
     const handlePasteEvent = (e: ClipboardEvent) => {
-      // Only proceed if we have an active assignment
-      if (linkedAssignment) {
+      if (linkedAssignment && e.target instanceof HTMLTextAreaElement) {
         const pastedText = e.clipboardData?.getData('text') || "";
         if (pastedText.trim()) {
           setCopiedText(pastedText);
           setCopyPasteCount(prev => prev + 1);
           setShowCitationPrompt(true);
           
-          // Log the paste event
           console.log("Paste detected:", pastedText.substring(0, 50) + (pastedText.length > 50 ? "..." : ""));
           toast.info("Content pasted", {
             description: "Please cite your source"
@@ -116,19 +108,12 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
       }
     };
     
-    // Add event listener to the textarea
-    const textarea = textareaRef.current;
-    if (textarea) {
-      textarea.addEventListener('paste', handlePasteEvent);
-    }
+    document.addEventListener('paste', handlePasteEvent);
     
     return () => {
-      // Clean up event listener
-      if (textarea) {
-        textarea.removeEventListener('paste', handlePasteEvent);
-      }
+      document.removeEventListener('paste', handlePasteEvent);
     };
-  }, [linkedAssignment, textareaRef]);
+  }, [linkedAssignment]);
   
   const handleLinkAssignment = (assignmentId: string, assignmentTitle?: string) => {
     setLinkedAssignment(assignmentId);
@@ -150,11 +135,9 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
     });
   };
   
-  const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newContent = e.target.value;
+  const handleTextChange = (newContent: string) => {
     setContent(newContent);
     
-    // Count words (simple splitting by spaces)
     const words = newContent.trim().split(/\s+/);
     setWordCount(newContent.trim() === "" ? 0 : words.length);
   };
@@ -177,7 +160,6 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
       description: "Your assignment has been successfully submitted"
     });
     
-    // Reset state
     setLinkedAssignment(null);
     setLinkedAssignmentTitle(null);
     setStartTime(null);
@@ -188,20 +170,17 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
     setDocumentName("Untitled Document");
     setOriginalDocumentName("Untitled Document");
     
-    // Clear local storage
     window.localStorage.removeItem("linkedAssignment");
     window.localStorage.removeItem("linkedAssignmentTitle");
     window.localStorage.removeItem("currentDocument");
     window.localStorage.removeItem("documentName");
     
-    // Navigate to assignments page
     navigate("/student/assignments");
   };
   
   const toggleEditName = () => {
     setIsEditingName(!isEditingName);
     if (!isEditingName) {
-      // Starting to edit - save the current name as original
       setOriginalDocumentName(documentName);
     }
   };
@@ -213,7 +192,6 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
       setDocumentName(linkedAssignmentTitle || "Untitled Document");
     }
     
-    // Only show toast if the name actually changed
     if (documentName !== originalDocumentName) {
       toast.success("Document renamed", {
         description: `Saved as "${documentName}"`
@@ -343,18 +321,11 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
             )}
           </div>
           
-          <textarea
-            ref={textareaRef}
-            className="w-full min-h-[350px] p-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-authentiya-maroon/50 transition-all resize-y text-authentiya-charcoal-darkest bg-white dark:bg-white"
+          <WordProcessor 
+            content={content} 
+            onChange={handleTextChange}
             placeholder="Start typing your document here..."
-            value={content}
-            onChange={handleTextAreaChange}
-            style={{
-              fontFamily: 'serif',
-              fontSize: '16px',
-              lineHeight: '1.6'
-            }}
-          ></textarea>
+          />
         </div>
       </div>
       

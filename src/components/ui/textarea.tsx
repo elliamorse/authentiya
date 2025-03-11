@@ -1,3 +1,12 @@
+
+/**
+ * Textarea.tsx
+ * 
+ * This component is a textarea input element designed to work seamlessly with our custom UI.
+ * It provides a clean, styled textarea that can be used across the application.
+ * Modified to work better with the WordProcessor component.
+ */
+
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
