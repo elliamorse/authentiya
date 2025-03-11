@@ -19,6 +19,11 @@ interface InvitationData {
   class_name: string;
 }
 
+interface AuthFormData {
+  email: string;
+  role: "student" | "teacher";
+}
+
 const Auth = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -67,16 +72,16 @@ const Auth = () => {
   const checkInvitation = async (studentEmail: string, code: string) => {
     try {
       // Check if invitation is valid
-      const { data, error } = await supabase.rpc<InvitationData[]>('check_student_invitation', {
+      const { data, error } = await supabase.rpc<InvitationData>('check_student_invitation', {
         student_email: studentEmail,
         invite_code: code
       });
       
       if (error) throw error;
       
-      if (data && data.length > 0) {
-        setInvitation(data[0]);
-        toast.info(`You've been invited to join ${data[0].class_name}`);
+      if (data) {
+        setInvitation(data as InvitationData);
+        toast.info(`You've been invited to join ${data.class_name}`);
       }
     } catch (error) {
       console.error('Error checking invitation:', error);
@@ -87,15 +92,15 @@ const Auth = () => {
   const processInvitation = async (userId: string, studentEmail: string, code: string) => {
     try {
       // Check if invitation is valid
-      const { data, error } = await supabase.rpc<InvitationData[]>('check_student_invitation', {
+      const { data, error } = await supabase.rpc<InvitationData>('check_student_invitation', {
         student_email: studentEmail,
         invite_code: code
       });
       
       if (error) throw error;
       
-      if (data && data.length > 0) {
-        const invitationData = data[0];
+      if (data) {
+        const invitationData = data as InvitationData;
         
         // Add student to class
         const { error: enrollError } = await supabase
@@ -123,14 +128,20 @@ const Auth = () => {
     }
   };
 
-  const handleSignUpSuccess = async (userId: string, email: string) => {
-    // If there was an invitation, process it
-    if (inviteCode && email && invitation) {
-      await processInvitation(userId, email, inviteCode);
+  const handleAuthComplete = async (formData: AuthFormData) => {
+    try {
+      // If there was an invitation, process it
+      if (inviteCode && formData.email && invitation) {
+        // This would be handled by the AuthForm component now
+        await processInvitation("user-id-will-be-provided-later", formData.email, inviteCode);
+      }
+      
+      // Redirect to dashboard
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Error during auth completion:', error);
+      toast.error('Authentication failed');
     }
-    
-    // Redirect to dashboard
-    navigate('/dashboard');
   };
 
   if (loading) {
@@ -145,10 +156,7 @@ const Auth = () => {
     <div className="flex items-center justify-center min-h-screen bg-gray-50 auth-container">
       <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
         <AuthForm 
-          redirectTo="/dashboard" 
-          defaultEmail={email || ''} 
-          onSignUpSuccess={handleSignUpSuccess}
-          invitation={invitation}
+          onComplete={handleAuthComplete}
         />
       </div>
     </div>

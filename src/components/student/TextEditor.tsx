@@ -31,7 +31,11 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Edit, Eye } from "lucide-react";
 
 interface TextEditorProps {
-  assignmentId: string;
+  content: string;
+  onChange: (newContent: string) => void;
+  onPaste?: (pastedText: string) => void;
+  readOnly?: boolean;
+  assignmentId?: string;
   studentAssignmentId?: string | null;
 }
 
@@ -64,7 +68,6 @@ const modules = {
     [{ 'align': [] }],
 
     ['clean'],                                         // remove formatting button
-    ['citation']
   ],
 };
 
@@ -73,58 +76,39 @@ const formats = [
   'blockquote', 'code-block',
   'header', 'list', 'script', 'indent', 'direction',
   'size', 'color', 'background', 'font', 'align',
-  'clean', 'link', 'image', 'video', 'citation'
+  'clean', 'link', 'image', 'video'
 ];
 
-export default function TextEditor({ assignmentId, studentAssignmentId }: TextEditorProps) {
-  const [content, setContent] = useState('');
-  const [documentName, setDocumentName] = useState('Untitled Document');
+export default function TextEditor({ 
+  content, 
+  onChange, 
+  onPaste, 
+  readOnly = false,
+  assignmentId, 
+  studentAssignmentId 
+}: TextEditorProps) {
   const [isCitationDialogOpen, setIsCitationDialogOpen] = useState(false);
   const [citationType, setCitationType] = useState('');
   const [citationSource, setCitationSource] = useState('');
   const [citationDetails, setCitationDetails] = useState('');
   const [selectedCitationId, setSelectedCitationId] = useState<string | null>(null);
   const [citations, setCitations] = useState<Citation[]>([]);
-  const [mode, setMode] = useState("edit");
+  const [mode, setMode] = useState<"edit" | "preview">("edit");
 
   const queryClient = useQueryClient();
   const { user } = useUser();
   const quillRef = useRef<ReactQuill>(null);
-  const debouncedContent = useDebounce(content, 500);
 
-  // Fetch existing student assignment
-  const { data: studentAssignment, isLoading: isAssignmentLoading } = useQuery({
-    queryKey: ["studentAssignment", assignmentId, user?.id],
-    queryFn: async () => {
-      if (!assignmentId || !user?.id) return null;
-
-      const { data, error } = await supabase
-        .from("student_assignments")
-        .select("*")
-        .eq("assignment_id", assignmentId)
-        .eq("student_id", user.id)
-        .single();
-
-      if (error) {
-        console.error("Error fetching student assignment:", error);
-        return null;
-      }
-
-      return data;
-    },
-    enabled: !!assignmentId && !!user?.id,
-  });
-
-  // Fetch citations
+  // Fetch citations if we have a student assignment ID
   const { data: fetchedCitations } = useQuery({
-    queryKey: ["citations", studentAssignment?.id],
+    queryKey: ["citations", studentAssignmentId],
     queryFn: async () => {
-      if (!studentAssignment?.id) return [];
+      if (!studentAssignmentId) return [];
 
       const { data, error } = await supabase
         .from("citations")
         .select("*")
-        .eq("student_assignment_id", studentAssignment.id);
+        .eq("student_assignment_id", studentAssignmentId);
 
       if (error) {
         console.error("Error fetching citations:", error);
@@ -133,7 +117,7 @@ export default function TextEditor({ assignmentId, studentAssignmentId }: TextEd
 
       return data as Citation[];
     },
-    enabled: !!studentAssignment?.id,
+    enabled: !!studentAssignmentId,
   });
 
   useEffect(() => {
@@ -142,87 +126,9 @@ export default function TextEditor({ assignmentId, studentAssignmentId }: TextEd
     }
   }, [fetchedCitations]);
 
-  // Initialize content and document name
-  useEffect(() => {
-    if (studentAssignment) {
-      setContent(studentAssignment.content || '');
-      setDocumentName(studentAssignment.document_name || 'Untitled Document');
-    }
-  }, [studentAssignment]);
-
-  // Mutation to create a new student assignment
-  const createStudentAssignmentMutation = useMutation({
-    mutationFn: async () => {
-      if (!assignmentId || !user?.id) return null;
-
-      const { data, error } = await supabase
-        .from("student_assignments")
-        .insert([
-          {
-            assignment_id: assignmentId,
-            student_id: user.id,
-            content: debouncedContent,
-            document_name: documentName,
-            status: 'draft',
-          },
-        ])
-        .select();
-
-      if (error) {
-        console.error("Error creating student assignment:", error);
-        throw new Error("Failed to create student assignment");
-      }
-
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["studentAssignment", assignmentId, user?.id] });
-    },
-  });
-
-  // Mutation to update an existing student assignment
-  const updateStudentAssignmentMutation = useMutation({
-    mutationFn: async () => {
-      if (!studentAssignment?.id) return null;
-
-      const { data, error } = await supabase
-        .from("student_assignments")
-        .update({
-          content: debouncedContent,
-          document_name: documentName,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", studentAssignment.id)
-        .select();
-
-      if (error) {
-        console.error("Error updating student assignment:", error);
-        throw new Error("Failed to update student assignment");
-      }
-
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["studentAssignment", assignmentId, user?.id] });
-    },
-  });
-
-  // Save content to database
-  useEffect(() => {
-    if (!debouncedContent) return;
-
-    if (studentAssignment) {
-      // Update existing assignment
-      updateStudentAssignmentMutation.mutate();
-    } else {
-      // Create new assignment
-      createStudentAssignmentMutation.mutate();
-    }
-  }, [debouncedContent, studentAssignment]);
-
   // Handle citation creation
   const handleCreateCitation = async () => {
-    if (!citationType || !citationSource || !citationDetails || !studentAssignment?.id) {
+    if (!citationType || !citationSource || !citationDetails || !studentAssignmentId) {
       toast.error("Please fill in all citation details");
       return;
     }
@@ -240,7 +146,7 @@ export default function TextEditor({ assignmentId, studentAssignmentId }: TextEd
             type: citationType,
             source: citationSource,
             details: citationDetails,
-            student_assignment_id: studentAssignment.id,
+            student_assignment_id: studentAssignmentId,
             id: selectedCitationId,
           },
         ])
@@ -265,7 +171,7 @@ export default function TextEditor({ assignmentId, studentAssignmentId }: TextEd
 
   // Handle citation updates
   const handleUpdateCitation = async () => {
-    if (!citationType || !citationSource || !citationDetails || !studentAssignment?.id) {
+    if (!citationType || !citationSource || !citationDetails || !studentAssignmentId) {
       toast.error("Please fill in all citation details");
       return;
     }
@@ -338,12 +244,15 @@ export default function TextEditor({ assignmentId, studentAssignmentId }: TextEd
 
   // Handle editor change
   const handleChange = (value: string) => {
-    setContent(value);
+    onChange(value);
   };
 
-  // Handle document name change
-  const handleDocumentNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDocumentName(e.target.value);
+  // Handle paste event
+  const handlePaste = (e: React.ClipboardEvent) => {
+    if (onPaste) {
+      const text = e.clipboardData.getData('text/plain');
+      onPaste(text);
+    }
   };
 
   // Handle citation dialog open
@@ -369,7 +278,7 @@ export default function TextEditor({ assignmentId, studentAssignmentId }: TextEd
         type="single"
         value={mode}
         onValueChange={(value) => {
-          if (value) setMode(value);
+          if (value) setMode(value as "edit" | "preview");
         }}
         className="justify-end"
       >
@@ -386,36 +295,26 @@ export default function TextEditor({ assignmentId, studentAssignmentId }: TextEd
   };
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="container mx-auto">
       <div className="mb-4">
-        <Label htmlFor="document-name" className="block text-sm font-medium text-gray-700">
-          Document Name
-        </Label>
-        <Input
-          type="text"
-          id="document-name"
-          className="mt-1 block w-full"
-          placeholder="Untitled Document"
-          value={documentName}
-          onChange={handleDocumentNameChange}
-        />
+        <EditorModeToggle />
       </div>
-
-      <EditorModeToggle />
 
       {mode === "edit" ? (
         <ReactQuill
           ref={quillRef}
           value={content}
           onChange={handleChange}
+          onPaste={handlePaste}
           modules={modules}
           formats={formats}
           placeholder="Start writing here..."
           className="bg-white"
+          readOnly={readOnly}
         />
       ) : (
         <div
-          className="prose"
+          className="prose bg-white p-4 rounded"
           dangerouslySetInnerHTML={{ __html: content }}
         />
       )}
