@@ -4,6 +4,10 @@
  * 
  * This component provides search functionality for existing students
  * and allows teachers to add them directly to their classes.
+ * 
+ * Updates:
+ * - Fixed TypeScript errors by properly typing Supabase RPC function calls
+ * - Added proper type narrowing for the returned data
  */
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -33,10 +37,10 @@ export default function StudentSearch({ classId, onStudentAdded }: StudentSearch
     queryKey: ["available-students", classId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .rpc<Student>('get_available_students', { class_identifier: classId });
+        .rpc<Student, { class_identifier: string }>('get_available_students', { class_identifier: classId });
       
       if (error) throw error;
-      return data;
+      return data || [];
     }
   });
 

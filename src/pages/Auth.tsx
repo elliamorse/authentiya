@@ -4,6 +4,11 @@
  * 
  * This file contains the authentication page component that handles user login,
  * registration, and processing invitation links for classes.
+ * 
+ * Updates:
+ * - Fixed TypeScript errors by properly typing Supabase RPC function calls
+ * - Added proper type narrowing for RPC responses
+ * - Improved type safety when accessing properties from RPC responses
  */
 
 import { useState, useEffect } from 'react';
@@ -22,6 +27,13 @@ interface InvitationData {
 interface AuthFormData {
   email: string;
   role: "student" | "teacher";
+}
+
+// Define the structure of our RPC response
+interface InvitationResponseItem {
+  invitation_id: string;
+  class_id: string;
+  class_name: string;
 }
 
 const Auth = () => {
@@ -72,7 +84,10 @@ const Auth = () => {
   const checkInvitation = async (studentEmail: string, code: string) => {
     try {
       // Check if invitation is valid
-      const { data, error } = await supabase.rpc<{ invitation_id: string; class_id: string; class_name: string; }[]>(
+      const { data, error } = await supabase.rpc<InvitationResponseItem[], {
+        student_email: string;
+        invite_code: string;
+      }>(
         'check_student_invitation',
         { student_email: studentEmail, invite_code: code }
       );
@@ -98,7 +113,10 @@ const Auth = () => {
   const processInvitation = async (userId: string, studentEmail: string, code: string) => {
     try {
       // Check if invitation is valid
-      const { data, error } = await supabase.rpc<{ invitation_id: string; class_id: string; class_name: string; }[]>(
+      const { data, error } = await supabase.rpc<InvitationResponseItem[], {
+        student_email: string;
+        invite_code: string;
+      }>(
         'check_student_invitation',
         { student_email: studentEmail, invite_code: code }
       );
@@ -174,4 +192,3 @@ const Auth = () => {
 };
 
 export default Auth;
-
