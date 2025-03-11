@@ -1,11 +1,13 @@
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 export function useTypingMetrics() {
   const [lastTypingTime, setLastTypingTime] = useState<number | null>(null);
   const [typedCharacters, setTypedCharacters] = useState(0);
   const [typingTime, setTypingTime] = useState(0);
   const [wpm, setWpm] = useState(0);
+  const [isTyping, setIsTyping] = useState(false);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   // Calculate WPM based on typing activity
   const calculateWPM = useCallback(() => {
@@ -24,6 +26,25 @@ export function useTypingMetrics() {
     setWpm(calculateWPM());
   }, [typedCharacters, typingTime, calculateWPM]);
   
+  // Set typing status to false after inactivity
+  useEffect(() => {
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    
+    if (isTyping) {
+      typingTimeoutRef.current = setTimeout(() => {
+        setIsTyping(false);
+      }, 3000); // Stop considering typing after 3 seconds of inactivity
+    }
+    
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    };
+  }, [isTyping, lastTypingTime]);
+  
   const trackTyping = (oldContent: string, newContent: string) => {
     // Check if characters were added (not deleted or pasted)
     if (newContent.length > oldContent.length) {
@@ -40,6 +61,7 @@ export function useTypingMetrics() {
         }
       }
       setLastTypingTime(now);
+      setIsTyping(true);
     }
     
     // Count words (simple splitting by spaces)
@@ -49,8 +71,18 @@ export function useTypingMetrics() {
     return wordCount;
   };
   
+  const resetTypingMetrics = () => {
+    setTypedCharacters(0);
+    setTypingTime(0);
+    setWpm(0);
+    setLastTypingTime(null);
+    setIsTyping(false);
+  };
+  
   return {
     wpm,
-    trackTyping
+    trackTyping,
+    resetTypingMetrics,
+    isTyping
   };
 }

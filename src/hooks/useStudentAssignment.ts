@@ -28,6 +28,7 @@ export function useStudentAssignment(linkedAssignmentId: string | null) {
             copy_paste_count,
             citation_count,
             content,
+            document_name,
             assignment_id,
             assignments(title, due_date, classes(name))
           `)
@@ -46,6 +47,8 @@ export function useStudentAssignment(linkedAssignmentId: string | null) {
         
         // If it doesn't exist, create it
         const now = new Date().toISOString();
+        const defaultDocName = "Untitled Document";
+        
         const { data: newData, error: insertError } = await supabase
           .from("student_assignments")
           .insert({
@@ -53,7 +56,8 @@ export function useStudentAssignment(linkedAssignmentId: string | null) {
             assignment_id: linkedAssignmentId,
             status: "in_progress",
             start_time: now,
-            last_active: now
+            last_active: now,
+            document_name: defaultDocName
           })
           .select()
           .single();
@@ -124,6 +128,19 @@ export function useStudentAssignment(linkedAssignmentId: string | null) {
       toast.error("Failed to update assignment");
     }
   });
+  
+  const updateDocumentName = (documentName: string) => {
+    if (!studentAssignment?.id) return;
+    
+    updateAssignment.mutate({
+      document_name: documentName,
+      last_active: new Date().toISOString()
+    });
+    
+    toast.success("Document name updated", {
+      description: "Your document name has been updated"
+    });
+  };
   
   const updateTimeSpent = () => {
     if (!studentAssignment?.id) return;
@@ -242,6 +259,7 @@ export function useStudentAssignment(linkedAssignmentId: string | null) {
     incrementCopyPasteCount,
     saveContent,
     updateWordCount,
+    updateDocumentName,
     submitAssignment,
     addCitation
   };

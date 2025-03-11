@@ -26,14 +26,16 @@ const Dashboard = () => {
     );
   }
   
+  // Fix: Make sure we render the dashboard even if profile is not fully loaded yet
+  // This prevents getting stuck in a loading state
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
       
-      {profile?.role === "student" ? (
-        <StudentDashboard />
-      ) : (
+      {profile?.role === "teacher" ? (
         <TeacherDashboardWrapper />
+      ) : (
+        <StudentDashboard />
       )}
     </div>
   );

@@ -11,6 +11,7 @@ interface WritingMetricsProps {
   wpm: number;
   copyPasteCount: number;
   citationCount: number;
+  isTyping?: boolean;
 }
 
 export default function WritingMetrics({ 
@@ -18,7 +19,8 @@ export default function WritingMetrics({
   wordCount,
   wpm,
   copyPasteCount, 
-  citationCount 
+  citationCount,
+  isTyping = false
 }: WritingMetricsProps) {
   const [elapsedTime, setElapsedTime] = useState<string>("");
   const [totalSeconds, setTotalSeconds] = useState<number>(0);
@@ -66,7 +68,12 @@ export default function WritingMetrics({
               <Edit3 className="h-4 w-4" />
               <span>Words</span>
             </div>
-            <div className="text-xl font-semibold">{wordCount}</div>
+            <div className="text-xl font-semibold flex items-center gap-2">
+              {wordCount}
+              {isTyping && (
+                <Badge variant="success" className="animate-pulse">Typing</Badge>
+              )}
+            </div>
             <div className="text-xs text-muted-foreground mt-1">
               {wpm > 0 && `${wpm} words/min`}
             </div>
