@@ -1,3 +1,4 @@
+
 /**
  * mockData.ts
  * 
@@ -481,4 +482,142 @@ export const mockStudentAssignments: StudentAssignment[] = [
     assignmentId: "3",
     studentName: "Samuel Carter",
     status: generateRandomStatus(),
-    startTime: generateRandomStatus()
+    startTime: generateRandomStatus() !== "not_started" ? generateRandomDate(10) : null,
+    submissionTime: generateRandomStatus() === "submitted" ? generateRandomDate(5) : null,
+    lastActive: generateRandomStatus() !== "not_started" ? generateRandomDate(1) : null,
+    timeSpent: generateRandomStatus() === "not_started" ? 0 : generateRandomTimeSpent(90, 180),
+    wordCount: generateRandomStatus() === "not_started" ? 0 : generateRandomWordCount(800, 1400),
+    copyPasteCount: generateRandomStatus() === "not_started" ? 0 : Math.floor(Math.random() * 3),
+    citationCount: generateRandomStatus() === "not_started" ? 0 : Math.floor(Math.random() * 9),
+    content: generateRandomStatus() === "not_started" ? null : "The Roman Empire's rise and fall demonstrates the complex interplay of political, military, economic, and social factors that influence the development and decline of great civilizations...",
+    comments: []
+  },
+  {
+    studentId: "32",
+    assignmentId: "3",
+    studentName: "Lily Cooper",
+    status: generateRandomStatus(),
+    startTime: generateRandomStatus() !== "not_started" ? generateRandomDate(9) : null,
+    submissionTime: generateRandomStatus() === "submitted" ? generateRandomDate(4) : null,
+    lastActive: generateRandomStatus() !== "not_started" ? generateRandomDate(2) : null,
+    timeSpent: generateRandomStatus() === "not_started" ? 0 : generateRandomTimeSpent(100, 190),
+    wordCount: generateRandomStatus() === "not_started" ? 0 : generateRandomWordCount(900, 1500),
+    copyPasteCount: generateRandomStatus() === "not_started" ? 0 : Math.floor(Math.random() * 4),
+    citationCount: generateRandomStatus() === "not_started" ? 0 : Math.floor(Math.random() * 10),
+    content: generateRandomStatus() === "not_started" ? null : "The Age of Exploration (15th-17th centuries) marked a period of extensive overseas exploration that established global connections and started the process of globalization...",
+    comments: []
+  },
+  {
+    studentId: "33",
+    assignmentId: "3",
+    studentName: "Ryan Phillips",
+    status: generateRandomStatus(),
+    startTime: generateRandomStatus() !== "not_started" ? generateRandomDate(11) : null,
+    submissionTime: generateRandomStatus() === "submitted" ? generateRandomDate(6) : null,
+    lastActive: generateRandomStatus() !== "not_started" ? generateRandomDate(1) : null,
+    timeSpent: generateRandomStatus() === "not_started" ? 0 : generateRandomTimeSpent(80, 170),
+    wordCount: generateRandomStatus() === "not_started" ? 0 : generateRandomWordCount(700, 1300),
+    copyPasteCount: generateRandomStatus() === "not_started" ? 0 : Math.floor(Math.random() * 2),
+    citationCount: generateRandomStatus() === "not_started" ? 0 : Math.floor(Math.random() * 8),
+    content: generateRandomStatus() === "not_started" ? null : "The Vietnam War (1955-1975) was a complex conflict that divided the American public and raised questions about the limits of American military power and foreign policy...",
+    comments: []
+  },
+  {
+    studentId: "34",
+    assignmentId: "3",
+    studentName: "Chloe Richardson",
+    status: generateRandomStatus(),
+    startTime: generateRandomStatus() !== "not_started" ? generateRandomDate(10) : null,
+    submissionTime: generateRandomStatus() === "submitted" ? generateRandomDate(5) : null,
+    lastActive: generateRandomStatus() !== "not_started" ? generateRandomDate(2) : null,
+    timeSpent: generateRandomStatus() === "not_started" ? 0 : generateRandomTimeSpent(110, 200),
+    wordCount: generateRandomStatus() === "not_started" ? 0 : generateRandomWordCount(1000, 1600),
+    copyPasteCount: generateRandomStatus() === "not_started" ? 0 : Math.floor(Math.random() * 5),
+    citationCount: generateRandomStatus() === "not_started" ? 0 : Math.floor(Math.random() * 12),
+    content: generateRandomStatus() === "not_started" ? null : "The Women's Suffrage Movement was a decades-long struggle to win the right to vote for women in the United States and around the world...",
+    comments: []
+  },
+  {
+    studentId: "35",
+    assignmentId: "3",
+    studentName: "Jacob Morris",
+    status: generateRandomStatus(),
+    startTime: generateRandomStatus() !== "not_started" ? generateRandomDate(9) : null,
+    submissionTime: generateRandomStatus() === "submitted" ? generateRandomDate(4) : null,
+    lastActive: generateRandomStatus() !== "not_started" ? generateRandomDate(1) : null,
+    timeSpent: generateRandomStatus() === "not_started" ? 0 : generateRandomTimeSpent(90, 180),
+    wordCount: generateRandomStatus() === "not_started" ? 0 : generateRandomWordCount(800, 1400),
+    copyPasteCount: generateRandomStatus() === "not_started" ? 0 : Math.floor(Math.random() * 3),
+    citationCount: generateRandomStatus() === "not_started" ? 0 : Math.floor(Math.random() * 9),
+    content: generateRandomStatus() === "not_started" ? null : "The Scientific Revolution (16th-18th centuries) marked a shift in the way people understood the natural world, emphasizing observation, experimentation, and rational thought...",
+    comments: []
+  }
+];
+
+// Mock data for assignments
+export const mockAssignments: Assignment[] = [
+  {
+    id: "1",
+    title: "Essay on American Literature",
+    className: "English 101",
+    dueDate: "2023-11-15",
+    totalStudents: 28,
+    studentsStarted: 22,
+    studentsSubmitted: 16,
+    averageTimeSpent: 95, // in minutes
+    averageWordCount: 850,
+    createdAt: "2023-11-01",
+  },
+  {
+    id: "2",
+    title: "Physics Problem Set",
+    className: "Physics 202",
+    dueDate: "2023-11-18",
+    totalStudents: 24,
+    studentsStarted: 18,
+    studentsSubmitted: 10,
+    averageTimeSpent: 120, // in minutes
+    averageWordCount: 650,
+    createdAt: "2023-11-05",
+  },
+  {
+    id: "3",
+    title: "History Research Paper",
+    className: "History 105",
+    dueDate: "2023-11-20",
+    totalStudents: 32,
+    studentsStarted: 20,
+    studentsSubmitted: 8,
+    averageTimeSpent: 150, // in minutes
+    averageWordCount: 1200,
+    createdAt: "2023-11-03",
+  },
+];
+
+// Mock data for classes
+export const mockClasses: ClassInfo[] = [
+  {
+    id: "1",
+    name: "English 101",
+    subject: "English",
+    period: "1st Period",
+    studentCount: 28,
+    activeAssignmentCount: 3,
+  },
+  {
+    id: "2",
+    name: "Physics 202",
+    subject: "Science",
+    period: "3rd Period",
+    studentCount: 24,
+    activeAssignmentCount: 2,
+  },
+  {
+    id: "3",
+    name: "History 105",
+    subject: "History",
+    period: "5th Period",
+    studentCount: 32,
+    activeAssignmentCount: 4,
+  },
+];
