@@ -2,6 +2,10 @@
 /**
  * This file provides a component for managing document metadata like name, last saved time,
  * and other document properties in the student editor.
+ * 
+ * Updates:
+ * - Added isAutoSaving prop to show autosaving status
+ * - Improved display of document metadata with autosave indicator
  */
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";

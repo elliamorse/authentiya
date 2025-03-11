@@ -2,6 +2,13 @@
 /**
  * This file provides the main student dashboard component with an enhanced document editor
  * that resembles a word processor, including document renaming and assignment submission.
+ * 
+ * Updates:
+ * - Auto-prompt for assignment linking when opening editor
+ * - Default document name comes from linked assignment
+ * - Improved session time tracking to only show active typing time
+ * - Implemented autosaving with visual indicator
+ * - Removed manual save and simulate paste buttons
  */
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
@@ -15,11 +22,8 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { 
   BookOpen, 
-  Copy, 
-  FileText, 
   Quote, 
-  SendHorizontal,
-  Save
+  SendHorizontal
 } from "lucide-react";
 
 interface StudentDashboardProps {
@@ -27,24 +31,34 @@ interface StudentDashboardProps {
   onLogout: () => void;
 }
 
+// Mock assignments data for demo purposes
+const mockAssignments = [
+  { id: '1', title: 'Essay on American Literature', class: 'English 101', dueDate: '2023-11-15' },
+  { id: '2', title: 'Physics Problem Set', class: 'Physics 202', dueDate: '2023-11-18' },
+  { id: '3', title: 'History Research Paper', class: 'History 105', dueDate: '2023-11-20' },
+];
+
 export default function StudentDashboard({ userEmail, onLogout }: StudentDashboardProps) {
   const navigate = useNavigate();
   const editorRef = useRef<HTMLDivElement>(null);
   
   const [showAssignmentPrompt, setShowAssignmentPrompt] = useState(false);
   const [linkedAssignment, setLinkedAssignment] = useState<string | null>(null);
-  const [startTime, setStartTime] = useState<Date | null>(null);
+  const [assignmentDetails, setAssignmentDetails] = useState<{id: string, title: string} | null>(null);
+  const [startTime, setStartTime] = useState<Date>(new Date());
   const [lastSavedTime, setLastSavedTime] = useState<Date | null>(null);
   const [wordCount, setWordCount] = useState(0);
   const [copyPasteCount, setCopyPasteCount] = useState(0);
+  const [pastedWordCount, setPastedWordCount] = useState(0);
   const [citationCount, setCitationCount] = useState(0);
   const [showCitationPrompt, setShowCitationPrompt] = useState(false);
   const [copiedText, setCopiedText] = useState("");
   const [content, setContent] = useState("");
   const [documentName, setDocumentName] = useState("Untitled Document");
   const [showSubmitDialog, setShowSubmitDialog] = useState(false);
+  const [isAutoSaving, setIsAutoSaving] = useState(false);
   
-  // Check for saved linked assignment
+  // Prompt for assignment linking on first load if no assignment is linked
   useEffect(() => {
     const savedLinkedAssignment = window.localStorage.getItem("linkedAssignment");
     const savedDocumentName = window.localStorage.getItem("documentName");
@@ -52,15 +66,28 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
     
     if (savedLinkedAssignment) {
       setLinkedAssignment(savedLinkedAssignment);
-      setStartTime(new Date());
+      
+      // Find assignment details to set document name
+      const assignment = mockAssignments.find(a => a.id === savedLinkedAssignment);
+      if (assignment) {
+        setAssignmentDetails(assignment);
+        // Only use assignment title if no custom document name was saved
+        if (!savedDocumentName) {
+          setDocumentName(assignment.title);
+          window.localStorage.setItem("documentName", assignment.title);
+        }
+      }
     } else {
+      // Show assignment prompt immediately if no assignment is linked
       setShowAssignmentPrompt(true);
     }
     
+    // Load saved document name if exists
     if (savedDocumentName) {
       setDocumentName(savedDocumentName);
     }
     
+    // Load saved content if exists
     if (savedContent) {
       setContent(savedContent);
       
@@ -69,6 +96,9 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
         editorRef.current.innerHTML = savedContent;
       }
     }
+    
+    // Initialize start time
+    setStartTime(new Date());
   }, []);
   
   // Auto-save effect
@@ -79,8 +109,16 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
         setContent(newContent);
         window.localStorage.setItem("documentContent", newContent);
         setLastSavedTime(new Date());
+        
+        // Show autosaving indicator
+        setIsAutoSaving(true);
+        
+        // Hide autosaving indicator after 2 seconds
+        setTimeout(() => {
+          setIsAutoSaving(false);
+        }, 2000);
       }
-    }, 5000); // Auto-save every 5 seconds
+    }, 3000); // Auto-save every 3 seconds
     
     return () => clearInterval(saveInterval);
   }, [content]);
@@ -95,6 +133,10 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
           setCopiedText(pastedText);
           setCopyPasteCount(prev => prev + 1);
           setShowCitationPrompt(true);
+          
+          // Calculate approximate word count of pasted text
+          const pastedWords = pastedText.trim().split(/\s+/).length;
+          setPastedWordCount(prev => prev + pastedWords);
           
           // Log the paste event
           console.log("Paste detected:", pastedText.substring(0, 50) + (pastedText.length > 50 ? "..." : ""));
@@ -147,10 +189,20 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
   
   const handleLinkAssignment = (assignmentId: string) => {
     setLinkedAssignment(assignmentId);
-    setStartTime(new Date());
-    setShowAssignmentPrompt(false);
+    
+    // Find assignment details
+    const assignment = mockAssignments.find(a => a.id === assignmentId);
+    if (assignment) {
+      setAssignmentDetails(assignment);
+      // Only set document name if it's still the default
+      if (documentName === "Untitled Document") {
+        setDocumentName(assignment.title);
+        window.localStorage.setItem("documentName", assignment.title);
+      }
+    }
     
     window.localStorage.setItem("linkedAssignment", assignmentId);
+    setShowAssignmentPrompt(false);
     
     toast.success("Assignment linked successfully", {
       description: "Your writing is now linked to this assignment"
@@ -177,16 +229,15 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
       setContent(editorRef.current.innerHTML);
       window.localStorage.setItem("documentContent", editorRef.current.innerHTML);
       setLastSavedTime(new Date());
+      
+      // Show autosaving indicator
+      setIsAutoSaving(true);
+      
+      // Hide autosaving indicator after 2 seconds
+      setTimeout(() => {
+        setIsAutoSaving(false);
+      }, 2000);
     }
-  };
-  
-  // Simulate copy/paste detection
-  const handleManualPaste = () => {
-    setCopyPasteCount(prev => prev + 1);
-    // Get clipboard text (in a real app, this would access navigator.clipboard)
-    // For demo, we'll just simulate it
-    setCopiedText("This is a simulated copied text from an external source...");
-    setShowCitationPrompt(true);
   };
   
   const handleAddCitation = (citation: {
@@ -232,28 +283,21 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
         editorRef.current.appendChild(citationElement);
       }
       
-      // Update content
+      // Update content and trigger autosave
       setContent(editorRef.current.innerHTML);
       window.localStorage.setItem("documentContent", editorRef.current.innerHTML);
       setLastSavedTime(new Date());
+      setIsAutoSaving(true);
+      
+      // Hide autosaving indicator after 2 seconds
+      setTimeout(() => {
+        setIsAutoSaving(false);
+      }, 2000);
     }
     
     toast.success("Citation added", {
       description: `Added citation from ${citation.source}`
     });
-  };
-  
-  const handleManualSave = () => {
-    if (editorRef.current) {
-      const newContent = editorRef.current.innerHTML;
-      setContent(newContent);
-      window.localStorage.setItem("documentContent", newContent);
-      setLastSavedTime(new Date());
-      
-      toast.success("Document saved", {
-        description: "Your document has been saved"
-      });
-    }
   };
   
   const handleSubmitAssignment = (classId: string, assignmentId: string) => {
@@ -309,6 +353,8 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
           wordCount={wordCount} 
           copyPasteCount={copyPasteCount}
           citationCount={citationCount}
+          activeTypingOnly={true}
+          pastedWordCount={pastedWordCount}
         />
       )}
       
@@ -318,6 +364,7 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
           onDocumentNameChange={handleDocumentNameChange}
           lastSavedTime={lastSavedTime}
           wordCount={wordCount}
+          isAutoSaving={isAutoSaving}
         />
         
         <DocumentToolbar onFormat={handleFormatCommand} />
@@ -335,15 +382,6 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
               variant="outline" 
               size="sm" 
               className="gap-1"
-              onClick={handleManualPaste}
-            >
-              <Copy className="h-4 w-4" />
-              <span>Simulate Paste</span>
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="gap-1 ml-2"
               onClick={() => {
                 setCitationCount(prev => prev + 1);
                 toast.success("Citation added", {
@@ -357,15 +395,6 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
           </div>
           
           <div>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="gap-1 mr-2"
-              onClick={handleManualSave}
-            >
-              <Save className="h-4 w-4" />
-              <span>Save</span>
-            </Button>
             <Button 
               size="sm" 
               className="gap-1 academic-btn-primary"
