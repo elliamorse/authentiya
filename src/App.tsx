@@ -1,10 +1,17 @@
 
+/**
+ * App.tsx
+ * 
+ * Main application component that sets up routing and global providers.
+ * Updated to rename Dashboard routes to Editor for consistency.
+ */
+
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
-import Editor from "./pages/Dashboard"; // Renamed but kept file the same
+import Editor from "./pages/Dashboard"; // File still named Dashboard.tsx but component is Editor
 import TeacherClasses from "./pages/teacher/TeacherClasses";
 import TeacherAssignments from "./pages/teacher/TeacherAssignments";
 import TeacherStudentView from "./pages/teacher/TeacherStudentView";

@@ -1,4 +1,12 @@
 
+/**
+ * Header.tsx
+ * 
+ * This component displays the header for the application.
+ * It includes navigation links and user profile information.
+ * Updated to rename "Dashboard" navigation item to "Editor".
+ */
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/common/Button";
@@ -48,8 +56,8 @@ export default function Header({ userEmail, userRole, onLogout }: HeaderProps) {
           
           {userEmail && !isMobile && (
             <nav className="flex items-center gap-6">
-              <Link to="/dashboard" className="text-sm font-medium transition-colors hover:text-primary">
-                Dashboard
+              <Link to="/editor" className="text-sm font-medium transition-colors hover:text-primary">
+                Editor
               </Link>
               {userRole === "student" ? (
                 <Link to="/student/assignments" className="text-sm font-medium transition-colors hover:text-primary">
@@ -79,8 +87,8 @@ export default function Header({ userEmail, userRole, onLogout }: HeaderProps) {
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link to="/dashboard" className="flex w-full items-center cursor-pointer">
-                    Dashboard
+                  <Link to="/editor" className="flex w-full items-center cursor-pointer">
+                    Editor
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
