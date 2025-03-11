@@ -4,14 +4,13 @@
  * 
  * This component renders a single assignment card in the student assignments list.
  * It displays assignment details, status, and provides a button to start or continue working on it.
- * Updated to handle completed assignments with a view-only option.
  */
 
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/common/Badge";
-import { AlertTriangle, Book, Calendar, CheckCircle, Clock, Eye, GraduationCap } from 'lucide-react';
+import { AlertTriangle, Book, Calendar, CheckCircle, Clock, GraduationCap } from 'lucide-react';
 
 interface AssignmentCardProps {
   assignment: any;
@@ -46,15 +45,13 @@ export default function AssignmentCard({
       case "completed":
         return (
           <Badge variant="success" className="flex items-center gap-1">
-            <CheckCircle className="h-3 w-3" /> Submitted
+            <CheckCircle className="h-3 w-3" /> Complete
           </Badge>
         );
       default:
         return null;
     }
   };
-
-  const existingDocument = documents.find(d => d.assignmentId === assignment.id);
 
   return (
     <Card key={assignment.id} className="overflow-hidden hover:shadow-md transition-all duration-300">
@@ -96,47 +93,31 @@ export default function AssignmentCard({
         <Button 
           variant="default" 
           size="sm" 
-          className={`w-full mt-3 ${assignment.status === 'completed' ? 'bg-green-600 hover:bg-green-700' : 'academic-btn-primary'}`}
+          className="w-full mt-3 academic-btn-primary"
           onClick={() => {
-            // If the assignment is already completed, view the submission
-            if (assignment.status === "completed") {
-              // Find the document and open it in view mode
-              const doc = documents.find(d => d.assignmentId === assignment.id);
-              if (doc) {
-                onOpenDocument(doc);
-              }
+            const doc = documents.find(d => d.assignmentId === assignment.id);
+            if (doc) {
+              onOpenDocument(doc);
             } else {
-              // For in-progress or not started assignments, open or create a document
-              if (existingDocument) {
-                onOpenDocument(existingDocument);
-              } else {
-                const newDoc = {
-                  id: `d${Date.now()}`,
-                  title: assignment.title,
-                  assignmentId: assignment.id,
-                  className: assignment.className,
-                  teacherName: assignment.teacherName,
-                  lastEdited: new Date().toISOString(),
-                  status: "in_progress",
-                  dueDate: assignment.dueDate,
-                  timeSpent: 0,
-                  wordCount: 0,
-                  content: ""
-                };
-                setDocuments([...documents, newDoc]);
-                onOpenDocument(newDoc);
-              }
+              const newDoc = {
+                id: `d${Date.now()}`,
+                title: assignment.title,
+                assignmentId: assignment.id,
+                className: assignment.className,
+                teacherName: assignment.teacherName,
+                lastEdited: new Date().toISOString(),
+                status: "in_progress",
+                dueDate: assignment.dueDate,
+                timeSpent: 0,
+                wordCount: 0,
+                content: ""
+              };
+              setDocuments([...documents, newDoc]);
+              onOpenDocument(newDoc);
             }
           }}
         >
-          {assignment.status === "completed" ? (
-            <div className="flex items-center gap-1">
-              <Eye className="h-4 w-4" />
-              <span>View Submission</span>
-            </div>
-          ) : (
-            assignment.status === "not_started" ? "Start Assignment" : "Continue Working"
-          )}
+          {assignment.status === "not_started" ? "Start Assignment" : "Continue Working"}
         </Button>
       </CardContent>
     </Card>
