@@ -7,7 +7,7 @@
  * - Index/landing page
  * - Dashboard (student or teacher based on role)
  * - Teacher-specific pages (classes, assignments, student view)
- * - Student-specific pages (assignments, editor)
+ * - Student-specific pages (assignments, editor, view submitted assignments)
  * 
  * Also configures global providers:
  * - Query client for data fetching
@@ -19,6 +19,7 @@
  * - Improved routing for student editor with ID parameter
  * - Fixed path for student assignments
  * - Added route for editor with assignment ID parameter
+ * - Added route for viewing submitted assignments
  */
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -30,6 +31,7 @@ import TeacherClasses from "./pages/teacher/TeacherClasses";
 import TeacherAssignments from "./pages/teacher/TeacherAssignments";
 import TeacherStudentView from "./pages/teacher/TeacherStudentView";
 import StudentAssignments from "./pages/student/StudentAssignments";
+import ViewSubmittedAssignment from "./pages/student/ViewSubmittedAssignment";
 import NotFound from "./pages/NotFound";
 import { ThemeProvider } from "./components/theme/ThemeProvider";
 
@@ -50,6 +52,7 @@ const App = () => (
             <Route path="/teacher/student/:studentId/assignment/:assignmentId" element={<TeacherStudentView />} />
             <Route path="/student/assignments" element={<StudentAssignments />} />
             <Route path="/student/editor" element={<Dashboard />} />
+            <Route path="/student/view" element={<ViewSubmittedAssignment />} />
             <Route path="/assignments" element={<Dashboard />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

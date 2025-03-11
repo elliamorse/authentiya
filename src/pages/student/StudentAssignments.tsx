@@ -8,7 +8,7 @@
  * - Added ability to click assignments to open them in the document editor
  * - Uses shared assignment data store for consistency with editor
  * - Shows documents created in the editor in the assignments list
- * - Added dummy content for all assignment states
+ * - Added navigation to the view-only component for submitted assignments
  */
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -55,13 +55,13 @@ export default function StudentAssignments() {
     return false;
   });
   
-  // Open assignment in editor
+  // Open assignment in editor or view component
   const handleOpenAssignment = (assignmentId: string) => {
     // Get the assignment to check its status
     const assignment = assignments.find(a => a.id === assignmentId);
     
     if (assignment && assignment.status === "submitted") {
-      // For submitted assignments, show a view-only mode
+      // For submitted assignments, navigate to the view-only component
       navigate(`/student/view?id=${assignmentId}`);
     } else {
       // For other assignments, open in the editor
