@@ -1,4 +1,3 @@
-
 /**
  * This file provides the student assignments page where students can view their
  * assignments across classes, organized by status (in-progress, submitted, all).
@@ -58,7 +57,16 @@ export default function StudentAssignments() {
   
   // Open assignment in editor
   const handleOpenAssignment = (assignmentId: string) => {
-    navigate(`/student/editor?id=${assignmentId}`);
+    // Get the assignment to check its status
+    const assignment = assignments.find(a => a.id === assignmentId);
+    
+    if (assignment && assignment.status === "submitted") {
+      // For submitted assignments, show a view-only mode
+      navigate(`/student/view?id=${assignmentId}`);
+    } else {
+      // For other assignments, open in the editor
+      navigate(`/student/editor?id=${assignmentId}`);
+    }
   };
   
   // Group assignments by due date (today, this week, future, past)
@@ -203,6 +211,7 @@ export default function StudentAssignments() {
                   size="sm" 
                   className="w-full mt-3 academic-btn-primary"
                   onClick={() => handleOpenAssignment(assignment.id)}
+                  disabled={false}
                 >
                   {assignment.status === "not_started" ? "Start Assignment" : 
                    assignment.status === "submitted" ? "View Submission" : "Continue Working"}

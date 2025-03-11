@@ -18,6 +18,7 @@
  */
 
 import { useEffect } from "react";
+import { toast } from "sonner";
 import AssignmentPrompt from "./AssignmentPrompt";
 import WritingMetrics from "./WritingMetrics";
 import CitationPrompt from "./CitationPrompt";
@@ -107,7 +108,7 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
         </div>
         
         <AssignmentLinkSection 
-          linkedAssignment={linkedAssignment}
+          linkedAssignment={linkedAssignment ? assignmentDetails?.title : null}
           onLinkAssignment={() => setShowAssignmentPrompt(true)}
         />
       </div>
