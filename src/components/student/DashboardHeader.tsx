@@ -2,8 +2,9 @@
 /**
  * DashboardHeader.tsx
  * 
- * This component displays the dashboard header with title, description,
- * and assignment linking controls.
+ * This component displays the editor header with title, description,
+ * and assignment linking controls. Renamed from "Dashboard" to "Editor"
+ * to better reflect its purpose.
  */
 
 import { Button } from "@/components/ui/button";
@@ -21,7 +22,7 @@ export default function DashboardHeader({
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>
-        <h1 className="text-3xl font-bold text-authentiya-charcoal-darkest dark:text-authentiya-accent-cream">Student Dashboard</h1>
+        <h1 className="text-3xl font-bold text-authentiya-charcoal-darkest dark:text-authentiya-accent-cream">Student Editor</h1>
         <p className="text-muted-foreground">Track your writing progress and assignments</p>
       </div>
       

@@ -1,3 +1,10 @@
+/**
+ * Dashboard.tsx
+ * 
+ * This file has been repurposed as the main Editor page that hosts both
+ * the student editor and teacher dashboard depending on the user's role.
+ * Previously called "Dashboard", now conceptually serves as an "Editor" for students.
+ */
 
 import { useState, useEffect } from "react";
 import Header from "../components/layout/Header";

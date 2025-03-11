@@ -1,4 +1,3 @@
-
 /**
  * StudentDashboard.tsx
  * 
@@ -7,6 +6,7 @@
  * Document names can be edited with confirmation popups only when actually changed.
  * Now uses a WordProcessor component for a more robust document editing experience.
  * Refactored into smaller components for better maintainability.
+ * Citation handling has been updated to use the CitationPrompt component directly.
  */
 
 import { useState, useEffect, useRef } from "react";
@@ -136,24 +136,23 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
     setWordCount(newContent.trim() === "" ? 0 : words.length);
   };
   
-  const handleAddCitation = (citation: {
-    type: "website" | "book" | "ai";
+  const handleAddCitation = (citation?: {
+    type: "website" | "book" | "ai" | "other";
     source: string;
     details?: string;
   }) => {
     setCitationCount(prev => prev + 1);
     setShowCitationPrompt(false);
     
-    toast.success("Citation added", {
-      description: `Added citation from ${citation.source}`
-    });
-  };
-  
-  const handleManualAddCitation = () => {
-    setCitationCount(prev => prev + 1);
-    toast.success("Citation added", {
-      description: "Manual citation added"
-    });
+    if (citation) {
+      toast.success("Citation added", {
+        description: `Added citation from ${citation.source}`
+      });
+    } else {
+      toast.success("Citation added", {
+        description: "Manual citation added"
+      });
+    }
   };
   
   const handleSubmitAssignment = () => {
@@ -210,7 +209,7 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
               <DocumentActions 
                 linkedAssignment={linkedAssignment}
                 wordCount={wordCount}
-                onAddCitation={handleManualAddCitation}
+                onAddCitation={handleAddCitation}
                 onSubmitAssignment={handleSubmitAssignment}
               />
             )}

@@ -1,30 +1,40 @@
 
+/**
+ * CitationPrompt.tsx
+ * 
+ * This component displays a popup dialog for users to cite their sources.
+ * It supports website, book, AI, and other citation types, and allows users
+ * to either add a citation or defer it for later.
+ */
+
 import { useState } from "react";
-import { Button } from "@/components/common/Button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/common/Card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { X, BookOpen, MessageSquare, Link2 } from "lucide-react";
+import { X, BookOpen, MessageSquare, Link2, FileQuestion } from "lucide-react";
 
 interface CitationPromptProps {
-  copiedText: string;
+  copiedText?: string;
   onSubmit: (citation: {
-    type: "website" | "book" | "ai";
+    type: "website" | "book" | "ai" | "other";
     source: string;
     details?: string;
   }) => void;
   onDismiss: () => void;
 }
 
-export default function CitationPrompt({ copiedText, onSubmit, onDismiss }: CitationPromptProps) {
-  const [activeTab, setActiveTab] = useState<"website" | "book" | "ai">("website");
+export default function CitationPrompt({ copiedText = "", onSubmit, onDismiss }: CitationPromptProps) {
+  const [activeTab, setActiveTab] = useState<"website" | "book" | "ai" | "other">("website");
   const [website, setWebsite] = useState("");
   const [bookTitle, setBookTitle] = useState("");
   const [bookAuthor, setBookAuthor] = useState("");
   const [aiModel, setAiModel] = useState("ChatGPT");
   const [aiPrompt, setAiPrompt] = useState("");
+  const [otherSource, setOtherSource] = useState("");
+  const [otherDetails, setOtherDetails] = useState("");
   
   const handleSubmit = () => {
     if (activeTab === "website" && website) {
@@ -41,6 +51,12 @@ export default function CitationPrompt({ copiedText, onSubmit, onDismiss }: Cita
         source: aiModel, 
         details: aiPrompt ? `Prompt: ${aiPrompt}` : undefined 
       });
+    } else if (activeTab === "other" && otherSource) {
+      onSubmit({
+        type: "other",
+        source: otherSource,
+        details: otherDetails || undefined
+      });
     }
   };
   
@@ -54,19 +70,21 @@ export default function CitationPrompt({ copiedText, onSubmit, onDismiss }: Cita
           </Button>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="p-3 bg-muted rounded-md text-sm">
-            <p className="font-medium mb-1">Copied text:</p>
-            <p className="text-muted-foreground line-clamp-3">
-              {copiedText || "No text detected"}
-            </p>
-          </div>
+          {copiedText && (
+            <div className="p-3 bg-muted rounded-md text-sm">
+              <p className="font-medium mb-1">Copied text:</p>
+              <p className="text-muted-foreground line-clamp-3">
+                {copiedText}
+              </p>
+            </div>
+          )}
           
           <Tabs 
             value={activeTab} 
-            onValueChange={(v) => setActiveTab(v as "website" | "book" | "ai")}
+            onValueChange={(v) => setActiveTab(v as "website" | "book" | "ai" | "other")}
             className="w-full"
           >
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="website" className="flex items-center gap-1">
                 <Link2 className="h-4 w-4" />
                 Website
@@ -78,6 +96,10 @@ export default function CitationPrompt({ copiedText, onSubmit, onDismiss }: Cita
               <TabsTrigger value="ai" className="flex items-center gap-1">
                 <MessageSquare className="h-4 w-4" />
                 AI
+              </TabsTrigger>
+              <TabsTrigger value="other" className="flex items-center gap-1">
+                <FileQuestion className="h-4 w-4" />
+                Other
               </TabsTrigger>
             </TabsList>
             
@@ -136,11 +158,33 @@ export default function CitationPrompt({ copiedText, onSubmit, onDismiss }: Cita
                 />
               </div>
             </TabsContent>
+            
+            <TabsContent value="other" className="space-y-4 animate-fade-in">
+              <div className="space-y-2">
+                <Label htmlFor="other-source">Source Type</Label>
+                <Input
+                  id="other-source"
+                  placeholder="Interview, Lecture, Video, etc."
+                  value={otherSource}
+                  onChange={(e) => setOtherSource(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="other-details">Details (optional)</Label>
+                <Textarea
+                  id="other-details"
+                  placeholder="Enter any additional details about this source"
+                  value={otherDetails}
+                  onChange={(e) => setOtherDetails(e.target.value)}
+                  rows={3}
+                />
+              </div>
+            </TabsContent>
           </Tabs>
         </CardContent>
         <CardFooter className="flex justify-between">
           <Button variant="outline" onClick={onDismiss}>
-            Cancel
+            Cite Later
           </Button>
           <Button onClick={handleSubmit}>
             Add Citation
