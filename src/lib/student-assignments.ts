@@ -1,13 +1,18 @@
-
 /**
  * This file provides a centralized store for student assignments data,
  * allowing it to be shared between the Dashboard and Assignments pages.
  * 
  * It includes:
+ * - Types for assignment data structures
  * - Mock data for student classes and assignments
  * - Functions to manage assignments (get, update, create)
  * - Assignment status tracking
+ * 
+ * Updates:
+ * - Added citationCount and lastActive to Assignment interface
+ * - Ensured proper typing for assignment status
  */
+
 import { useState, useEffect } from "react";
 
 // Define types for our data structures
@@ -25,6 +30,8 @@ export interface Assignment {
   timeSpent: number;
   wordCount: number;
   copyPasteCount?: number;
+  citationCount?: number;
+  lastActive?: string;
   grade?: string;
   content?: string;
 }
@@ -56,6 +63,8 @@ const initialClasses: Class[] = [
         timeSpent: 120,
         wordCount: 950,
         copyPasteCount: 3,
+        citationCount: 2,
+        lastActive: "2023-11-10T15:45:00Z",
         content: "American literature is characterized by the stories, poems, and essays written in the United States. One notable theme is the American Dream, a concept that has evolved throughout American literary history from the Puritans to contemporary authors.\n\nIn F. Scott Fitzgerald's 'The Great Gatsby,' we see the corruption of the American Dream through materialism and excess. Jay Gatsby represents both the idealistic pursuit of dreams and the corrupting influence of wealth.\n\nModern American literature continues to explore themes of identity, diversity, and the evolving nature of American society."
       },
       {
@@ -250,6 +259,8 @@ export const useAssignments = () => {
       timeSpent: 0,
       wordCount: 0,
       copyPasteCount: 0,
+      citationCount: 0,
+      lastActive: new Date().toISOString(),
       content: ""
     };
     

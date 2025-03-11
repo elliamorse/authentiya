@@ -1,16 +1,21 @@
-
 /**
  * This file provides the main student dashboard component with an enhanced document editor
  * that resembles a word processor, including document renaming and assignment submission.
  * 
- * Updates:
+ * Features:
  * - Auto-prompt for assignment linking when opening editor
- * - Default document name comes from linked assignment
- * - Improved session time tracking to only show active typing time
- * - Implemented autosaving with visual indicator
- * - New documents are added to My Assignments page
- * - Documents use the shared assignment data store
+ * - Default document name from linked assignment
+ * - Session time tracking (active typing only)
+ * - Autosaving with visual indicator
+ * - Documents added to My Assignments page
+ * - Citation tracking and prompting
+ * 
+ * Updates:
+ * - Fixed type issues with Assignment interface
+ * - Properly handling AssignmentStatus type
+ * - Added proper typing for citationCount
  */
+
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import AssignmentPrompt from "./AssignmentPrompt";
@@ -26,7 +31,7 @@ import {
   Quote, 
   SendHorizontal
 } from "lucide-react";
-import { useAssignments, mockAssignments } from "@/lib/student-assignments";
+import { useAssignments, Assignment, AssignmentStatus } from "@/lib/student-assignments";
 
 interface StudentDashboardProps {
   userEmail: string | null;
@@ -66,7 +71,6 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
     const assignmentId = urlParams.get('id');
     
     if (assignmentId) {
-      // Load the assignment from our store
       const assignment = getAssignment(assignmentId);
       if (assignment) {
         setLinkedAssignment(assignmentId);
@@ -89,9 +93,9 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
         
         // Mark as in progress if it wasn't already
         if (assignment.status === "not_started") {
-          const updatedAssignment = {
+          const updatedAssignment: Assignment = {
             ...assignment,
-            status: "in_progress",
+            status: "in_progress" as AssignmentStatus,
             startedOn: new Date().toISOString()
           };
           updateAssignment(updatedAssignment);
@@ -165,17 +169,18 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
           setIsAutoSaving(false);
         }, 2000);
         
-        // Update assignment in our store
+        // Update assignment in store
         if (currentDocId) {
           const assignment = getAssignment(currentDocId);
           if (assignment) {
-            updateAssignment({
+            const updatedAssignment: Assignment = {
               ...assignment,
               content: newContent,
               wordCount,
               timeSpent: assignment.timeSpent + 1,
               lastActive: new Date().toISOString()
-            });
+            };
+            updateAssignment(updatedAssignment);
           }
         }
       }
@@ -286,9 +291,9 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
       }
       
       // Update the assignment status to in_progress
-      const updatedAssignment = {
+      const updatedAssignment: Assignment = {
         ...assignment,
-        status: "in_progress",
+        status: "in_progress" as AssignmentStatus,
         startedOn: assignment.startedOn || new Date().toISOString()
       };
       updateAssignment(updatedAssignment);
@@ -431,11 +436,12 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
       if (currentDocId) {
         const assignment = getAssignment(currentDocId);
         if (assignment) {
-          updateAssignment({
+          const updatedAssignment: Assignment = {
             ...assignment,
             content: editorRef.current.innerHTML,
             citationCount: (assignment.citationCount || 0) + 1
-          });
+          };
+          updateAssignment(updatedAssignment);
         }
       }
     }
@@ -450,9 +456,9 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
     if (currentDocId) {
       const assignment = getAssignment(currentDocId);
       if (assignment) {
-        const updatedAssignment = {
+        const updatedAssignment: Assignment = {
           ...assignment,
-          status: "submitted" as const,
+          status: "submitted" as AssignmentStatus,
           submittedOn: new Date().toISOString()
         };
         updateAssignment(updatedAssignment);
@@ -550,10 +556,11 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
                 if (currentDocId) {
                   const assignment = getAssignment(currentDocId);
                   if (assignment) {
-                    updateAssignment({
+                    const updatedAssignment: Assignment = {
                       ...assignment,
                       citationCount: (assignment.citationCount || 0) + 1
-                    });
+                    };
+                    updateAssignment(updatedAssignment);
                   }
                 }
                 
