@@ -81,8 +81,7 @@ export function useStudentAssignment(linkedAssignmentId: string | null) {
   const { data: assignment } = useQuery({
     queryKey: ["assignment", studentAssignment?.assignment_id],
     queryFn: async () => {
-      const safeAssignment = safeStudentAssignment(studentAssignment);
-      if (!safeAssignment?.assignment_id) return null;
+      if (!studentAssignment || !studentAssignment.assignment_id) return null;
       
       try {
         const { data, error } = await supabase
@@ -93,7 +92,7 @@ export function useStudentAssignment(linkedAssignmentId: string | null) {
             due_date,
             classes(name)
           `)
-          .eq("id", safeAssignment.assignment_id)
+          .eq("id", studentAssignment.assignment_id)
           .single();
         
         if (error) throw error;
@@ -104,19 +103,18 @@ export function useStudentAssignment(linkedAssignmentId: string | null) {
         return null;
       }
     },
-    enabled: !!studentAssignment && !hasError(studentAssignment),
+    enabled: !!studentAssignment && !!studentAssignment.assignment_id,
   });
   
   // Mutation to update the student assignment
   const updateAssignment = useMutation({
     mutationFn: async (data: any) => {
-      const safeAssignment = safeStudentAssignment(studentAssignment);
-      if (!safeAssignment?.id) throw new Error("No assignment linked");
+      if (!studentAssignment || !studentAssignment.id) throw new Error("No assignment linked");
       
       const { error } = await supabase
         .from("student_assignments")
         .update(data)
-        .eq("id", safeAssignment.id);
+        .eq("id", studentAssignment.id);
       
       if (error) throw error;
       
@@ -132,8 +130,7 @@ export function useStudentAssignment(linkedAssignmentId: string | null) {
   });
   
   const updateDocumentName = (documentName: string) => {
-    const safeAssignment = safeStudentAssignment(studentAssignment);
-    if (!safeAssignment?.id) return;
+    if (!studentAssignment || !studentAssignment.id) return;
     
     updateAssignment.mutate({
       document_name: documentName,
@@ -146,16 +143,15 @@ export function useStudentAssignment(linkedAssignmentId: string | null) {
   };
   
   const updateTimeSpent = () => {
-    const safeAssignment = safeStudentAssignment(studentAssignment);
-    if (!safeAssignment?.id) return;
+    if (!studentAssignment || !studentAssignment.id) return;
     
     // Calculate time spent
-    const startTime = safeAssignment.start_time ? new Date(safeAssignment.start_time) : new Date();
+    const startTime = studentAssignment.start_time ? new Date(studentAssignment.start_time) : new Date();
     const now = new Date();
     const diffMinutes = Math.round((now.getTime() - startTime.getTime()) / (1000 * 60));
     
     // Add to the existing time spent
-    const totalTimeSpent = (safeAssignment.time_spent || 0) + diffMinutes;
+    const totalTimeSpent = (studentAssignment.time_spent || 0) + diffMinutes;
     
     updateAssignment.mutate({
       time_spent: totalTimeSpent,
@@ -164,18 +160,16 @@ export function useStudentAssignment(linkedAssignmentId: string | null) {
   };
   
   const incrementCopyPasteCount = () => {
-    const safeAssignment = safeStudentAssignment(studentAssignment);
-    if (!safeAssignment?.id) return;
+    if (!studentAssignment || !studentAssignment.id) return;
     
-    const newCount = (safeAssignment.copy_paste_count || 0) + 1;
+    const newCount = (studentAssignment.copy_paste_count || 0) + 1;
     updateAssignment.mutate({
       copy_paste_count: newCount
     });
   };
   
   const saveContent = (content: string) => {
-    const safeAssignment = safeStudentAssignment(studentAssignment);
-    if (!safeAssignment?.id) return;
+    if (!studentAssignment || !studentAssignment.id) return;
     
     updateAssignment.mutate({
       content,
@@ -184,8 +178,7 @@ export function useStudentAssignment(linkedAssignmentId: string | null) {
   };
   
   const updateWordCount = (wordCount: number) => {
-    const safeAssignment = safeStudentAssignment(studentAssignment);
-    if (!safeAssignment?.id) return;
+    if (!studentAssignment || !studentAssignment.id) return;
     
     updateAssignment.mutate({
       word_count: wordCount
@@ -193,8 +186,7 @@ export function useStudentAssignment(linkedAssignmentId: string | null) {
   };
   
   const submitAssignment = async (content: string) => {
-    const safeAssignment = safeStudentAssignment(studentAssignment);
-    if (!safeAssignment?.id) return false;
+    if (!studentAssignment || !studentAssignment.id) return false;
     
     try {
       const { error } = await supabase
@@ -204,7 +196,7 @@ export function useStudentAssignment(linkedAssignmentId: string | null) {
           submission_time: new Date().toISOString(),
           content: content
         })
-        .eq("id", safeAssignment.id);
+        .eq("id", studentAssignment.id);
         
       if (error) throw error;
       
@@ -227,15 +219,14 @@ export function useStudentAssignment(linkedAssignmentId: string | null) {
     source: string;
     details?: string;
   }) => {
-    const safeAssignment = safeStudentAssignment(studentAssignment);
-    if (!safeAssignment?.id || !user) return false;
+    if (!studentAssignment || !studentAssignment.id || !user) return false;
     
     try {
       // Create the citation
       const { error } = await supabase
         .from("citations")
         .insert({
-          student_assignment_id: safeAssignment.id,
+          student_assignment_id: studentAssignment.id,
           type: citation.type,
           source: citation.source,
           details: citation.details || null
@@ -244,7 +235,7 @@ export function useStudentAssignment(linkedAssignmentId: string | null) {
       if (error) throw error;
       
       // Update citation count
-      const newCount = (safeAssignment.citation_count || 0) + 1;
+      const newCount = (studentAssignment.citation_count || 0) + 1;
       updateAssignment.mutate({
         citation_count: newCount
       });
@@ -262,7 +253,7 @@ export function useStudentAssignment(linkedAssignmentId: string | null) {
   };
   
   return {
-    studentAssignment: safeStudentAssignment(studentAssignment),
+    studentAssignment,
     assignment,
     updateTimeSpent,
     incrementCopyPasteCount,

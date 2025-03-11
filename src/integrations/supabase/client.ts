@@ -62,7 +62,7 @@ export const supabase = createClient<Database>(
 export const hasError = (
   result: { error: any } | null | undefined
 ): boolean => {
-  return !!(result && result.error);
+  return !!(result && 'error' in result && result.error);
 };
 
 // Type guard to check if data exists and is not an error
