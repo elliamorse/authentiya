@@ -1,9 +1,18 @@
 
+/**
+ * File: AssignmentOverview.tsx
+ * 
+ * Description: This component displays a comprehensive overview of a selected assignment,
+ * including submission statistics, AI usage risk indicators, and time-related metrics.
+ * The component serves as a key part of the teacher dashboard, providing at-a-glance
+ * information about student progress and potential academic integrity concerns.
+ */
+
 import React from "react";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/common/Card";
 import { Badge } from "@/components/common/Badge";
 import { Progress } from "@/components/ui/progress";
-import { AlertTriangle, Clock } from "lucide-react";
+import { AlertTriangle, Clock, FileCheck, FileWarning, BarChart, User } from "lucide-react";
 import { Assignment } from "@/lib/teacher-data";
 
 interface AssignmentOverviewProps {
@@ -14,6 +23,13 @@ export function AssignmentOverview({ assignment }: AssignmentOverviewProps) {
   // Calculate completion percentage
   const startedPercentage = Math.round((assignment.studentsStarted / assignment.totalStudents) * 100);
   const submittedPercentage = Math.round((assignment.studentsSubmitted / assignment.totalStudents) * 100);
+  
+  // Calculate estimated AI usage risk (for demo purposes)
+  // In a real app, this would come from Authentiya's analysis algorithms
+  const potentialAiRiskCount = Math.floor(assignment.studentsSubmitted * 0.2); // Simulating 20% of submissions flagged
+  const aiRiskPercentage = assignment.studentsSubmitted > 0 
+    ? Math.round((potentialAiRiskCount / assignment.studentsSubmitted) * 100)
+    : 0;
   
   // Helper to format dates
   const formatDate = (dateString: string) => {
@@ -90,6 +106,68 @@ export function AssignmentOverview({ assignment }: AssignmentOverviewProps) {
             </span>
           </div>
           <Progress value={submittedPercentage} className="h-2 dark:bg-gray-700" />
+        </div>
+        
+        {/* New Authentiya AI Usage Risk Metrics Section */}
+        <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+          <h4 className="text-sm font-medium mb-2 flex items-center gap-1.5">
+            <BarChart className="h-4 w-4 text-authentiya-maroon" />
+            <span>Authentiya Insights</span>
+          </h4>
+          
+          <div className="grid grid-cols-2 gap-3 text-sm">
+            <div className="p-2 bg-gray-50 dark:bg-gray-900 rounded-md flex flex-col">
+              <span className="text-xs text-muted-foreground mb-1">Potential AI Usage</span>
+              <div className="flex justify-between items-center">
+                <div className="flex items-center">
+                  <FileWarning className="h-3.5 w-3.5 text-amber-500 mr-1.5" />
+                  <span className="font-medium">{potentialAiRiskCount}</span>
+                </div>
+                <Badge 
+                  variant={aiRiskPercentage > 30 ? "destructive" : aiRiskPercentage > 15 ? "warning" : "secondary"} 
+                  className="text-xs"
+                >
+                  {aiRiskPercentage}%
+                </Badge>
+              </div>
+            </div>
+            
+            <div className="p-2 bg-gray-50 dark:bg-gray-900 rounded-md flex flex-col">
+              <span className="text-xs text-muted-foreground mb-1">Original Work</span>
+              <div className="flex justify-between items-center">
+                <div className="flex items-center">
+                  <FileCheck className="h-3.5 w-3.5 text-green-500 mr-1.5" />
+                  <span className="font-medium">{assignment.studentsSubmitted - potentialAiRiskCount}</span>
+                </div>
+                <Badge variant="success" className="text-xs">
+                  {assignment.studentsSubmitted > 0 ? (100 - aiRiskPercentage) : 0}%
+                </Badge>
+              </div>
+            </div>
+            
+            <div className="p-2 bg-gray-50 dark:bg-gray-900 rounded-md flex flex-col">
+              <span className="text-xs text-muted-foreground mb-1">Avg. Time Spent</span>
+              <div className="flex items-center">
+                <Clock className="h-3.5 w-3.5 text-blue-500 mr-1.5" />
+                <span className="font-medium">{assignment.averageTimeSpent} min</span>
+              </div>
+            </div>
+            
+            <div className="p-2 bg-gray-50 dark:bg-gray-900 rounded-md flex flex-col">
+              <span className="text-xs text-muted-foreground mb-1">Requiring Review</span>
+              <div className="flex items-center">
+                <AlertTriangle className="h-3.5 w-3.5 text-authentiya-maroon mr-1.5" />
+                <span className="font-medium">
+                  {Math.max(Math.floor(assignment.studentsSubmitted * 0.15), 0)}
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="mt-3 text-xs text-muted-foreground flex items-center">
+            <User className="h-3 w-3 mr-1 inline-block" />
+            <span>Last analysis: {new Date().toLocaleDateString()}</span>
+          </div>
         </div>
       </CardContent>
     </Card>
