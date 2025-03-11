@@ -1,9 +1,16 @@
 
+/**
+ * This file provides the main student dashboard component with an enhanced document editor
+ * that resembles a word processor, including document renaming and assignment submission.
+ */
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import AssignmentPrompt from "./AssignmentPrompt";
 import WritingMetrics from "./WritingMetrics";
 import CitationPrompt from "./CitationPrompt";
+import DocumentMetadata from "./DocumentMetadata";
+import DocumentToolbar from "./DocumentToolbar";
+import SubmitAssignmentDialog from "./SubmitAssignmentDialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { 
@@ -11,7 +18,8 @@ import {
   Copy, 
   FileText, 
   Quote, 
-  SendHorizontal 
+  SendHorizontal,
+  Save
 } from "lucide-react";
 
 interface StudentDashboardProps {
@@ -21,34 +29,67 @@ interface StudentDashboardProps {
 
 export default function StudentDashboard({ userEmail, onLogout }: StudentDashboardProps) {
   const navigate = useNavigate();
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const editorRef = useRef<HTMLDivElement>(null);
   
   const [showAssignmentPrompt, setShowAssignmentPrompt] = useState(false);
   const [linkedAssignment, setLinkedAssignment] = useState<string | null>(null);
   const [startTime, setStartTime] = useState<Date | null>(null);
+  const [lastSavedTime, setLastSavedTime] = useState<Date | null>(null);
   const [wordCount, setWordCount] = useState(0);
   const [copyPasteCount, setCopyPasteCount] = useState(0);
   const [citationCount, setCitationCount] = useState(0);
   const [showCitationPrompt, setShowCitationPrompt] = useState(false);
   const [copiedText, setCopiedText] = useState("");
   const [content, setContent] = useState("");
+  const [documentName, setDocumentName] = useState("Untitled Document");
+  const [showSubmitDialog, setShowSubmitDialog] = useState(false);
   
   // Check for saved linked assignment
   useEffect(() => {
     const savedLinkedAssignment = window.localStorage.getItem("linkedAssignment");
+    const savedDocumentName = window.localStorage.getItem("documentName");
+    const savedContent = window.localStorage.getItem("documentContent");
+    
     if (savedLinkedAssignment) {
       setLinkedAssignment(savedLinkedAssignment);
       setStartTime(new Date());
     } else {
       setShowAssignmentPrompt(true);
     }
+    
+    if (savedDocumentName) {
+      setDocumentName(savedDocumentName);
+    }
+    
+    if (savedContent) {
+      setContent(savedContent);
+      
+      // Initialize editor with content
+      if (editorRef.current) {
+        editorRef.current.innerHTML = savedContent;
+      }
+    }
   }, []);
+  
+  // Auto-save effect
+  useEffect(() => {
+    const saveInterval = setInterval(() => {
+      if (editorRef.current && editorRef.current.innerHTML !== content) {
+        const newContent = editorRef.current.innerHTML;
+        setContent(newContent);
+        window.localStorage.setItem("documentContent", newContent);
+        setLastSavedTime(new Date());
+      }
+    }, 5000); // Auto-save every 5 seconds
+    
+    return () => clearInterval(saveInterval);
+  }, [content]);
   
   // Add event listeners for copy-paste detection
   useEffect(() => {
     const handlePasteEvent = (e: ClipboardEvent) => {
       // Only proceed if we have an active assignment
-      if (linkedAssignment) {
+      if (linkedAssignment && editorRef.current) {
         const pastedText = e.clipboardData?.getData('text') || "";
         if (pastedText.trim()) {
           setCopiedText(pastedText);
@@ -64,19 +105,45 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
       }
     };
     
-    // Add event listener to the textarea
-    const textarea = textareaRef.current;
-    if (textarea) {
-      textarea.addEventListener('paste', handlePasteEvent);
+    // Add event listener to the editor div
+    const editor = editorRef.current;
+    if (editor) {
+      editor.addEventListener('paste', handlePasteEvent);
     }
     
     return () => {
       // Clean up event listener
-      if (textarea) {
-        textarea.removeEventListener('paste', handlePasteEvent);
+      if (editor) {
+        editor.removeEventListener('paste', handlePasteEvent);
       }
     };
-  }, [linkedAssignment, textareaRef]);
+  }, [linkedAssignment, editorRef]);
+  
+  // Track word count
+  useEffect(() => {
+    if (editorRef.current) {
+      const calculateWordCount = () => {
+        // Get text content from editor
+        const text = editorRef.current?.textContent || "";
+        // Count words (split by whitespace)
+        const words = text.trim().split(/\s+/);
+        setWordCount(text.trim() === "" ? 0 : words.length);
+      };
+      
+      // Initial calculation
+      calculateWordCount();
+      
+      // Setup mutation observer to detect content changes
+      const observer = new MutationObserver(calculateWordCount);
+      observer.observe(editorRef.current, { 
+        childList: true, 
+        subtree: true, 
+        characterData: true 
+      });
+      
+      return () => observer.disconnect();
+    }
+  }, []);
   
   const handleLinkAssignment = (assignmentId: string) => {
     setLinkedAssignment(assignmentId);
@@ -90,13 +157,27 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
     });
   };
   
-  const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newContent = e.target.value;
-    setContent(newContent);
-    
-    // Count words (simple splitting by spaces)
-    const words = newContent.trim().split(/\s+/);
-    setWordCount(newContent.trim() === "" ? 0 : words.length);
+  const handleDocumentNameChange = (name: string) => {
+    setDocumentName(name);
+    window.localStorage.setItem("documentName", name);
+    toast.success("Document renamed", {
+      description: `Document is now named "${name}"`
+    });
+  };
+  
+  const handleFormatCommand = (command: string, value?: string) => {
+    if (editorRef.current) {
+      // Make the editor the active element
+      editorRef.current.focus();
+      
+      // Execute formatting command
+      document.execCommand(command, false, value);
+      
+      // Update content
+      setContent(editorRef.current.innerHTML);
+      window.localStorage.setItem("documentContent", editorRef.current.innerHTML);
+      setLastSavedTime(new Date());
+    }
   };
   
   // Simulate copy/paste detection
@@ -116,34 +197,82 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
     setCitationCount(prev => prev + 1);
     setShowCitationPrompt(false);
     
+    // Insert citation into the document
+    if (editorRef.current) {
+      // Create citation element
+      const citationElement = document.createElement('div');
+      citationElement.className = 'citation-element p-2 my-2 bg-muted/30 border rounded-md text-sm';
+      
+      // Format the citation text based on type
+      let citationText = '';
+      switch (citation.type) {
+        case 'website':
+          citationText = `Web: ${citation.source}`;
+          break;
+        case 'book':
+          citationText = `Book: ${citation.source}`;
+          break;
+        case 'ai':
+          citationText = `AI: ${citation.source}`;
+          break;
+      }
+      
+      if (citation.details) {
+        citationText += ` - ${citation.details}`;
+      }
+      
+      citationElement.textContent = citationText;
+      
+      // Get selection or insert at end
+      const selection = window.getSelection();
+      if (selection && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        range.insertNode(citationElement);
+      } else {
+        editorRef.current.appendChild(citationElement);
+      }
+      
+      // Update content
+      setContent(editorRef.current.innerHTML);
+      window.localStorage.setItem("documentContent", editorRef.current.innerHTML);
+      setLastSavedTime(new Date());
+    }
+    
     toast.success("Citation added", {
       description: `Added citation from ${citation.source}`
     });
   };
   
-  const handleSubmitAssignment = () => {
+  const handleManualSave = () => {
+    if (editorRef.current) {
+      const newContent = editorRef.current.innerHTML;
+      setContent(newContent);
+      window.localStorage.setItem("documentContent", newContent);
+      setLastSavedTime(new Date());
+      
+      toast.success("Document saved", {
+        description: "Your document has been saved"
+      });
+    }
+  };
+  
+  const handleSubmitAssignment = (classId: string, assignmentId: string) => {
+    // In a real app, this would make an API call
     toast.success("Assignment submitted", {
       description: "Your assignment has been successfully submitted"
     });
     
-    // In a real app, this would make an API call to Canvas or similar
-    // Reset state
+    // Reset state if needed
     setLinkedAssignment(null);
-    setStartTime(null);
-    setWordCount(0);
-    setCopyPasteCount(0);
-    setCitationCount(0);
-    setContent("");
-    
     window.localStorage.removeItem("linkedAssignment");
   };
   
   return (
-    <main className="flex-1 container py-6 space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <main className="flex-1 container py-6 space-y-2">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         <div>
-          <h1 className="text-3xl font-bold text-authentiya-charcoal-darkest dark:text-authentiya-accent-cream">Student Dashboard</h1>
-          <p className="text-muted-foreground">Track your writing progress and assignments</p>
+          <h1 className="text-3xl font-bold text-authentiya-charcoal-darkest dark:text-authentiya-accent-cream">Document Editor</h1>
+          <p className="text-muted-foreground">Create, edit and submit your assignments</p>
         </div>
         
         <div className="flex items-center gap-2">
@@ -183,59 +312,69 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
         />
       )}
       
-      <div className="academic-card">
-        <div className="p-4">
-          <div className="flex justify-between items-center mb-3">
-            <div className="flex items-center gap-3">
-              <FileText className="h-5 w-5 text-authentiya-maroon" />
-              <h2 className="text-xl font-semibold text-authentiya-charcoal-darkest dark:text-authentiya-accent-cream">My Document</h2>
-            </div>
-            
-            {startTime && (
-              <div className="flex items-center gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="gap-2" 
-                  onClick={handleManualPaste}
-                >
-                  <Copy className="h-4 w-4" />
-                  <span className="hidden sm:inline">Simulate Copy/Paste</span>
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="gap-2"
-                  onClick={() => {
-                    setCitationCount(prev => prev + 1);
-                    toast.success("Citation added", {
-                      description: "Manual citation added"
-                    });
-                  }}
-                >
-                  <Quote className="h-4 w-4" />
-                  <span className="hidden sm:inline">Add Citation</span>
-                </Button>
-                <Button 
-                  size="sm" 
-                  className="gap-2 academic-btn-primary"
-                  onClick={handleSubmitAssignment}
-                  disabled={!linkedAssignment || wordCount === 0}
-                >
-                  <SendHorizontal className="h-4 w-4" />
-                  <span className="hidden sm:inline">Submit</span>
-                </Button>
-              </div>
-            )}
+      <div className="academic-card overflow-hidden">
+        <DocumentMetadata 
+          documentName={documentName}
+          onDocumentNameChange={handleDocumentNameChange}
+          lastSavedTime={lastSavedTime}
+          wordCount={wordCount}
+        />
+        
+        <DocumentToolbar onFormat={handleFormatCommand} />
+        
+        <div 
+          ref={editorRef}
+          contentEditable
+          className="min-h-[400px] p-6 focus:outline-none"
+          style={{ overflowY: 'auto', maxHeight: '60vh' }}
+        ></div>
+        
+        <div className="p-2 border-t flex justify-between items-center">
+          <div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-1"
+              onClick={handleManualPaste}
+            >
+              <Copy className="h-4 w-4" />
+              <span>Simulate Paste</span>
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-1 ml-2"
+              onClick={() => {
+                setCitationCount(prev => prev + 1);
+                toast.success("Citation added", {
+                  description: "Manual citation added"
+                });
+              }}
+            >
+              <Quote className="h-4 w-4" />
+              <span>Add Citation</span>
+            </Button>
           </div>
           
-          <textarea
-            ref={textareaRef}
-            className="w-full min-h-[300px] p-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-authentiya-maroon/50 transition-all resize-y"
-            placeholder="Start typing your document here..."
-            value={content}
-            onChange={handleTextAreaChange}
-          ></textarea>
+          <div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-1 mr-2"
+              onClick={handleManualSave}
+            >
+              <Save className="h-4 w-4" />
+              <span>Save</span>
+            </Button>
+            <Button 
+              size="sm" 
+              className="gap-1 academic-btn-primary"
+              onClick={() => setShowSubmitDialog(true)}
+            >
+              <SendHorizontal className="h-4 w-4" />
+              <span>Submit</span>
+            </Button>
+          </div>
         </div>
       </div>
       
@@ -253,6 +392,13 @@ export default function StudentDashboard({ userEmail, onLogout }: StudentDashboa
           onDismiss={() => setShowCitationPrompt(false)}
         />
       )}
+      
+      <SubmitAssignmentDialog
+        open={showSubmitDialog}
+        onOpenChange={setShowSubmitDialog}
+        onSubmit={handleSubmitAssignment}
+        documentName={documentName}
+      />
     </main>
   );
 }

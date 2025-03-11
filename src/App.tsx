@@ -1,4 +1,8 @@
 
+/**
+ * This file is the main entry point for the React application, setting up routing,
+ * global providers, and the application structure.
+ */
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -28,6 +32,7 @@ const App = () => (
             <Route path="/teacher/assignment/:assignmentId" element={<TeacherAssignments />} />
             <Route path="/teacher/student/:studentId/assignment/:assignmentId" element={<TeacherStudentView />} />
             <Route path="/student/assignments" element={<StudentAssignments />} />
+            <Route path="/student/editor" element={<Dashboard />} />
             <Route path="/assignments" element={<Dashboard />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

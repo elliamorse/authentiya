@@ -1,4 +1,7 @@
-
+/**
+ * This file provides the student assignments page where students can view their
+ * assignments across classes and navigate to the document editor.
+ */
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/layout/Header";
@@ -14,7 +17,9 @@ import {
   CheckCircle, 
   Clock, 
   GraduationCap, 
-  School 
+  School,
+  FileText,
+  Plus
 } from "lucide-react";
 
 // Mock data for student classes and assignments
@@ -280,13 +285,24 @@ export default function StudentAssignments() {
       />
       
       <main className="flex-1 container py-6 space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold font-playfair text-authentiya-charcoal-darkest dark:text-authentiya-accent-cream">
-            My Assignments
-          </h1>
-          <p className="text-muted-foreground">
-            View and manage all your assignments across classes
-          </p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold font-playfair text-authentiya-charcoal-darkest dark:text-authentiya-accent-cream">
+              My Assignments
+            </h1>
+            <p className="text-muted-foreground">
+              View and manage all your assignments across classes
+            </p>
+          </div>
+          
+          <Button 
+            onClick={() => navigate("/student/editor")}
+            className="academic-btn-primary gap-2"
+          >
+            <FileText className="h-4 w-4" />
+            <span className="hidden sm:inline">Open Document Editor</span>
+            <span className="sm:hidden">Editor</span>
+          </Button>
         </div>
         
         <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -306,6 +322,18 @@ export default function StudentAssignments() {
           </TabsList>
           
           <TabsContent value="all" className="animate-fade-in">
+            <div className="flex justify-end mb-4">
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="gap-2"
+                onClick={() => navigate("/student/editor")}
+              >
+                <Plus className="h-4 w-4" />
+                New Document
+              </Button>
+            </div>
+            
             {renderAssignmentSection("Due Today", groupedAssignments.today)}
             {renderAssignmentSection("Due This Week", groupedAssignments.thisWeek)}
             {renderAssignmentSection("Future Assignments", groupedAssignments.future)}
