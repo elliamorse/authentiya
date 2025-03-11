@@ -9,6 +9,7 @@
  * - Fixed TypeScript errors by properly typing Supabase RPC function calls
  * - Added proper type narrowing for RPC responses
  * - Improved type safety when accessing properties from RPC responses
+ * - Added type assertions to handle returned data correctly
  */
 
 import { useState, useEffect } from 'react';
@@ -84,25 +85,25 @@ const Auth = () => {
   const checkInvitation = async (studentEmail: string, code: string) => {
     try {
       // Check if invitation is valid
-      const { data, error } = await supabase.rpc<InvitationResponseItem[], {
-        student_email: string;
-        invite_code: string;
-      }>(
+      const { data, error } = await supabase.rpc(
         'check_student_invitation',
         { student_email: studentEmail, invite_code: code }
       );
       
       if (error) throw error;
       
-      if (data && data.length > 0) {
+      // Type assertion for the returned data
+      const invitationData = data as InvitationResponseItem[];
+      
+      if (invitationData && invitationData.length > 0) {
         // Get the first item from the array
-        const invitationData = data[0];
+        const firstInvitation = invitationData[0];
         setInvitation({
-          invitation_id: invitationData.invitation_id,
-          class_id: invitationData.class_id,
-          class_name: invitationData.class_name
+          invitation_id: firstInvitation.invitation_id,
+          class_id: firstInvitation.class_id,
+          class_name: firstInvitation.class_name
         });
-        toast.info(`You've been invited to join ${invitationData.class_name}`);
+        toast.info(`You've been invited to join ${firstInvitation.class_name}`);
       }
     } catch (error) {
       console.error('Error checking invitation:', error);
@@ -113,26 +114,26 @@ const Auth = () => {
   const processInvitation = async (userId: string, studentEmail: string, code: string) => {
     try {
       // Check if invitation is valid
-      const { data, error } = await supabase.rpc<InvitationResponseItem[], {
-        student_email: string;
-        invite_code: string;
-      }>(
+      const { data, error } = await supabase.rpc(
         'check_student_invitation',
         { student_email: studentEmail, invite_code: code }
       );
       
       if (error) throw error;
       
-      if (data && data.length > 0) {
+      // Type assertion for the returned data
+      const invitationData = data as InvitationResponseItem[];
+      
+      if (invitationData && invitationData.length > 0) {
         // Get the first item from the array
-        const invitationData = data[0];
+        const firstInvitation = invitationData[0];
         
         // Add student to class
         const { error: enrollError } = await supabase
           .from('class_students')
           .insert({
             student_id: userId,
-            class_id: invitationData.class_id
+            class_id: firstInvitation.class_id
           });
           
         if (enrollError) throw enrollError;
@@ -141,14 +142,14 @@ const Auth = () => {
         const { error: updateError } = await supabase.rpc(
           'update_invitation_status',
           { 
-            invitation_identifier: invitationData.invitation_id,
+            invitation_identifier: firstInvitation.invitation_id,
             new_status: 'accepted'
           }
         );
         
         if (updateError) throw updateError;
         
-        toast.success(`You've been added to ${invitationData.class_name}`);
+        toast.success(`You've been added to ${firstInvitation.class_name}`);
       }
     } catch (error) {
       console.error('Error processing invitation:', error);
