@@ -1,9 +1,7 @@
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase, isDataNotError } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { useQuery, useMutation } from "@tanstack/react-query";
 import AssignmentPrompt from "./AssignmentPrompt";
 import WritingMetrics from "./WritingMetrics";
 import CitationPrompt from "./CitationPrompt";
@@ -16,6 +14,8 @@ import {
   Quote, 
   SendHorizontal 
 } from "lucide-react";
+import { useStudentAssignment } from "@/hooks/useStudentAssignment";
+import { useTypingMetrics } from "@/hooks/useTypingMetrics";
 
 export default function StudentDashboard() {
   const { user } = useAuth();
@@ -28,110 +28,17 @@ export default function StudentDashboard() {
   const [copiedText, setCopiedText] = useState("");
   const [content, setContent] = useState("");
   
-  // Stats tracking
-  const [lastTypingTime, setLastTypingTime] = useState<number | null>(null);
-  const [typedCharacters, setTypedCharacters] = useState(0);
-  const [typingTime, setTypingTime] = useState(0);
-  const [wpm, setWpm] = useState(0);
-  
-  // Get the linked student assignment
-  const { data: studentAssignment, refetch: refetchAssignment } = useQuery({
-    queryKey: ["studentAssignment", linkedAssignmentId],
-    queryFn: async () => {
-      if (!linkedAssignmentId || !user) return null;
-      
-      try {
-        // First check if this student assignment already exists
-        const { data, error } = await supabase
-          .from("student_assignments")
-          .select(`
-            id, 
-            status, 
-            start_time, 
-            submission_time,
-            time_spent,
-            word_count,
-            copy_paste_count,
-            citation_count,
-            content,
-            assignment_id,
-            assignments(title, due_date, classes(name))
-          `)
-          .eq("student_id", user.id)
-          .eq("assignment_id", linkedAssignmentId)
-          .maybeSingle();
-        
-        if (error) {
-          console.error("Error checking for existing assignment:", error);
-          return null;
-        }
-        
-        if (data) {
-          // If there's content, set it
-          if (data.content) {
-            setContent(data.content);
-          }
-          
-          return data;
-        }
-        
-        // If it doesn't exist, create it
-        const now = new Date().toISOString();
-        const { data: newData, error: insertError } = await supabase
-          .from("student_assignments")
-          .insert({
-            student_id: user.id,
-            assignment_id: linkedAssignmentId,
-            status: "in_progress",
-            start_time: now,
-            last_active: now
-          })
-          .select()
-          .single();
-        
-        if (insertError) {
-          console.error("Error creating assignment:", insertError);
-          return null;
-        }
-        
-        return newData;
-      } catch (error) {
-        console.error("Error fetching student assignment:", error);
-        toast.error("Failed to load assignment");
-        return null;
-      }
-    },
-    enabled: !!linkedAssignmentId && !!user,
-  });
-  
-  // Get assignment details
-  const { data: assignment } = useQuery({
-    queryKey: ["assignment", studentAssignment?.assignment_id],
-    queryFn: async () => {
-      if (!studentAssignment?.assignment_id) return null;
-      
-      try {
-        const { data, error } = await supabase
-          .from("assignments")
-          .select(`
-            id,
-            title,
-            due_date,
-            classes(name)
-          `)
-          .eq("id", studentAssignment.assignment_id)
-          .single();
-        
-        if (error) throw error;
-        
-        return data;
-      } catch (error) {
-        console.error("Error fetching assignment details:", error);
-        return null;
-      }
-    },
-    enabled: !!studentAssignment?.assignment_id,
-  });
+  // Custom hooks
+  const { trackTyping, wpm } = useTypingMetrics();
+  const {
+    studentAssignment,
+    updateTimeSpent,
+    incrementCopyPasteCount,
+    saveContent,
+    updateWordCount,
+    submitAssignment,
+    addCitation
+  } = useStudentAssignment(linkedAssignmentId);
   
   // Check for saved linked assignment
   useEffect(() => {
@@ -150,22 +57,12 @@ export default function StudentDashboard() {
     };
   }, []);
   
-  // Calculate WPM based on typing activity
-  const calculateWPM = useCallback(() => {
-    if (typingTime === 0) return 0;
-    
-    // Standard WPM calculation - 5 characters = 1 word
-    const words = typedCharacters / 5;
-    // Convert milliseconds to minutes
-    const minutes = typingTime / 60000;
-    
-    return Math.round(words / Math.max(minutes, 0.01));
-  }, [typedCharacters, typingTime]);
-  
-  // Update WPM when typing metrics change
+  // Set initial content if available from database
   useEffect(() => {
-    setWpm(calculateWPM());
-  }, [typedCharacters, typingTime, calculateWPM]);
+    if (studentAssignment?.content) {
+      setContent(studentAssignment.content);
+    }
+  }, [studentAssignment?.content]);
   
   // Add event listeners for copy-paste detection
   useEffect(() => {
@@ -199,68 +96,14 @@ export default function StudentDashboard() {
         textarea.removeEventListener('paste', handlePasteEvent);
       }
     };
-  }, [studentAssignment?.id, textareaRef]);
-  
-  // Mutation to update the student assignment
-  const updateAssignmentMutation = useMutation({
-    mutationFn: async (data: any) => {
-      if (!studentAssignment?.id) throw new Error("No assignment linked");
-      
-      const { error } = await supabase
-        .from("student_assignments")
-        .update(data)
-        .eq("id", studentAssignment.id);
-      
-      if (error) throw error;
-      
-      return true;
-    },
-    onSuccess: () => {
-      refetchAssignment();
-    },
-    onError: (error) => {
-      console.error("Error updating assignment:", error);
-      toast.error("Failed to update assignment");
-    }
-  });
-  
-  // Function to update time spent
-  const updateTimeSpent = () => {
-    if (!studentAssignment?.id) return;
-    
-    // Calculate time spent
-    const startTime = studentAssignment.start_time ? new Date(studentAssignment.start_time) : new Date();
-    const now = new Date();
-    const diffMinutes = Math.round((now.getTime() - startTime.getTime()) / (1000 * 60));
-    
-    // Add to the existing time spent
-    const totalTimeSpent = (studentAssignment.time_spent || 0) + diffMinutes;
-    
-    updateAssignmentMutation.mutate({
-      time_spent: totalTimeSpent,
-      last_active: now.toISOString()
-    });
-  };
-  
-  // Increment copy paste count
-  const incrementCopyPasteCount = () => {
-    if (!studentAssignment?.id) return;
-    
-    const newCount = (studentAssignment.copy_paste_count || 0) + 1;
-    updateAssignmentMutation.mutate({
-      copy_paste_count: newCount
-    });
-  };
+  }, [studentAssignment?.id]);
   
   // Save content periodically
   useEffect(() => {
     if (!studentAssignment?.id || !content) return;
     
     const saveTimer = setTimeout(() => {
-      updateAssignmentMutation.mutate({
-        content,
-        last_active: new Date().toISOString()
-      });
+      saveContent(content);
     }, 3000);
     
     return () => clearTimeout(saveTimer);
@@ -282,32 +125,11 @@ export default function StudentDashboard() {
     const newContent = e.target.value;
     const oldContent = content;
     
-    // Check if characters were added (not deleted or pasted)
-    if (newContent.length > oldContent.length) {
-      // Increment typed characters by the difference
-      const newChars = newContent.length - oldContent.length;
-      setTypedCharacters(prev => prev + newChars);
-      
-      // Track typing time
-      const now = Date.now();
-      if (lastTypingTime) {
-        // Only count as typing if it's within a short time window (3 seconds)
-        if (now - lastTypingTime < 3000) {
-          setTypingTime(prev => prev + (now - lastTypingTime));
-        }
-      }
-      setLastTypingTime(now);
-    }
+    // Use our custom hook to track typing metrics and get word count
+    const wordCount = trackTyping(oldContent, newContent);
     
     setContent(newContent);
-    
-    // Count words (simple splitting by spaces)
-    const words = newContent.trim().split(/\s+/);
-    const wordCount = newContent.trim() === "" ? 0 : words.length;
-    
-    updateAssignmentMutation.mutate({
-      word_count: wordCount
-    });
+    updateWordCount(wordCount);
   };
   
   // Simulate copy/paste detection for demo purposes
@@ -324,68 +146,19 @@ export default function StudentDashboard() {
     source: string;
     details?: string;
   }) => {
-    if (!studentAssignment?.id || !user) return;
-    
-    try {
-      // Create the citation
-      const { error } = await supabase
-        .from("citations")
-        .insert({
-          student_assignment_id: studentAssignment.id,
-          type: citation.type,
-          source: citation.source,
-          details: citation.details || null
-        });
-        
-      if (error) throw error;
-      
-      // Update citation count
-      const newCount = (studentAssignment.citation_count || 0) + 1;
-      updateAssignmentMutation.mutate({
-        citation_count: newCount
-      });
-      
+    const success = await addCitation(citation);
+    if (success) {
       setShowCitationPrompt(false);
-      
-      toast.success("Citation added", {
-        description: `Added citation from ${citation.source}`
-      });
-    } catch (error: any) {
-      console.error("Error adding citation:", error);
-      toast.error("Failed to add citation");
     }
   };
   
   const handleSubmitAssignment = async () => {
-    if (!studentAssignment?.id) return;
-    
-    try {
-      const { error } = await supabase
-        .from("student_assignments")
-        .update({
-          status: "submitted",
-          submission_time: new Date().toISOString(),
-          content: content
-        })
-        .eq("id", studentAssignment.id);
-        
-      if (error) throw error;
-      
-      toast.success("Assignment submitted", {
-        description: "Your assignment has been successfully submitted"
-      });
-      
+    const success = await submitAssignment(content);
+    if (success) {
       // Reset state
       setLinkedAssignmentId(null);
       setContent("");
-      
       window.localStorage.removeItem("linkedAssignment");
-      
-      // Refetch to get updated data
-      refetchAssignment();
-    } catch (error) {
-      console.error("Error submitting assignment:", error);
-      toast.error("Failed to submit assignment");
     }
   };
   
