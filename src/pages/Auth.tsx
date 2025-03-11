@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,16 +8,42 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { ClipboardCheck } from "lucide-react";
+import { ClipboardCheck, Info } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function Auth() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [role, setRole] = useState<"student" | "teacher">("student");
+  const [activeTab, setActiveTab] = useState("signin");
+  const [inviteInfo, setInviteInfo] = useState<{
+    code: string;
+    email: string;
+    className: string;
+  } | null>(null);
+
+  // Parse URL parameters for invitation
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const inviteCode = params.get('invite');
+    const inviteEmail = params.get('email');
+    const className = params.get('class');
+    
+    if (inviteCode && inviteEmail) {
+      setInviteInfo({
+        code: inviteCode,
+        email: inviteEmail,
+        className: className || "a class"
+      });
+      setEmail(inviteEmail);
+      setActiveTab("signup");
+    }
+  }, [location]);
 
   useEffect(() => {
     const handleAuthRedirect = async () => {
@@ -67,6 +93,16 @@ export default function Auth() {
       if (error) throw error;
       
       if (data.user) {
+        // If this was an invited student, process the invitation
+        if (inviteInfo && inviteInfo.code) {
+          try {
+            await processInvitation(data.user.id, inviteInfo.code);
+          } catch (inviteError) {
+            console.error("Error processing invitation:", inviteError);
+            // Continue anyway, since the account creation was successful
+          }
+        }
+        
         toast.success("Registration successful! Please check your email for verification");
       }
     } catch (error: any) {
@@ -104,6 +140,47 @@ export default function Auth() {
       setLoading(false);
     }
   };
+  
+  // Process the invitation after signup
+  const processInvitation = async (userId: string, inviteCode: string) => {
+    try {
+      // First, check if the invitation is valid
+      const { data: inviteData, error: inviteError } = await supabase
+        .rpc('check_student_invitation', {
+          student_email: email.toLowerCase().trim(),
+          invite_code: inviteCode
+        });
+      
+      if (inviteError) throw inviteError;
+      
+      if (!inviteData || inviteData.length === 0) {
+        throw new Error("Invalid invitation");
+      }
+      
+      // Add the student to the class
+      const { error: enrollError } = await supabase
+        .from("class_students")
+        .insert({
+          student_id: userId,
+          class_id: inviteData[0].class_id
+        });
+        
+      if (enrollError) throw enrollError;
+      
+      // Update invitation status
+      const { error: updateError } = await supabase
+        .from("invitations")
+        .update({ status: "accepted" })
+        .eq("id", inviteData[0].invitation_id);
+        
+      if (updateError) throw updateError;
+      
+      return true;
+    } catch (error) {
+      console.error("Error processing invitation:", error);
+      throw error;
+    }
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-white to-gray-100 px-4 dark:from-gray-900 dark:to-gray-800">
@@ -114,9 +191,18 @@ export default function Auth() {
           </div>
           <CardTitle className="text-2xl font-bold font-playfair">Authentiya</CardTitle>
           <CardDescription>Academic integrity tracking application</CardDescription>
+          
+          {inviteInfo && (
+            <Alert className="mt-4 bg-authentiya-maroon/10 text-authentiya-maroon border-authentiya-maroon/20">
+              <Info className="h-4 w-4" />
+              <AlertDescription>
+                You've been invited to join <strong>{inviteInfo.className}</strong>. Create an account to accept the invitation.
+              </AlertDescription>
+            </Alert>
+          )}
         </CardHeader>
         
-        <Tabs defaultValue="signin" className="w-full">
+        <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="signin">Sign In</TabsTrigger>
             <TabsTrigger value="signup">Sign Up</TabsTrigger>
@@ -193,6 +279,7 @@ export default function Auth() {
                     placeholder="your@email.com" 
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    disabled={!!inviteInfo}
                     required
                   />
                 </div>
@@ -230,6 +317,7 @@ export default function Auth() {
                         className="mr-2"
                         checked={role === "teacher"}
                         onChange={() => setRole("teacher")}
+                        disabled={!!inviteInfo}
                       />
                       <Label htmlFor="role-teacher">Teacher</Label>
                     </div>

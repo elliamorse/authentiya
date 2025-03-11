@@ -1,10 +1,11 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/layout/Header";
 import StudentDashboard from "../components/student/StudentDashboard";
 import TeacherDashboardWrapper from "../components/teacher/TeacherDashboardWrapper";
 import { useAuth } from "@/contexts/AuthContext";
+import { Spinner } from "@/components/ui/spinner";
 
 const Dashboard = () => {
   const { profile, isAuthenticated, isLoading } = useAuth();
@@ -21,13 +22,14 @@ const Dashboard = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center">
-        <p className="text-lg">Loading...</p>
+        <Spinner size="lg" />
+        <p className="text-lg mt-4">Loading your dashboard...</p>
       </div>
     );
   }
   
   // Don't render anything until authentication is completed
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !profile) {
     return null;
   }
   

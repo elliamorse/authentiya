@@ -2,28 +2,20 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import WelcomeDialog from "./WelcomeDialog";
 import AssignmentPrompt from "./AssignmentPrompt";
 import WritingMetrics from "./WritingMetrics";
 import CitationPrompt from "./CitationPrompt";
+import TextEditor from "./TextEditor"; // We'll implement this next
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { 
   BookOpen, 
-  Copy, 
-  FileText,
   Edit2,
   Save, 
   Quote, 
-  SendHorizontal,
-  Trash2,
-  Bold,
-  Italic,
-  Underline,
-  AlignLeft,
-  AlignCenter,
-  AlignRight
+  SendHorizontal
 } from "lucide-react";
 import { useStudentAssignment } from "@/hooks/useStudentAssignment";
 import { useTypingMetrics } from "@/hooks/useTypingMetrics";
@@ -31,8 +23,9 @@ import { useTypingMetrics } from "@/hooks/useTypingMetrics";
 export default function StudentDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   
+  const [isNewUser, setIsNewUser] = useState(false);
+  const [showWelcomeDialog, setShowWelcomeDialog] = useState(false);
   const [showAssignmentPrompt, setShowAssignmentPrompt] = useState(false);
   const [linkedAssignmentId, setLinkedAssignmentId] = useState<string | null>(null);
   const [showCitationPrompt, setShowCitationPrompt] = useState(false);
@@ -54,12 +47,28 @@ export default function StudentDashboard() {
     addCitation
   } = useStudentAssignment(linkedAssignmentId);
   
+  // Check if the user is new
+  useEffect(() => {
+    if (user) {
+      const userCreationTime = new Date(user.created_at || Date.now());
+      const now = new Date();
+      const diffMs = now.getTime() - userCreationTime.getTime();
+      const diffMins = Math.floor(diffMs / 60000);
+      
+      // If user account is less than 5 minutes old, consider them new
+      if (diffMins < 5) {
+        setIsNewUser(true);
+        setShowWelcomeDialog(true);
+      }
+    }
+  }, [user]);
+  
   // Check for saved linked assignment
   useEffect(() => {
     const savedLinkedAssignment = window.localStorage.getItem("linkedAssignment");
     if (savedLinkedAssignment) {
       setLinkedAssignmentId(savedLinkedAssignment);
-    } else {
+    } else if (!isNewUser) {
       setShowAssignmentPrompt(true);
     }
     
@@ -82,40 +91,6 @@ export default function StudentDashboard() {
       }
     }
   }, [studentAssignment]);
-  
-  // Add event listeners for copy-paste detection
-  useEffect(() => {
-    const handlePasteEvent = (e: ClipboardEvent) => {
-      // Only proceed if we have an active assignment
-      if (studentAssignment?.id) {
-        const pastedText = e.clipboardData?.getData('text') || "";
-        if (pastedText.trim()) {
-          setCopiedText(pastedText);
-          incrementCopyPasteCount();
-          setShowCitationPrompt(true);
-          
-          // Log the paste event
-          console.log("Paste detected:", pastedText.substring(0, 50) + (pastedText.length > 50 ? "..." : ""));
-          toast.info("Content pasted", {
-            description: "Please cite your source"
-          });
-        }
-      }
-    };
-    
-    // Add event listener to the textarea
-    const textarea = textareaRef.current;
-    if (textarea) {
-      textarea.addEventListener('paste', handlePasteEvent);
-    }
-    
-    return () => {
-      // Clean up event listener
-      if (textarea) {
-        textarea.removeEventListener('paste', handlePasteEvent);
-      }
-    };
-  }, [studentAssignment?.id]);
   
   // Save content periodically
   useEffect(() => {
@@ -140,8 +115,7 @@ export default function StudentDashboard() {
   };
   
   // Enhanced text area change handler that tracks typing metrics
-  const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newContent = e.target.value;
+  const handleContentChange = (newContent: string) => {
     const oldContent = content;
     
     // Use our custom hook to track typing metrics and get word count
@@ -161,62 +135,16 @@ export default function StudentDashboard() {
     setEditingDocName(false);
   };
   
-  // Text formatting functions
-  const applyFormat = (format: string) => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-    
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = content.substring(start, end);
-    
-    let formattedText = '';
-    let newCursorPos = 0;
-    
-    switch (format) {
-      case 'bold':
-        formattedText = `**${selectedText}**`;
-        newCursorPos = end + 4;
-        break;
-      case 'italic':
-        formattedText = `*${selectedText}*`;
-        newCursorPos = end + 2;
-        break;
-      case 'underline':
-        formattedText = `_${selectedText}_`;
-        newCursorPos = end + 2;
-        break;
-      case 'align-left':
-      case 'align-center':
-      case 'align-right':
-        // Simple alignment tags (in a real editor, you'd use proper formatting)
-        formattedText = `[${format}]${selectedText}[/${format}]`;
-        newCursorPos = end + format.length * 2 + 5;
-        break;
-      default:
-        return;
+  const handlePasteDetected = (pastedText: string) => {
+    if (studentAssignment?.id && pastedText.trim()) {
+      setCopiedText(pastedText);
+      incrementCopyPasteCount();
+      setShowCitationPrompt(true);
+      
+      toast.info("Content pasted", {
+        description: "Please cite your source"
+      });
     }
-    
-    const newContent = content.substring(0, start) + formattedText + content.substring(end);
-    setContent(newContent);
-    
-    // Save the content
-    saveContent(newContent);
-    
-    // Set selection to after the formatting
-    setTimeout(() => {
-      textarea.focus();
-      textarea.setSelectionRange(newCursorPos, newCursorPos);
-    }, 0);
-  };
-  
-  // Simulate copy/paste detection for demo purposes
-  const handleManualPaste = () => {
-    incrementCopyPasteCount();
-    // Get clipboard text (in a real app, this would access navigator.clipboard)
-    // For demo, we'll just simulate it
-    setCopiedText("This is a simulated copied text from an external source...");
-    setShowCitationPrompt(true);
   };
   
   const handleAddCitation = async (citation: {
@@ -291,8 +219,6 @@ export default function StudentDashboard() {
         <div className="p-4">
           <div className="flex justify-between items-center mb-3">
             <div className="flex items-center gap-3 flex-1">
-              <FileText className="h-5 w-5 text-authentiya-maroon" />
-              
               {editingDocName ? (
                 <div className="flex items-center gap-2 flex-1">
                   <Input
@@ -330,15 +256,6 @@ export default function StudentDashboard() {
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="gap-2" 
-                  onClick={handleManualPaste}
-                >
-                  <Copy className="h-4 w-4" />
-                  <span className="hidden sm:inline">Simulate Copy/Paste</span>
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
                   className="gap-2"
                   onClick={() => {
                     setShowCitationPrompt(true);
@@ -360,76 +277,22 @@ export default function StudentDashboard() {
             )}
           </div>
           
-          {/* Text formatting toolbar */}
-          <div className="flex items-center gap-2 mb-3 p-2 border rounded-md bg-gray-50 dark:bg-gray-800">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="h-8 w-8 p-0"
-              onClick={() => applyFormat('bold')}
-              title="Bold"
-            >
-              <Bold className="h-4 w-4" />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="h-8 w-8 p-0"
-              onClick={() => applyFormat('italic')}
-              title="Italic"
-            >
-              <Italic className="h-4 w-4" />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="h-8 w-8 p-0"
-              onClick={() => applyFormat('underline')}
-              title="Underline"
-            >
-              <Underline className="h-4 w-4" />
-            </Button>
-            <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1"></div>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="h-8 w-8 p-0"
-              onClick={() => applyFormat('align-left')}
-              title="Align Left"
-            >
-              <AlignLeft className="h-4 w-4" />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="h-8 w-8 p-0"
-              onClick={() => applyFormat('align-center')}
-              title="Align Center"
-            >
-              <AlignCenter className="h-4 w-4" />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="h-8 w-8 p-0"
-              onClick={() => applyFormat('align-right')}
-              title="Align Right"
-            >
-              <AlignRight className="h-4 w-4" />
-            </Button>
-          </div>
-          
-          <Textarea
-            ref={textareaRef}
-            className="w-full min-h-[300px] p-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-authentiya-maroon/50 transition-all resize-y text-base"
-            placeholder="Start typing your document here..."
-            value={content}
-            onChange={handleTextAreaChange}
-            disabled={!studentAssignment?.id}
-            autoFocus
+          <TextEditor 
+            content={content}
+            onChange={handleContentChange}
+            onPaste={handlePasteDetected}
+            readOnly={!studentAssignment?.id}
           />
         </div>
       </div>
+      
+      {showWelcomeDialog && (
+        <WelcomeDialog
+          open={showWelcomeDialog}
+          onOpenChange={setShowWelcomeDialog}
+          onLinkAssignment={handleLinkAssignment}
+        />
+      )}
       
       {showAssignmentPrompt && (
         <AssignmentPrompt
