@@ -2,6 +2,18 @@
 /**
  * This file provides a read-only view for submitted assignments,
  * allowing students to view their submitted work without the ability to edit.
+ * 
+ * Features:
+ * - Displays assignment details and metadata
+ * - Shows submission statistics (word count, time spent, etc.)
+ * - Presents the submitted content in read-only mode
+ * - Provides navigation back to assignments list
+ * 
+ * Updates:
+ * - Enhanced display of assignment metadata
+ * - Added comprehensive statistics about the submission
+ * - Improved formatting of document content
+ * - Added robust error handling for invalid assignments
  */
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";

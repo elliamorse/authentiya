@@ -10,11 +10,11 @@
  * - Assignment status tracking
  * 
  * Updates:
- * - Fixed issue with duplicate assignments being created on auto-save
- * - Ensured createDocument only creates new documents when necessary
- * - Added proper type checking for assignment status
- * - Extended assignment interface with citation count and lastActive properties
- * - Improved mock data with various assignment statuses for demo purposes
+ * - Added comprehensive dummy assignments for each status type (in-progress, not_started, submitted)
+ * - Enhanced mock data with realistic content, word counts, and timestamps
+ * - Fixed integration between document editor and assignment views
+ * - Ensured proper status tracking for new documents
+ * - Improved type checking for assignment properties
  */
 
 import { useState, useEffect } from "react";
@@ -313,10 +313,12 @@ export const useAssignments = () => {
     );
     setAssignments(newAssignments);
     saveAssignments(newAssignments);
+    return updatedAssignment;
   };
   
   // Function to get an assignment by ID
-  const getAssignment = (id: string) => {
+  const getAssignment = (id: string | null) => {
+    if (!id) return null;
     return assignments.find(assignment => assignment.id === id) || null;
   };
   
@@ -326,6 +328,7 @@ export const useAssignments = () => {
     if (linkedAssignmentId) {
       const existingAssignment = assignments.find(a => a.id === linkedAssignmentId);
       if (existingAssignment) {
+        // Update assignment status if not already in progress
         if (existingAssignment.status !== "in_progress") {
           const updatedAssignment: Assignment = {
             ...existingAssignment,
@@ -333,8 +336,7 @@ export const useAssignments = () => {
             startedOn: existingAssignment.startedOn || new Date().toISOString(),
             lastActive: new Date().toISOString()
           };
-          updateAssignment(updatedAssignment);
-          return updatedAssignment;
+          return updateAssignment(updatedAssignment);
         }
         return existingAssignment;
       }
@@ -351,7 +353,7 @@ export const useAssignments = () => {
       return existingDoc;
     }
     
-    // Create new document only if it doesn't exist
+    // Create new document
     const newAssignment: Assignment = {
       id: `new-${Date.now()}`,
       title,
