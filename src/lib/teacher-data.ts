@@ -1,3 +1,4 @@
+
 /**
  * This file provides mock data for teacher views including student assignments,
  * class information, and statistics for visualizations.
@@ -807,3 +808,19 @@ export const getClassesForTeacher = (): ClassInfo[] => {
     },
     {
       id: "c3",
+      name: "History 105",
+      subject: "History",
+      period: "5th Period (2:00 - 3:30 PM)",
+      studentCount: 32,
+      activeAssignmentCount: 2
+    },
+    {
+      id: "c4",
+      name: "Computer Science 301",
+      subject: "Math",
+      period: "2nd Period (9:45 - 11:15 AM)",
+      studentCount: 26,
+      activeAssignmentCount: 2
+    }
+  ];
+};
