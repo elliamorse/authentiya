@@ -1,4 +1,15 @@
 
+/**
+ * StatisticsCard.tsx
+ * 
+ * This component displays statistics for a selected assignment in two tabs:
+ * 1. Statistics tab - Shows charts and metrics about student submissions
+ * 2. Students tab - Lists all students assigned to the assignment
+ * 
+ * It uses the Tabs component to switch between these views and passes the
+ * relevant data to child components for detailed visualization.
+ */
+
 import React from "react";
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/components/common/Card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
