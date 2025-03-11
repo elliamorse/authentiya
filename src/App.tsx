@@ -16,10 +16,11 @@
  * - Tooltips
  * 
  * Updates:
- * - Fixed paths for student editor with and without assignment ID
- * - Improved route structure for submitted assignment viewing
- * - Added proper parameterization for editor routes
- * - Enhanced documentation for route structure
+ * - Fixed student routes for assignments, editor and view pages
+ * - Added proper route parameter handling for assignment IDs
+ * - Ensured submitted assignments navigate to read-only view component
+ * - Enhanced routing structure for better navigation flow
+ * - Improved documentation for routing structure
  */
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -56,8 +57,9 @@ const App = () => (
             {/* Student routes */}
             <Route path="/student/assignments" element={<StudentAssignments />} />
             <Route path="/student/editor" element={<Dashboard />} />  {/* Editor without assignment */}
-            <Route path="/student/view" element={<ViewSubmittedAssignment />} /> {/* Read-only view */}
-            <Route path="/assignments" element={<Dashboard />} /> {/* Legacy redirect */}
+            <Route path="/student/editor/:assignmentId" element={<Dashboard />} />  {/* Editor with specific assignment */}
+            <Route path="/student/view" element={<ViewSubmittedAssignment />} /> {/* Read-only view for submitted assignments */}
+            <Route path="/assignments" element={<StudentAssignments />} /> {/* Redirect to assignments page */}
             
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
