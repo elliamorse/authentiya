@@ -46,6 +46,7 @@ src/
 │   ├── layout/           # Layout components (Header, etc.)
 │   ├── student/          # Student-specific components
 │   ├── teacher/          # Teacher-specific components
+│   ├── theme/            # Theme-related components (ThemeProvider, ThemeToggle)
 │   └── ui/               # Shadcn UI components
 ├── hooks/                # Custom React hooks
 ├── lib/                  # Utility functions
@@ -86,6 +87,8 @@ The application adapts its interface based on the user's role:
 - Copy-paste detection and citation prompting
 - Assignment linking functionality
 - Basic writing metrics (time, word count, copy-paste count)
+- Theme provider implementation with light/dark mode support
+- Assignment submission view functionality
 
 ### In Progress / Planned
 - Canvas API integration
@@ -93,7 +96,6 @@ The application adapts its interface based on the user's role:
 - Advanced analytics for teachers
 - Plagiarism detection algorithms
 - Mobile-responsive design refinements
-- Dark mode implementation
 - Unit and integration testing
 
 ## Key Technical Decisions
@@ -108,6 +110,8 @@ The application adapts its interface based on the user's role:
 
 5. **Event-based Copy-Paste Detection**: The application uses DOM events to detect copy-paste actions rather than periodic content scanning, which is more efficient and less intrusive.
 
+6. **Theme Provider**: The application implements a custom theme provider that supports light, dark, and system preference modes.
+
 ## Future Roadmap
 
 1. **Authentication System**: Implement proper user authentication and role management
@@ -119,4 +123,4 @@ The application adapts its interface based on the user's role:
 
 ---
 
-Last Updated: June 2023
+Last Updated: March 2024
