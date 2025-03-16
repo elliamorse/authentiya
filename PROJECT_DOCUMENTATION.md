@@ -114,9 +114,4 @@ The application adapts its interface based on the user's role:
 2. **Analytics Dashboard**: Enhance the teacher view with more detailed analytics
 3. **LMS Integration**: Implement direct integration with Canvas and other LMS platforms
 4. **AI-assisted Citation**: Add AI capabilities to help identify and format citations
-5. **Offline Mode**: Allow students to work offline with synchronization when reconnected
-6. **Mobile App**: Develop a companion mobile application for on-the-go access
 
----
-
-Last Updated: June 2023
