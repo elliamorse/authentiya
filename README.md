@@ -22,14 +22,6 @@ Unlike competitors such as TurnItIn (which works after submission and has accura
 - **Assignment Management**: Create, track, and evaluate student assignments
 - **Contact Form**: Request pricing information and customize solutions for your institution
 
-## Link Preview Information
-
-The website uses Open Graph metadata to control how the site appears when shared on social media:
-- Title: "Authentiya - Academic Integrity Solution"
-- Description: "A seamless browser extension that works in the background, detecting AI usage with real-time tracking and comprehensive reporting at scale."
-- Image: Custom Authentiya hero image showcasing the platform's tagline "Track, Verify, and Authenticate Student Writing"
-- Twitter Card: Large image summary
-
 ## Technical Details
 
 This project is built with:
