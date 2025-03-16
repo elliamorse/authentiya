@@ -1,4 +1,43 @@
 
+/**
+ * TeacherStudentView.tsx
+ * 
+ * This component provides a detailed view of a specific student's assignment,
+ * including their work, comments, and submission details for a teacher to review.
+ * 
+ * Created by: Authentiya Development Team
+ * Created on: 2023-11-15
+ * 
+ * Revision History:
+ * - 2023-12-20: Added tabbed interface for work/comments by Authentiya Team
+ * - 2024-06-26: Updated StudentInfoCard props to match component definition by Authentiya Team
+ * 
+ * Preconditions:
+ * - Must be used within a React component tree with React Router
+ * - Requires studentId and assignmentId as URL parameters
+ * 
+ * Input Types:
+ * - URL parameters: studentId, assignmentId
+ * 
+ * Postconditions:
+ * - Renders a detailed view of a student's assignment
+ * 
+ * Return:
+ * - React.ReactNode - The rendered component
+ * 
+ * Error Conditions:
+ * - Handles missing student/assignment data with a not found message
+ * 
+ * Side Effects:
+ * - None
+ * 
+ * Invariants:
+ * - Will always display "not found" message if data is missing
+ * 
+ * Known Faults:
+ * - None
+ */
+
 import { useParams, useNavigate } from "react-router-dom";
 import Header from "../../components/layout/Header";
 import { Button } from "@/components/ui/button";

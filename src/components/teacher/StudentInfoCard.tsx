@@ -11,6 +11,7 @@
  * Revision History:
  * - 2023-12-15: Added activity tracking visualization by Authentiya Team
  * - 2024-06-22: Fixed badge variant type by Authentiya Team
+ * - 2024-06-26: Fixed startDate property error by Authentiya Team
  * 
  * Preconditions:
  * - Must be used within a React component tree
@@ -18,6 +19,9 @@
  * 
  * Input Types:
  * - studentAssignment: StudentAssignment - Data object containing student's assignment information
+ * - assignmentTitle: string - Title of the assignment
+ * - assignmentClassName: string - Name of the class the assignment belongs to
+ * - dueDate: string - Due date of the assignment
  * 
  * Postconditions:
  * - Renders a card with student assignment information
@@ -47,9 +51,17 @@ import { StudentAssignment } from "@/lib/teacherData";
 
 interface StudentInfoCardProps {
   studentAssignment: StudentAssignment;
+  assignmentTitle: string;
+  assignmentClassName: string;
+  dueDate: string;
 }
 
-export const StudentInfoCard: React.FC<StudentInfoCardProps> = ({ studentAssignment }) => {
+export const StudentInfoCard: React.FC<StudentInfoCardProps> = ({ 
+  studentAssignment,
+  assignmentTitle,
+  assignmentClassName,
+  dueDate
+}) => {
   // Format date for display
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "N/A";
@@ -125,7 +137,7 @@ export const StudentInfoCard: React.FC<StudentInfoCardProps> = ({ studentAssignm
               <Calendar className="h-3 w-3" />
               <span>Started:</span>
             </div>
-            <div className="font-medium">{formatDate(studentAssignment.startDate)}</div>
+            <div className="font-medium">{formatDate(studentAssignment.startTime)}</div>
           </div>
           
           {/* Progress section only shown for started assignments */}

@@ -11,6 +11,7 @@
  * Revision History:
  * - 2023-12-15: Added completion percentage visualization by Authentiya Team
  * - 2024-06-22: Fixed badge variant type issues by Authentiya Team
+ * - 2024-06-26: Fixed error badge variant by Authentiya Team
  * 
  * Preconditions:
  * - Must be used within a React component tree
@@ -74,7 +75,7 @@ export function AssignmentOverview({ assignment }: AssignmentOverviewProps) {
     const daysRemaining = getDaysRemaining(dateString);
     
     if (daysRemaining < 0) {
-      return <Badge variant="error">Past Due</Badge>;
+      return <Badge variant="destructive">Past Due</Badge>;
     } else if (daysRemaining === 0) {
       return <Badge variant="warning">Due Today</Badge>;
     } else if (daysRemaining <= 2) {
