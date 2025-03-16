@@ -58,9 +58,4 @@ npm i
 npm run dev
 ```
 
-## Deployment
-
-Open [Lovable](https://lovable.dev/projects/d4855ff7-0d76-4608-a6e3-33aaef944cce) and click on Share -> Publish to deploy the project.
-
-For custom domain deployment, we recommend using Netlify. See our [custom domains documentation](https://docs.lovable.dev/tips-tricks/custom-domain/) for more details.
 
