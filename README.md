@@ -1,7 +1,7 @@
 
 # Authentiya - Academic Integrity Platform
 
-**URL**: https://lovable.dev/projects/d4855ff7-0d76-4608-a6e3-33aaef944cce
+**URL**: Built in collaboration with Lovable.dev! edit here: https://lovable.dev/projects/d4855ff7-0d76-4608-a6e3-33aaef944cce
 
 ## About Authentiya
 
