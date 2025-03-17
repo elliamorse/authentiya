@@ -1,3 +1,29 @@
+/**
+ * select.tsx
+ * 
+ * This component renders a select dropdown, allowing users to choose an option from a list.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `options`: array - A list of select options, each with a label and value.
+ * - `value`: string - The currently selected value.
+ * - `onChange`: function - The function to handle changes to the selected value.
+ * 
+ * Postconditions:
+ * - Renders a select dropdown with the specified options and value.
+ * 
+ * Return Values:
+ * - None directly, but renders a select element.
+ */
+
 import * as React from "react"
 import * as SelectPrimitive from "@radix-ui/react-select"
 import { Check, ChevronDown, ChevronUp } from "lucide-react"

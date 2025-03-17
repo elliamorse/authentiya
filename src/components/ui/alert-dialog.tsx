@@ -1,3 +1,29 @@
+/**
+ * alert-dialog.tsx
+ * 
+ * This component renders an alert dialog, providing a modal dialog with a message and action buttons.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `message`: string - The message to be displayed in the alert dialog.
+ * - `onConfirm`: function - The function to handle the confirm action.
+ * - `onCancel`: function - The function to handle the cancel action.
+ * 
+ * Postconditions:
+ * - Renders an alert dialog with a message and action buttons.
+ * 
+ * Return Values:
+ * - None directly, but renders an alert dialog element.
+ */
+
 import * as React from "react"
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog"
 

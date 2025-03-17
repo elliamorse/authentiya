@@ -1,9 +1,26 @@
-
 /**
  * DocumentCard.tsx
  * 
- * This component renders a single document card in the student documents list.
- * It displays document details, status, and provides a button to open it.
+ * This component renders a card displaying information about a document,
+ * including the title, status, and last modified date.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `document`: object - The document details including title, status, and last modified date.
+ * 
+ * Postconditions:
+ * - Renders a card with document information.
+ * 
+ * Return Values:
+ * - None directly, but renders a card element.
  */
 
 import React from 'react';

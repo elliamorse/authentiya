@@ -1,10 +1,27 @@
-
 /**
  * DocumentHeader.tsx
  * 
- * This component handles the document title display and editing functionality.
- * It shows an editable document name with an edit button, and handles saving changes
- * only when the name is actually changed from its previous value.
+ * This component renders the header section of a document,
+ * including the document title and status.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `title`: string - The title of the document.
+ * - `status`: string - The status of the document.
+ * 
+ * Postconditions:
+ * - Renders the header section with the document title and status.
+ * 
+ * Return Values:
+ * - None directly, but renders a header element.
  */
 
 import { useState } from "react";

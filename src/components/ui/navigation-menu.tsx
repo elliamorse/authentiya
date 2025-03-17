@@ -1,3 +1,27 @@
+/**
+ * navigation-menu.tsx
+ * 
+ * This component renders a navigation menu, providing links to different sections of the application.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `links`: array - A list of navigation links, each with a label and URL.
+ * 
+ * Postconditions:
+ * - Renders a navigation menu with links to different sections.
+ * 
+ * Return Values:
+ * - None directly, but renders a navigation menu element.
+ */
+
 import * as React from "react"
 import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu"
 import { cva } from "class-variance-authority"

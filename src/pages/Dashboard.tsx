@@ -1,14 +1,27 @@
-
 /**
  * Dashboard.tsx
  * 
- * This file serves as the main entry point for the application's dashboard functionality.
- * It determines whether to render the student or teacher dashboard based on the user's role,
- * and provides role-switching capabilities for demonstration purposes.
+ * This component renders the main dashboard page, providing an overview of the user's activities and statistics.
  * 
- * The file has been repurposed from its original "Dashboard" concept to now serve
- * as an "Editor" for students while maintaining the teacher dashboard functionality.
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - None directly, as this component does not accept props.
+ * 
+ * Postconditions:
+ * - Renders the main dashboard page with an overview of activities and statistics.
+ * 
+ * Return Values:
+ * - None directly, but renders a page element.
  */
+
 
 import { useState, useEffect } from "react";
 import Header from "../components/layout/Header";

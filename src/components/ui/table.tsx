@@ -1,3 +1,28 @@
+/**
+ * table.tsx
+ * 
+ * This component renders a table, providing a structured layout for displaying data.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `columns`: array - A list of column definitions for the table.
+ * - `data`: array - A list of data rows to be displayed in the table.
+ * 
+ * Postconditions:
+ * - Renders a table with the specified columns and data.
+ * 
+ * Return Values:
+ * - None directly, but renders a table element.
+ */
+
 import * as React from "react"
 
 import { cn } from "@/lib/utils"

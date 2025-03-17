@@ -1,3 +1,27 @@
+/**
+ * NotFound.tsx
+ * 
+ * This component renders a 404 Not Found page, indicating that the requested page does not exist.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - None directly, as this component does not accept props.
+ * 
+ * Postconditions:
+ * - Renders a 404 Not Found page.
+ * 
+ * Return Values:
+ * - None directly, but renders a page element.
+ */
+
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 

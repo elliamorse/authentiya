@@ -1,3 +1,28 @@
+/**
+ * alert.tsx
+ * 
+ * This component renders an alert message, providing a notification with a message and optional action.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `message`: string - The message to be displayed in the alert.
+ * - `action`: object (optional) - The action button details including label and onClick handler.
+ * 
+ * Postconditions:
+ * - Renders an alert message with an optional action.
+ * 
+ * Return Values:
+ * - None directly, but renders an alert element.
+ */
+
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 

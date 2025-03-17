@@ -1,3 +1,28 @@
+/**
+ * popover.tsx
+ * 
+ * This component renders a popover, providing additional information or actions in a floating container.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `content`: React.ReactNode - The content to be displayed inside the popover.
+ * - `trigger`: React.ReactNode - The element that triggers the popover.
+ * 
+ * Postconditions:
+ * - Renders a popover with the specified content and trigger.
+ * 
+ * Return Values:
+ * - None directly, but renders a popover element.
+ */
+
 import * as React from "react"
 import * as PopoverPrimitive from "@radix-ui/react-popover"
 

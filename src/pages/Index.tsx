@@ -1,11 +1,25 @@
-
 /**
  * Index.tsx
  * 
- * This component serves as the landing page for Authentiya. It showcases the main features
- * of the application through a hero section, features section, and information about how
- * the platform works. The page has been refactored into smaller, more maintainable components
- * while preserving the exact same functionality.
+ * This component renders the main landing page of the application, providing an introduction and links to other sections.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - None directly, as this component does not accept props.
+ * 
+ * Postconditions:
+ * - Renders the main landing page with an introduction and links to other sections.
+ * 
+ * Return Values:
+ * - None directly, but renders a page element.
  */
 
 import HeroSection from '@/components/landing/HeroSection';

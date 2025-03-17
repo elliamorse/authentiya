@@ -1,3 +1,27 @@
+/**
+ * command.tsx
+ * 
+ * This component renders a command input, allowing users to enter and execute commands.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `onCommand`: function - The function to handle command execution.
+ * 
+ * Postconditions:
+ * - Renders a command input with the specified command handler.
+ * 
+ * Return Values:
+ * - None directly, but renders a command input element.
+ */
+
 import * as React from "react"
 import { type DialogProps } from "@radix-ui/react-dialog"
 import { Command as CommandPrimitive } from "cmdk"

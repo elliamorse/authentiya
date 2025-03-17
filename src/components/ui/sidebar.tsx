@@ -1,3 +1,27 @@
+/**
+ * sidebar.tsx
+ * 
+ * This component renders a sidebar, providing a vertical navigation or content area.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `children`: React.ReactNode - The content to be displayed inside the sidebar.
+ * 
+ * Postconditions:
+ * - Renders a sidebar with the specified content.
+ * 
+ * Return Values:
+ * - None directly, but renders a sidebar element.
+ */
+
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"

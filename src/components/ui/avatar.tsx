@@ -1,3 +1,28 @@
+/**
+ * avatar.tsx
+ * 
+ * This component renders an avatar, displaying a user's profile picture or initials.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `src`: string - The URL of the profile picture.
+ * - `alt`: string - The alt text for the profile picture.
+ * - `initials`: string (optional) - The initials to be displayed if no profile picture is provided.
+ * 
+ * Postconditions:
+ * - Renders an avatar with a profile picture or initials.
+ * 
+ * Return Values:
+ * - None directly, but renders an avatar element.
+ */
 import * as React from "react"
 import * as AvatarPrimitive from "@radix-ui/react-avatar"
 

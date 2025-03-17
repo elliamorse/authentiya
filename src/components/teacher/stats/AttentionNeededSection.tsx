@@ -1,3 +1,27 @@
+/**
+ * AttentionNeededSection.tsx
+ * 
+ * This component renders a section highlighting students or assignments that need attention,
+ * including those with low grades or incomplete assignments.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `attentionNeeded`: array - A list of students or assignments that need attention.
+ * 
+ * Postconditions:
+ * - Renders a section highlighting students or assignments that need attention.
+ * 
+ * Return Values:
+ * - None directly, but renders a section element.
+ */
 import React, { useMemo } from "react";
 import { Card, CardContent } from "@/components/common/Card";
 import { Badge } from "@/components/common/Badge";

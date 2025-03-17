@@ -1,3 +1,29 @@
+/**
+ * card.tsx
+ * 
+ * This component renders a customizable card with various styles and hover effects.
+ * It uses the class-variance-authority library to manage different card variants.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - The class-variance-authority library must be installed and properly configured.
+ * 
+ * Acceptable Input:
+ * - `variant`: string - The style variant of the card (e.g., 'default', 'glass', 'glass-lg').
+ * - `hover`: string - The hover effect of the card (e.g., 'default', 'lift').
+ * 
+ * Postconditions:
+ * - Renders a card with the specified styles and hover effects.
+ * 
+ * Return Values:
+ * - None directly, but renders a card element.
+ */
+
 import * as React from "react"
 
 import { cn } from "@/lib/utils"

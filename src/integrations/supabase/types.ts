@@ -1,3 +1,27 @@
+/**
+ * types.ts
+ * 
+ * This file defines TypeScript types and interfaces for interacting with the Supabase API.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - None directly, as this file does not accept parameters.
+ * 
+ * Postconditions:
+ * - Provides TypeScript types and interfaces for Supabase interactions.
+ * 
+ * Return Values:
+ * - None directly, but exports types and interfaces.
+ */
+
 export type Json =
   | string
   | number

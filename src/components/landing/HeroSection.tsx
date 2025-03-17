@@ -1,10 +1,39 @@
-
 /**
  * HeroSection.tsx
  * 
  * This component is the top section of the landing page, featuring the main headline,
  * description, call-to-action buttons, and tabbed content showing different features
  * for students and teachers.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - The `react-router-dom` and `lucide-react` libraries must be installed and properly configured.
+ * 
+ * Acceptable Input:
+ * - None directly, as this component does not accept props.
+ * 
+ * Postconditions:
+ * - Renders the hero section with headline, description, call-to-action buttons, and tabbed content.
+ * 
+ * Return Values:
+ * - None directly, but renders a div element.
+ * 
+ * Error and Exception Conditions:
+ * - None identified.
+ * 
+ * Side Effects:
+ * - None identified.
+ * 
+ * Invariants:
+ * - The hero section must always render with the specified structure and content.
+ * 
+ * Known Faults:
+ * - None identified.
  */
 
 import { useState } from 'react';

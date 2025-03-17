@@ -1,4 +1,40 @@
-
+/**
+ * Header.tsx
+ * 
+ * This component renders the header section of the Authentiya application,
+ * including navigation links, user account menu, and sign-in button.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - The `react-router-dom` and `lucide-react` libraries must be installed and properly configured.
+ * 
+ * Acceptable Input:
+ * - `email`: string - The email of the logged-in user.
+ * - `handleLogout`: function - The function to handle user logout.
+ * 
+ * Postconditions:
+ * - Renders the header section with navigation links, user account menu, and sign-in button.
+ * 
+ * Return Values:
+ * - None directly, but renders a header element.
+ * 
+ * Error and Exception Conditions:
+ * - None identified.
+ * 
+ * Side Effects:
+ * - None identified.
+ * 
+ * Invariants:
+ * - The header must always render with the specified structure and content.
+ * 
+ * Known Faults:
+ * - None identified.
+ */
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/common/Button";

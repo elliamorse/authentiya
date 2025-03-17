@@ -1,4 +1,49 @@
+/**
+ * Card.tsx
+ * 
+ * This component provides a customizable card with various styles and hover effects.
+ * It uses the class-variance-authority library to manage different card variants.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - The class-variance-authority library must be installed and properly configured.
+ * 
+ * Acceptable Input:
+ * - `variant`: string - The style variant of the card (e.g., 'default', 'glass', 'glass-lg').
+ * - `hover`: string - The hover effect of the card (e.g., 'default', 'lift').
+ * 
+ * Unacceptable Input:
+ * - Any value for `variant` or `hover` that is not defined in the `cardVariants` object.
+ * 
+ * Postconditions:
+ * - Renders a card with the specified styles and hover effects.
+ * 
+ * Return Values:
+ * - None directly, but renders a card element.
+ * 
+ * Error and Exception Conditions:
+ * - None identified.
+ * 
+ * Side Effects:
+ * - None identified.
+ * 
+ * Invariants:
+ * - The card must always have a valid `variant` and `hover`.
+ * 
+ * Known Faults:
+ * - None identified.
+ */
 
+// Import React library
+// Import cva function and VariantProps type from class-variance-authority
+// Import cn utility function
+
+// Define card variants using the cva function
 import React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";

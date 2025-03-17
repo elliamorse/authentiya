@@ -1,11 +1,26 @@
-
 /**
  * DocumentActions.tsx
  * 
- * This component displays action buttons for the document editor, such as
- * adding citations and submitting assignments. It handles the action logic
- * and button rendering. It has been enhanced with visual feedback for users.
- * Now shows the citation prompt when "Add Citation" is clicked.
+ * This component renders a set of actions that can be performed on a document,
+ * including editing, deleting, and sharing the document.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `documentId`: string - The ID of the document.
+ * 
+ * Postconditions:
+ * - Renders a set of actions for the document.
+ * 
+ * Return Values:
+ * - None directly, but renders a set of action elements.
  */
 
 import { useState } from "react";

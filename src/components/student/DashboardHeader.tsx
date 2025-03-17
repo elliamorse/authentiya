@@ -1,10 +1,26 @@
-
 /**
  * DashboardHeader.tsx
  * 
- * This component displays the editor header with title, description,
- * and assignment linking controls. Renamed from "Dashboard" to "Editor"
- * to better reflect its purpose.
+ * This component renders the header section of the student dashboard,
+ * including the student's name and a welcome message.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `studentName`: string - The name of the student.
+ * 
+ * Postconditions:
+ * - Renders the header section with the student's name and a welcome message.
+ * 
+ * Return Values:
+ * - None directly, but renders a header element.
  */
 
 import { Button } from "@/components/ui/button";

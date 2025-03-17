@@ -1,3 +1,29 @@
+/**
+ * pagination.tsx
+ * 
+ * This component renders a pagination control, allowing users to navigate through pages of content.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `currentPage`: number - The current page number.
+ * - `totalPages`: number - The total number of pages.
+ * - `onPageChange`: function - The function to handle page changes.
+ * 
+ * Postconditions:
+ * - Renders a pagination control with navigation buttons.
+ * 
+ * Return Values:
+ * - None directly, but renders a pagination element.
+ */
+
 import * as React from "react"
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react"
 

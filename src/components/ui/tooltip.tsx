@@ -1,3 +1,28 @@
+/**
+ * tooltip.tsx
+ * 
+ * This component renders a tooltip, providing additional information when hovering over an element.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `content`: string - The content to be displayed inside the tooltip.
+ * - `children`: React.ReactNode - The element that triggers the tooltip.
+ * 
+ * Postconditions:
+ * - Renders a tooltip with the specified content and trigger.
+ * 
+ * Return Values:
+ * - None directly, but renders a tooltip element.
+ */
+
 import * as React from "react"
 import * as TooltipPrimitive from "@radix-ui/react-tooltip"
 

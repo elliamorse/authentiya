@@ -1,3 +1,27 @@
+/**
+ * carousel.tsx
+ * 
+ * This component renders a carousel, allowing users to navigate through a series of images or content.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `items`: array - A list of carousel items, each with an image or content.
+ * 
+ * Postconditions:
+ * - Renders a carousel with navigable items.
+ * 
+ * Return Values:
+ * - None directly, but renders a carousel element.
+ */
+
 import * as React from "react"
 import useEmblaCarousel, {
   type UseEmblaCarouselType,

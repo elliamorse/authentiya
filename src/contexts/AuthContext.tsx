@@ -1,9 +1,41 @@
-
 /**
  * AuthContext.tsx
  * 
  * This context provides authentication state and methods throughout the application.
  * It handles user sessions, login/logout functionality, and authentication state changes.
+ *  
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - Supabase client must be properly configured and initialized.
+ * 
+ * Acceptable Input:
+ * - `children`: React.ReactNode - The child components that will be wrapped by the AuthProvider.
+ * 
+ * Unacceptable Input:
+ * - Any non-React.ReactNode type for `children`.
+ * 
+ * Postconditions:
+ * - Provides authentication context to the wrapped components.
+ * 
+ * Return Values:
+ * - None directly, but provides context values through React's Context API.
+ * 
+ * Error and Exception Conditions:
+ * - Errors related to Supabase client initialization and session handling.
+ * 
+ * Side Effects:
+ * - Updates the authentication state and user session.
+ * 
+ * Invariants:
+ * - The context must always provide the current session and user state.
+ * 
+ * Known Faults:
+ * - None identified.
  */
 
 import { createContext, useContext, useState, useEffect } from 'react';

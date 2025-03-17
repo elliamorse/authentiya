@@ -1,3 +1,27 @@
+/**
+ * accordion.tsx
+ * 
+ * This component renders an accordion, allowing for expandable and collapsible sections of content.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `items`: array - A list of accordion items, each with a title and content.
+ * 
+ * Postconditions:
+ * - Renders an accordion with expandable and collapsible sections.
+ * 
+ * Return Values:
+ * - None directly, but renders an accordion element.
+ */
+
 import * as React from "react"
 import * as AccordionPrimitive from "@radix-ui/react-accordion"
 import { ChevronDown } from "lucide-react"

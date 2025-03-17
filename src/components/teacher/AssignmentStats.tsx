@@ -1,13 +1,26 @@
-
 /**
- * File: AssignmentStats.tsx
+ * AssignmentStats.tsx
  * 
- * Description: This component manages and displays various statistics for assignments,
- * including time distribution, word count distribution, start time patterns, and 
- * submission status. It processes raw student data into visualizable formats.
+ * This component renders statistics for a specific assignment,
+ * including metrics such as average grade, completion rate, and more.
  * 
- * Update: Fixed data processing to correctly populate charts with mock data when no real data
- * is available. Enhanced error handling and data processing logic.
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `assignmentId`: string - The ID of the assignment.
+ * 
+ * Postconditions:
+ * - Renders statistics for the specified assignment.
+ * 
+ * Return Values:
+ * - None directly, but renders a statistics element.
  */
 
 import React, { useMemo } from "react";

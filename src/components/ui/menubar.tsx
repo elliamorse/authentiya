@@ -1,3 +1,27 @@
+/**
+ * menubar.tsx
+ * 
+ * This component renders a menubar, providing a set of menu items for navigation or actions.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `items`: array - A list of menu items, each with a label and action.
+ * 
+ * Postconditions:
+ * - Renders a menubar with a set of menu items.
+ * 
+ * Return Values:
+ * - None directly, but renders a menubar element.
+ */
+
 import * as React from "react"
 import * as MenubarPrimitive from "@radix-ui/react-menubar"
 import { Check, ChevronRight, Circle } from "lucide-react"

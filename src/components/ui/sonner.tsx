@@ -1,3 +1,27 @@
+/**
+ * sonner.tsx
+ * 
+ * This component renders a notification system, providing alerts and messages to the user.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `notifications`: array - A list of notifications, each with a message and type.
+ * 
+ * Postconditions:
+ * - Renders a notification system with the specified notifications.
+ * 
+ * Return Values:
+ * - None directly, but renders a notification system element.
+ */
+
 
 import { useTheme } from "next-themes"
 import { Toaster as Sonner } from "sonner"

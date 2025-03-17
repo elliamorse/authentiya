@@ -1,10 +1,25 @@
-
 /**
  * helpers.ts
  * 
- * This file contains utility functions for retrieving and manipulating teacher data.
- * These functions provide access to student assignments, classes, and comments,
- * allowing components to easily filter and retrieve the data they need.
+ * This file contains helper functions for processing and manipulating teacher data.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - Various inputs depending on the specific helper function.
+ * 
+ * Postconditions:
+ * - Provides helper functions for teacher data processing.
+ * 
+ * Return Values:
+ * - Various return values depending on the specific helper function.
  */
 
 import { Assignment, ClassInfo, Comment, StudentAssignment } from "./types";

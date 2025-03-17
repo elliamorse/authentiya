@@ -1,3 +1,28 @@
+/**
+ * radio-group.tsx
+ * 
+ * This component renders a group of radio buttons, allowing users to select one option from a set.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `options`: array - A list of radio button options, each with a label and value.
+ * - `value`: string - The currently selected value.
+ * - `onChange`: function - The function to handle changes to the selected value.
+ * 
+ * Postconditions:
+ * - Renders a group of radio buttons with the specified options and value.
+ * 
+ * Return Values:
+ * - None directly, but renders a radio group element.
+ */
 import * as React from "react"
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group"
 import { Circle } from "lucide-react"

@@ -1,4 +1,27 @@
-
+/**
+ * CommentsSection.tsx
+ * 
+ * This component renders a section for teacher comments on student assignments,
+ * including a form to add new comments and a list of existing comments.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `assignmentId`: string - The ID of the assignment.
+ * 
+ * Postconditions:
+ * - Renders a section for teacher comments on student assignments.
+ * 
+ * Return Values:
+ * - None directly, but renders a comments section element.
+ */
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";

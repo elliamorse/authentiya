@@ -1,13 +1,26 @@
-
 /**
  * StatisticsCard.tsx
  * 
- * This component displays statistics for a selected assignment in two tabs:
- * 1. Statistics tab - Shows charts and metrics about student submissions
- * 2. Students tab - Lists all students assigned to the assignment
+ * This component renders a card displaying statistics for an assignment,
+ * including metrics such as average grade, completion rate, and more.
  * 
- * It uses the Tabs component to switch between these views and passes the
- * relevant data to child components for detailed visualization.
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `statistics`: object - The statistics details including average grade, completion rate, and more.
+ * 
+ * Postconditions:
+ * - Renders a card with assignment statistics.
+ * 
+ * Return Values:
+ * - None directly, but renders a card element.
  */
 
 import React from "react";

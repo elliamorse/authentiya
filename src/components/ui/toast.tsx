@@ -1,3 +1,28 @@
+/**
+ * toast.tsx
+ * 
+ * This component renders a toast notification, providing brief messages to the user.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `message`: string - The message to be displayed in the toast.
+ * - `type`: string - The type of the toast (e.g., 'success', 'error').
+ * 
+ * Postconditions:
+ * - Renders a toast notification with the specified message and type.
+ * 
+ * Return Values:
+ * - None directly, but renders a toast element.
+ */
+
 import * as React from "react"
 import * as ToastPrimitives from "@radix-ui/react-toast"
 import { cva, type VariantProps } from "class-variance-authority"

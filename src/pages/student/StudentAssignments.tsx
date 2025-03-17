@@ -1,44 +1,25 @@
-
 /**
  * StudentAssignments.tsx
  * 
- * This component serves as the Assignments page for student users, displaying
- * a list of their assignments and documents with filtering capabilities.
+ * This component renders the student assignments page, displaying a list of assignments and their details.
  * 
- * Created by: Authentiya Development Team
- * Created on: 2023-11-05
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
  * 
- * Revision History:
- * - 2023-12-12: Added document filtering by status by Authentiya Team
- * - 2024-01-10: Integrated with DocumentsSection component by Authentiya Team
- * - 2024-06-22: Fixed badge variant type issue by Authentiya Team
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
  * 
  * Preconditions:
- * - Must be used within a React component tree with router context
- * - Requires mock data for demonstration (would connect to backend in production)
+ * - None identified.
  * 
- * Input Types:
- * - None directly, uses internal state and mock data
+ * Acceptable Input:
+ * - None directly, as this component does not accept props.
  * 
  * Postconditions:
- * - Renders a page with filterable document list
- * - Allows navigation to document editor
+ * - Renders the student assignments page with a list of assignments.
  * 
- * Return:
- * - React.ReactNode - The rendered component
- * 
- * Error Conditions:
- * - None specifically handled
- * 
- * Side Effects:
- * - Updates localStorage with document data when a document is opened
- * - Navigates to dashboard when a document is opened
- * 
- * Invariants:
- * - Always shows document filtering options even if no documents match the filter
- * 
- * Known Faults:
- * - Uses mock data instead of actual backend connection
+ * Return Values:
+ * - None directly, but renders a page element.
  */
 
 import React, { useState } from "react";

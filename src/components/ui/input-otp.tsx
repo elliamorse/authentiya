@@ -1,3 +1,27 @@
+/**
+ * input-otp.tsx
+ * 
+ * This component renders an input field for one-time passwords (OTP), allowing users to enter a multi-digit code.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `length`: number - The number of digits in the OTP.
+ * - `onChange`: function - The function to handle changes to the OTP.
+ * 
+ * Postconditions:
+ * - Renders an input field for OTP with the specified length and change handler.
+ * 
+ * Return Values:
+ * - None directly, but renders an input element.
+ */
 import * as React from "react"
 import { OTPInput, OTPInputContext } from "input-otp"
 import { Dot } from "lucide-react"

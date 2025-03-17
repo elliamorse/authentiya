@@ -1,3 +1,27 @@
+/**
+ * breadcrumb.tsx
+ * 
+ * This component renders a breadcrumb navigation, displaying a trail of links to indicate the current page's location within a hierarchy.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `items`: array - A list of breadcrumb items, each with a label and URL.
+ * 
+ * Postconditions:
+ * - Renders a breadcrumb navigation with a trail of links.
+ * 
+ * Return Values:
+ * - None directly, but renders a breadcrumb element.
+ */
+
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { ChevronRight, MoreHorizontal } from "lucide-react"

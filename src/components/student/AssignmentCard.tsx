@@ -1,9 +1,26 @@
-
 /**
  * AssignmentCard.tsx
  * 
- * This component renders a single assignment card in the student assignments list.
- * It displays assignment details, status, and provides a button to start or continue working on it.
+ * This component renders a card displaying information about a student's assignment,
+ * including the title, due date, and status.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `assignment`: object - The assignment details including title, due date, and status.
+ * 
+ * Postconditions:
+ * - Renders a card with assignment information.
+ * 
+ * Return Values:
+ * - None directly, but renders a card element.
  */
 
 import React from 'react';

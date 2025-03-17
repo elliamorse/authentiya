@@ -1,3 +1,28 @@
+/**
+ * checkbox.tsx
+ * 
+ * This component renders a checkbox, allowing users to select or deselect an option.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `checked`: boolean - The checked state of the checkbox.
+ * - `onChange`: function - The function to handle changes to the checked state.
+ * 
+ * Postconditions:
+ * - Renders a checkbox with the specified checked state and change handler.
+ * 
+ * Return Values:
+ * - None directly, but renders a checkbox element.
+ */
+
 import * as React from "react"
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox"
 import { Check } from "lucide-react"

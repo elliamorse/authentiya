@@ -1,41 +1,25 @@
-
 /**
  * TeacherStudentView.tsx
  * 
- * This component provides a detailed view of a specific student's assignment,
- * including their work, comments, and submission details for a teacher to review.
+ * This component renders the teacher student view page, displaying details of a specific student and their work.
  * 
- * Created by: Authentiya Development Team
- * Created on: 2023-11-15
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
  * 
- * Revision History:
- * - 2023-12-20: Added tabbed interface for work/comments by Authentiya Team
- * - 2024-06-26: Updated StudentInfoCard props to match component definition by Authentiya Team
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
  * 
  * Preconditions:
- * - Must be used within a React component tree with React Router
- * - Requires studentId and assignmentId as URL parameters
+ * - None identified.
  * 
- * Input Types:
- * - URL parameters: studentId, assignmentId
+ * Acceptable Input:
+ * - None directly, as this component does not accept props.
  * 
  * Postconditions:
- * - Renders a detailed view of a student's assignment
+ * - Renders the teacher student view page with student details and work.
  * 
- * Return:
- * - React.ReactNode - The rendered component
- * 
- * Error Conditions:
- * - Handles missing student/assignment data with a not found message
- * 
- * Side Effects:
- * - None
- * 
- * Invariants:
- * - Will always display "not found" message if data is missing
- * 
- * Known Faults:
- * - None
+ * Return Values:
+ * - None directly, but renders a page element.
  */
 
 import { useParams, useNavigate } from "react-router-dom";

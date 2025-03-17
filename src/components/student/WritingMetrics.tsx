@@ -1,3 +1,27 @@
+/**
+ * WritingMetrics.tsx
+ * 
+ * This component renders writing metrics for a student's document,
+ * including word count, reading time, and other statistics.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `documentId`: string - The ID of the document for which metrics are displayed.
+ * 
+ * Postconditions:
+ * - Renders writing metrics for the document.
+ * 
+ * Return Values:
+ * - None directly, but renders a metrics element.
+ */
 
 import { useState, useEffect } from "react";
 import { Badge } from "@/components/common/Badge";

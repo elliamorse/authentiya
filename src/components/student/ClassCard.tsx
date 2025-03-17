@@ -1,8 +1,26 @@
-
 /**
  * ClassCard.tsx
  * 
- * This component renders a single class card in the student classes list.
+ * This component renders a card displaying information about a class,
+ * including the class name, instructor, and schedule.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `classInfo`: object - The class details including name, instructor, and schedule.
+ * 
+ * Postconditions:
+ * - Renders a card with class information.
+ * 
+ * Return Values:
+ * - None directly, but renders a card element.
  */
 
 import React from 'react';

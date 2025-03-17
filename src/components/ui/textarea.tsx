@@ -1,11 +1,29 @@
-
 /**
- * Textarea.tsx
+ * textarea.tsx
  * 
- * This component is a textarea input element designed to work seamlessly with our custom UI.
- * It provides a clean, styled textarea that can be used across the application.
- * Modified to work better with the WordProcessor component.
+ * This component renders a textarea, allowing users to enter multi-line text.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `value`: string - The value of the textarea.
+ * - `onChange`: function - The function to handle changes to the textarea value.
+ * 
+ * Postconditions:
+ * - Renders a textarea with the specified value.
+ * 
+ * Return Values:
+ * - None directly, but renders a textarea element.
  */
+
+
 
 import * as React from "react"
 

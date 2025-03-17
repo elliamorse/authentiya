@@ -1,3 +1,26 @@
+/**
+ * form.tsx
+ * 
+ * This component renders a form, providing input fields and action buttons for user input.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `onSubmit`: function - The function to handle form submission.
+ * 
+ * Postconditions:
+ * - Renders a form with input fields and action buttons.
+ * 
+ * Return Values:
+ * - None directly, but renders a form element.
+ */
 import * as React from "react"
 import * as LabelPrimitive from "@radix-ui/react-label"
 import { Slot } from "@radix-ui/react-slot"

@@ -1,3 +1,27 @@
+/**
+ * scroll-area.tsx
+ * 
+ * This component renders a scrollable area, allowing users to scroll through content that exceeds the container size.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `children`: React.ReactNode - The content to be displayed inside the scrollable area.
+ * 
+ * Postconditions:
+ * - Renders a scrollable area with the specified content.
+ * 
+ * Return Values:
+ * - None directly, but renders a scrollable area element.
+ */
+
 import * as React from "react"
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area"
 

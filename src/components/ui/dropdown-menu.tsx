@@ -1,3 +1,26 @@
+/**
+ * dropdown-menu.tsx
+ * 
+ * This component renders a dropdown menu, providing a menu of actions that can be performed on a selected item.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `items`: array - A list of dropdown menu items, each with a label and action.
+ * 
+ * Postconditions:
+ * - Renders a dropdown menu with a list of actions.
+ * 
+ * Return Values:
+ * - None directly, but renders a dropdown menu element.
+ */
 import * as React from "react"
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
 import { Check, ChevronRight, Circle } from "lucide-react"

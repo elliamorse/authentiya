@@ -1,3 +1,28 @@
+/**
+ * chart.tsx
+ * 
+ * This component renders a chart, displaying data in various graphical formats such as bar, line, or pie charts.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `data`: array - The data to be displayed in the chart.
+ * - `type`: string - The type of chart to be rendered (e.g., 'bar', 'line', 'pie').
+ * 
+ * Postconditions:
+ * - Renders a chart with the specified data and type.
+ * 
+ * Return Values:
+ * - None directly, but renders a chart element.
+ */
+
 import * as React from "react"
 import * as RechartsPrimitive from "recharts"
 

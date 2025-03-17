@@ -1,3 +1,27 @@
+/**
+ * TeacherClasses.tsx
+ * 
+ * This component renders the teacher classes page, displaying a list of classes and their details.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - None directly, as this component does not accept props.
+ * 
+ * Postconditions:
+ * - Renders the teacher classes page with a list of classes.
+ * 
+ * Return Values:
+ * - None directly, but renders a page element.
+ */
+
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";

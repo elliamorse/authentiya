@@ -1,8 +1,27 @@
-
 /**
  * DocumentStatusFilter.tsx
  * 
- * This component renders filter buttons for document status.
+ * This component renders a filter for document status,
+ * allowing the user to filter documents by their status.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `status`: string - The current status filter.
+ * - `onStatusChange`: function - The function to handle status changes.
+ * 
+ * Postconditions:
+ * - Renders a filter for document status.
+ * 
+ * Return Values:
+ * - None directly, but renders a filter element.
  */
 
 import React from 'react';

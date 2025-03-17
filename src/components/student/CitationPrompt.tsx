@@ -1,43 +1,26 @@
-
 /**
  * CitationPrompt.tsx
  * 
- * This component provides a form for students to add citations to their documents.
- * It supports various citation types and source details.
+ * This component renders a prompt for students to add citations to their document.
+ * It includes a button to add a new citation.
  * 
- * Created by: Authentiya Development Team
- * Created on: 2023-11-15
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
  * 
- * Revision History:
- * - 2023-12-05: Added support for AI source citations by Authentiya Team
- * - 2024-06-22: Updated interface to include copiedText property by Authentiya Team
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
  * 
  * Preconditions:
- * - Must be used within a React component tree
+ * - None identified.
  * 
- * Input Types:
- * - onSubmit: Function - Callback when citation is submitted
- * - onDismiss: Function - Callback when form is dismissed
- * - copiedText: string (optional) - Text that was copied for citation
+ * Acceptable Input:
+ * - `documentId`: string - The ID of the document to which citations will be added.
  * 
  * Postconditions:
- * - When submitted, calls onSubmit with citation data
- * - When dismissed, calls onDismiss
+ * - Renders a prompt with a button to add citations.
  * 
- * Return:
- * - React.ReactNode - The rendered citation form
- * 
- * Error Conditions:
- * - Form validation errors when required fields are missing
- * 
- * Side Effects:
- * - None
- * 
- * Invariants:
- * - Citation type will always be one of the predefined options
- * 
- * Known Faults:
- * - None
+ * Return Values:
+ * - None directly, but renders a prompt element.
  */
 
 import React, { useState } from "react";

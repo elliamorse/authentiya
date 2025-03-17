@@ -1,3 +1,26 @@
+/**
+ * TeacherAssignments.tsx
+ * 
+ * This component renders the teacher assignments page, displaying a list of assignments and their details.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - None directly, as this component does not accept props.
+ * 
+ * Postconditions:
+ * - Renders the teacher assignments page with a list of assignments.
+ * 
+ * Return Values:
+ * - None directly, but renders a page element.
+ */
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Header from "../../components/layout/Header";

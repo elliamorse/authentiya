@@ -1,13 +1,26 @@
-
 /**
- * File: StatusPieChart.tsx
+ * StatusPieChart.tsx
  * 
- * Description: This component shows the distribution of assignment status across all students
- * using a pie chart. It provides a quick overview of how many students have started,
- * completed, or not yet begun their assignments.
+ * This component renders a pie chart displaying the status distribution of assignments,
+ * showing the proportion of completed, in-progress, and not started assignments.
  * 
- * Update: Enhanced visualization with better styling and improved handling of empty data.
- * Added support for dark mode and improved tooltips.
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `data`: array - The data for the chart, including status distribution.
+ * 
+ * Postconditions:
+ * - Renders a pie chart displaying the status distribution of assignments.
+ * 
+ * Return Values:
+ * - None directly, but renders a chart element.
  */
 
 import React from "react";

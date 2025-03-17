@@ -1,3 +1,27 @@
+/**
+ * resizable.tsx
+ * 
+ * This component renders a resizable container, allowing users to adjust the size of the container.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `children`: React.ReactNode - The content to be displayed inside the resizable container.
+ * 
+ * Postconditions:
+ * - Renders a resizable container with the specified content.
+ * 
+ * Return Values:
+ * - None directly, but renders a resizable container element.
+ */
+
 import { GripVertical } from "lucide-react"
 import * as ResizablePrimitive from "react-resizable-panels"
 

@@ -1,12 +1,27 @@
-
 /**
  * WordProcessor.tsx
  * 
- * This component provides a rich text editor similar to Google Docs or Microsoft Word.
- * It includes text formatting options like bold, italic, underline, and text alignment.
- * The editor maintains state of the document content and handles formatting commands.
+ * This component renders a word processor for students to write and edit their documents.
+ * It includes a text editor and toolbar with formatting options.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `documentId`: string - The ID of the document being edited.
+ * 
+ * Postconditions:
+ * - Renders a word processor with a text editor and toolbar.
+ * 
+ * Return Values:
+ * - None directly, but renders a word processor element.
  */
-
 import React, { useRef, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";

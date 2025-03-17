@@ -1,3 +1,27 @@
+/**
+ * context-menu.tsx
+ * 
+ * This component renders a context menu, providing a menu of actions that can be performed on a selected item.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `items`: array - A list of context menu items, each with a label and action.
+ * 
+ * Postconditions:
+ * - Renders a context menu with a list of actions.
+ * 
+ * Return Values:
+ * - None directly, but renders a context menu element.
+ */
+
 import * as React from "react"
 import * as ContextMenuPrimitive from "@radix-ui/react-context-menu"
 import { Check, ChevronRight, Circle } from "lucide-react"

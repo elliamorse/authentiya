@@ -1,3 +1,28 @@
+/**
+ * progress.tsx
+ * 
+ * This component renders a progress bar, indicating the completion status of a task.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `value`: number - The current progress value.
+ * - `max`: number - The maximum progress value.
+ * 
+ * Postconditions:
+ * - Renders a progress bar with the specified value and maximum.
+ * 
+ * Return Values:
+ * - None directly, but renders a progress bar element.
+ */
+
 import * as React from "react"
 import * as ProgressPrimitive from "@radix-ui/react-progress"
 

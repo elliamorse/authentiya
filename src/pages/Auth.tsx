@@ -1,11 +1,28 @@
-
 /**
  * Auth.tsx
  * 
- * This component provides the authentication page for Authentiya, offering
- * both login and signup functionality. It manages authentication state and
- * redirects authenticated users to the dashboard.
+ * This component renders the authentication page, providing login and registration forms for users.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - None directly, as this component does not accept props.
+ * 
+ * Postconditions:
+ * - Renders the authentication page with login and registration forms.
+ * 
+ * Return Values:
+ * - None directly, but renders a page element.
  */
+
+
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';

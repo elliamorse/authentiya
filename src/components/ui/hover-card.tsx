@@ -1,3 +1,26 @@
+/**
+ * hover-card.tsx
+ * 
+ * This component renders a hover card, displaying additional information when the user hovers over an element.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `content`: React.ReactNode - The content to be displayed in the hover card.
+ * 
+ * Postconditions:
+ * - Renders a hover card with the specified content.
+ * 
+ * Return Values:
+ * - None directly, but renders a hover card element.
+ */
 import * as React from "react"
 import * as HoverCardPrimitive from "@radix-ui/react-hover-card"
 

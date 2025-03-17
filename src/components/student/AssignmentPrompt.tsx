@@ -1,4 +1,27 @@
-
+/**
+ * AssignmentPrompt.tsx
+ * 
+ * This component renders a prompt for students to start or continue working on an assignment.
+ * It includes the assignment title and a button to begin or resume work.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `assignment`: object - The assignment details including title and status.
+ * 
+ * Postconditions:
+ * - Renders a prompt with assignment information and a button.
+ * 
+ * Return Values:
+ * - None directly, but renders a prompt element.
+ */
 import React, { useState } from "react";
 import { 
   Dialog, 

@@ -1,4 +1,27 @@
-
+/**
+ * ThemeProvider.tsx
+ * 
+ * This component provides theme context and functionality for the application,
+ * allowing for theme switching between light and dark modes.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `children`: React.ReactNode - The child components that will be wrapped by the ThemeProvider.
+ * 
+ * Postconditions:
+ * - Provides theme context and functionality to the wrapped components.
+ * 
+ * Return Values:
+ * - None directly, but provides context values through React's Context API.
+ */
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 type Theme = "light" | "dark" | "system";

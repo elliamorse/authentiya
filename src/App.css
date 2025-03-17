@@ -1,4 +1,28 @@
-#root {
+/**
+ * App.css
+ * 
+ * This file contains the global CSS styles for the application.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - None directly, as this file does not accept parameters.
+ * 
+ * Postconditions:
+ * - Provides global CSS styles for the application.
+ * 
+ * Return Values:
+ * - None directly, but applies global styles.
+ */
+ 
+ #root {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;

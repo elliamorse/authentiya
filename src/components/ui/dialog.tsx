@@ -1,3 +1,29 @@
+
+/**
+ * dialog.tsx
+ * 
+ * This component renders a dialog, providing a modal window with content and action buttons.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `isOpen`: boolean - The open state of the dialog.
+ * - `onClose`: function - The function to handle closing the dialog.
+ * 
+ * Postconditions:
+ * - Renders a dialog with the specified open state and close handler.
+ * 
+ * Return Values:
+ * - None directly, but renders a dialog element.
+ */
+
 import * as React from "react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { X } from "lucide-react"

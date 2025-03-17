@@ -1,3 +1,27 @@
+/**
+ * sheet.tsx
+ * 
+ * This component renders a sheet, providing a container for additional content or actions.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `children`: React.ReactNode - The content to be displayed inside the sheet.
+ * 
+ * Postconditions:
+ * - Renders a sheet with the specified content.
+ * 
+ * Return Values:
+ * - None directly, but renders a sheet element.
+ */
+
 import * as SheetPrimitive from "@radix-ui/react-dialog"
 import { cva, type VariantProps } from "class-variance-authority"
 import { X } from "lucide-react"

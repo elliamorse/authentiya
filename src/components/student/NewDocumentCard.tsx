@@ -1,10 +1,27 @@
-
 /**
  * NewDocumentCard.tsx
  * 
- * This component renders a card for creating a new document.
+ * This component renders a card for creating a new document,
+ * including a button to start a new document.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `onCreate`: function - The function to handle the creation of a new document.
+ * 
+ * Postconditions:
+ * - Renders a card with a button to create a new document.
+ * 
+ * Return Values:
+ * - None directly, but renders a card element.
  */
-
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

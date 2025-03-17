@@ -1,3 +1,28 @@
+/**
+ * toggle.tsx
+ * 
+ * This component renders a toggle button, allowing users to switch between two states.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `checked`: boolean - The current state of the toggle button.
+ * - `onChange`: function - The function to handle changes to the toggle button state.
+ * 
+ * Postconditions:
+ * - Renders a toggle button with the specified state.
+ * 
+ * Return Values:
+ * - None directly, but renders a toggle button element.
+ */
+
 import * as React from "react"
 import * as TogglePrimitive from "@radix-ui/react-toggle"
 import { cva, type VariantProps } from "class-variance-authority"

@@ -1,3 +1,28 @@
+/**
+ * drawer.tsx
+ * 
+ * This component renders a drawer, providing a slide-in panel with content and action buttons.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `isOpen`: boolean - The open state of the drawer.
+ * - `onClose`: function - The function to handle closing the drawer.
+ * 
+ * Postconditions:
+ * - Renders a drawer with the specified open state and close handler.
+ * 
+ * Return Values:
+ * - None directly, but renders a drawer element.
+ */
+
 import * as React from "react"
 import { Drawer as DrawerPrimitive } from "vaul"
 

@@ -1,44 +1,26 @@
-
 /**
  * StudentList.tsx
  * 
- * This component displays a list of students assigned to a particular assignment,
- * showing their status and providing actions to view detailed information.
+ * This component renders a list of students for the teacher,
+ * including student information cards for each student.
  * 
- * Created by: Authentiya Development Team
- * Created on: 2023-11-12
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
  * 
- * Revision History:
- * - 2023-12-10: Added sorting functionality by Authentiya Team
- * - 2024-06-22: Fixed badge variant type issue by Authentiya Team
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
  * 
  * Preconditions:
- * - Must be used within a React component tree
- * - Requires students data array
- * - Requires onViewStudent callback function
+ * - None identified.
  * 
- * Input Types:
- * - students: StudentAssignment[] - Array of student assignment data
- * - onViewStudent: Function - Callback for when a student row is clicked
+ * Acceptable Input:
+ * - `students`: array - A list of student objects.
  * 
  * Postconditions:
- * - Renders a table of students with their assignment status
- * - Clicking on a student row calls onViewStudent with the student's ID
+ * - Renders a list of students with student information cards.
  * 
- * Return:
- * - React.ReactNode - The rendered component
- * 
- * Error Conditions:
- * - Displays an empty state message if no students are provided
- * 
- * Side Effects:
- * - None
- * 
- * Invariants:
- * - Will always render either the students table or an empty state
- * 
- * Known Faults:
- * - None
+ * Return Values:
+ * - None directly, but renders a list element.
  */
 
 import React from "react";

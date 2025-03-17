@@ -1,3 +1,29 @@
+/**
+ * tabs.tsx
+ * 
+ * This component renders a tabbed interface, allowing users to switch between different views or sections.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `tabs`: array - A list of tab definitions, each with a label and content.
+ * - `activeTab`: string - The currently active tab.
+ * - `onTabChange`: function - The function to handle changes to the active tab.
+ * 
+ * Postconditions:
+ * - Renders a tabbed interface with the specified tabs and active tab.
+ * 
+ * Return Values:
+ * - None directly, but renders a tabbed interface element.
+ */
+
 import * as React from "react"
 import * as TabsPrimitive from "@radix-ui/react-tabs"
 

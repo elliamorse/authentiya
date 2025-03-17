@@ -1,3 +1,30 @@
+/**
+ * slider.tsx
+ * 
+ * This component renders a slider, allowing users to select a value from a range.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `min`: number - The minimum value of the slider.
+ * - `max`: number - The maximum value of the slider.
+ * - `value`: number - The current value of the slider.
+ * - `onChange`: function - The function to handle changes to the slider value.
+ * 
+ * Postconditions:
+ * - Renders a slider with the specified range and value.
+ * 
+ * Return Values:
+ * - None directly, but renders a slider element.
+ */
+
 import * as React from "react"
 import * as SliderPrimitive from "@radix-ui/react-slider"
 

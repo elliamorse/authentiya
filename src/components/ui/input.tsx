@@ -1,3 +1,30 @@
+/**
+ * input.tsx
+ * 
+ * This component renders an input field, allowing users to enter text.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `type`: string - The type of the input field (e.g., 'text', 'password').
+ * - `value`: string - The value of the input field.
+ * - `onChange`: function - The function to handle changes to the input field.
+ * 
+ * Postconditions:
+ * - Renders an input field with the specified type and value.
+ * 
+ * Return Values:
+ * - None directly, but renders an input element.
+ */
+
+
 import * as React from "react"
 
 import { cn } from "@/lib/utils"

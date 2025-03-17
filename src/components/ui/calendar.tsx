@@ -1,3 +1,27 @@
+/**
+ * calendar.tsx
+ * 
+ * This component renders a calendar, allowing users to select dates and view events.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `events`: array (optional) - A list of events to be displayed on the calendar.
+ * 
+ * Postconditions:
+ * - Renders a calendar with date selection and event display.
+ * 
+ * Return Values:
+ * - None directly, but renders a calendar element.
+ */
+
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DayPicker } from "react-day-picker";

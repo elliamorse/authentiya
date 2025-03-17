@@ -1,13 +1,26 @@
-
 /**
- * File: WordCountChart.tsx
+ * WordCountChart.tsx
  * 
- * Description: This component displays a bar chart showing the distribution of word counts
- * across student assignments. It helps teachers identify patterns in assignment length
- * and potential areas where students might need support with content development.
+ * This component renders a chart displaying the word count distribution of assignments,
+ * showing the range of word counts for student submissions.
  * 
- * Update: Enhanced visualization with better styling and added support for dark mode.
- * Improved handling for empty data scenarios and tooltips.
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `data`: array - The data for the chart, including word count distribution.
+ * 
+ * Postconditions:
+ * - Renders a chart displaying the word count distribution of assignments.
+ * 
+ * Return Values:
+ * - None directly, but renders a chart element.
  */
 
 import React from "react";

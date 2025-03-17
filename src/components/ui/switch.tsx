@@ -1,3 +1,28 @@
+/**
+ * switch.tsx
+ * 
+ * This component renders a switch, allowing users to toggle between two states.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - None identified.
+ * 
+ * Acceptable Input:
+ * - `checked`: boolean - The current state of the switch.
+ * - `onChange`: function - The function to handle changes to the switch state.
+ * 
+ * Postconditions:
+ * - Renders a switch with the specified state.
+ * 
+ * Return Values:
+ * - None directly, but renders a switch element.
+ */
+
 import * as React from "react"
 import * as SwitchPrimitives from "@radix-ui/react-switch"
 

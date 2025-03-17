@@ -1,3 +1,29 @@
+/**
+ * button.tsx
+ * 
+ * This component renders a customizable button with various styles and sizes.
+ * It uses the class-variance-authority library to manage different button variants.
+ * 
+ * Programmer: Ellia Morse
+ * Date Created: 3/16/2025
+ * 
+ * Revisions:
+ * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * 
+ * Preconditions:
+ * - The class-variance-authority library must be installed and properly configured.
+ * 
+ * Acceptable Input:
+ * - `variant`: string - The style variant of the button (e.g., 'default', 'destructive').
+ * - `size`: string - The size of the button (e.g., 'default', 'sm', 'lg', 'icon').
+ * 
+ * Postconditions:
+ * - Renders a button with the specified styles and sizes.
+ * 
+ * Return Values:
+ * - None directly, but renders a button element.
+ */
+
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
