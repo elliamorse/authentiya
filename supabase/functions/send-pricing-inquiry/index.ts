@@ -28,10 +28,10 @@ Deno.serve(async (req) => {
     // Parse the incoming request body
     const inquiry: PricingInquiry = await req.json();
 
-    // Send email to the admin (replace with your email)
+    // Send email to the admin 
     const emailResponse = await resend.emails.send({
       from: 'Authentiya Pricing Inquiry <onboarding@resend.dev>',
-      to: ['your-email@example.com'], // Replace with your actual email
+      to: ['ellia@ku.edu'], // Updated recipient email
       subject: 'New Pricing Inquiry from Authentiya Website',
       html: `
         <h1>New Pricing Inquiry Received</h1>
