@@ -1,11 +1,4 @@
 
-/**
- * index.ts
- * 
- * This edge function sends email notifications when a pricing inquiry is submitted.
- * It uses the Resend email API to deliver messages to the administrator.
- */
-
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
 
@@ -55,10 +48,10 @@ serve(async (req) => {
       throw new Error('Resend client is not initialized');
     }
 
-    // Send email to the admin 
+    // Send email to elyiagrace@gmail.com 
     const emailResponse = await resend.emails.send({
       from: 'Authentiya Pricing Inquiry <onboarding@resend.dev>',
-      to: ['ellia@ku.edu'],
+      to: ['elyiagrace@gmail.com'],
       subject: 'New Pricing Inquiry from Authentiya Website',
       html: `
         <h1>New Pricing Inquiry Received</h1>
