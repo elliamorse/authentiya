@@ -1,3 +1,4 @@
+
 /**
  * Button.tsx
  * 
@@ -9,6 +10,7 @@
  * 
  * Revisions:
  * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * - 3/27/2025: Fixed the children rendering issue - AI Assistant
  * 
  * Preconditions:
  * - The class-variance-authority library must be installed and properly configured.
@@ -82,7 +84,7 @@ const Button = React.forwardRef<
         ref={ref} // Attach ref to the button element
         {...props} // Spread remaining props to the button element
       >
-        {children} // Render children inside the button
+        {children} {/* Properly render children inside the button */}
       </button>
     );
   }

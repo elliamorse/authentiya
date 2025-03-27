@@ -1,3 +1,4 @@
+
 /**
  * Header.tsx
  * 
@@ -9,6 +10,7 @@
  * 
  * Revisions:
  * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * - 3/27/2025: Enhanced the Sign In button - AI Assistant
  * 
  * Preconditions:
  * - The `react-router-dom` and `lucide-react` libraries must be installed and properly configured.
@@ -46,7 +48,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
-import { ClipboardCheck, LogOut, Settings, User } from "lucide-react";
+import { ClipboardCheck, LogIn, LogOut, Settings, User } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ThemeToggle } from "../theme/ThemeToggle";
 import { useAuth } from "@/contexts/AuthContext";
@@ -143,7 +145,10 @@ export default function Header({ userEmail, userRole, onLogout }: HeaderProps) {
             </DropdownMenu>
           ) : (
             <Link to="/auth">
-              <Button variant="default" size="sm">Sign In</Button>
+              <Button variant="default" size="sm" className="gap-2 academic-btn-primary">
+                <LogIn className="h-4 w-4" />
+                <span>Sign In</span>
+              </Button>
             </Link>
           )}
         </div>
