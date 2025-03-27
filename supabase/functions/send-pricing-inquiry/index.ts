@@ -15,7 +15,14 @@ if (!resendApiKey) {
   console.error('RESEND_API_KEY is not set in environment variables');
 }
 
-const resend = new Resend(resendApiKey);
+// Initialize Resend client with proper error handling
+let resend;
+try {
+  resend = new Resend(resendApiKey);
+  console.log("Resend client initialized successfully");
+} catch (error) {
+  console.error("Failed to initialize Resend client:", error);
+}
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -31,7 +38,7 @@ interface PricingInquiry {
   message?: string;
 }
 
-Deno.serve(async (req) => {
+serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -43,6 +50,10 @@ Deno.serve(async (req) => {
     
     console.log('Received pricing inquiry:', inquiry);
     console.log('Using Resend API key:', resendApiKey ? 'API key is set' : 'API key is missing');
+
+    if (!resend) {
+      throw new Error('Resend client is not initialized');
+    }
 
     // Send email to the admin 
     const emailResponse = await resend.emails.send({
@@ -67,7 +78,12 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error('Error in send-pricing-inquiry function:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    // Return a more detailed error response for debugging
+    return new Response(JSON.stringify({ 
+      error: error.message,
+      stack: error.stack,
+      details: 'Failed to send email. Please check logs for more information.' 
+    }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

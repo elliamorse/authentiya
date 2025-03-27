@@ -4,6 +4,11 @@
  * This component provides a contact form for users interested in pricing information.
  * It collects user information including name, email, role, institution, and additional messages
  * and provides submission feedback through toast notifications.
+ * 
+ * Updates:
+ * - Enhanced error handling and feedback
+ * - Improved loading state management
+ * - Better error reporting from edge function
  */
 
 import { useState } from "react";
@@ -56,10 +61,17 @@ const ContactForm = () => {
 
       if (dbError) throw dbError;
 
+      // Show a toast that the submission is in progress
+      toast.info("Submitting your inquiry...");
+
       // Then, send an email via the edge function
-      const response = await supabase.functions.invoke('send-pricing-inquiry', {
+      const { data, error } = await supabase.functions.invoke('send-pricing-inquiry', {
         body: JSON.stringify(formData)
       });
+
+      if (error) throw error;
+
+      console.log("Edge function response:", data);
 
       // Show success toast
       toast.success("Thank you for your interest!", {
@@ -77,7 +89,7 @@ const ContactForm = () => {
     } catch (error) {
       console.error('Submission error:', error);
       toast.error("Oops! Something went wrong.", {
-        description: "Please try again or contact support.",
+        description: error.message || "Please try again or contact support.",
       });
     } finally {
       setIsSubmitting(false);
