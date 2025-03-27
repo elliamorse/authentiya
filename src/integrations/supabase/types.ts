@@ -248,6 +248,39 @@ export type Database = {
           },
         ]
       }
+      pricing_inquiries: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          institution: string
+          message: string | null
+          name: string
+          role: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          institution: string
+          message?: string | null
+          name: string
+          role: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          institution?: string
+          message?: string | null
+          name?: string
+          role?: string
+          status?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

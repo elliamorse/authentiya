@@ -1,4 +1,3 @@
-
 /**
  * ContactForm.tsx
  * 
@@ -17,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const ContactForm = () => {
   const navigate = useNavigate();
@@ -38,13 +38,30 @@ const ContactForm = () => {
     setFormData(prev => ({ ...prev, role: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate form submission
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      // First, insert the inquiry into the database
+      const { error: dbError } = await supabase
+        .from('pricing_inquiries')
+        .insert({
+          name: formData.name,
+          email: formData.email,
+          role: formData.role,
+          institution: formData.institution,
+          message: formData.message
+        });
+
+      if (dbError) throw dbError;
+
+      // Then, send an email via the edge function
+      const response = await supabase.functions.invoke('send-pricing-inquiry', {
+        body: JSON.stringify(formData)
+      });
+
+      // Show success toast
       toast.success("Thank you for your interest!", {
         description: "Our team will contact you with pricing information shortly.",
       });
@@ -57,7 +74,14 @@ const ContactForm = () => {
         institution: "",
         message: ""
       });
-    }, 1500);
+    } catch (error) {
+      console.error('Submission error:', error);
+      toast.error("Oops! Something went wrong.", {
+        description: "Please try again or contact support.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
