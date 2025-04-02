@@ -3,7 +3,7 @@
  * Header.tsx
  * 
  * This component renders the header section of the Authentiya application,
- * including navigation links, user account menu, and sign-in button.
+ * including navigation links and user account menu.
  * 
  * Programmer: Ellia Morse
  * Date Created: 3/16/2025
@@ -11,6 +11,7 @@
  * Revisions:
  * - 3/16/2025: Initial creation of the file - Ellia Morse
  * - 3/27/2025: Enhanced the Sign In button - AI Assistant
+ * - 3/28/2025: Removed the Sign In button - AI Assistant
  * 
  * Preconditions:
  * - The `react-router-dom` and `lucide-react` libraries must be installed and properly configured.
@@ -20,7 +21,7 @@
  * - `handleLogout`: function - The function to handle user logout.
  * 
  * Postconditions:
- * - Renders the header section with navigation links, user account menu, and sign-in button.
+ * - Renders the header section with navigation links and user account menu.
  * 
  * Return Values:
  * - None directly, but renders a header element.
@@ -48,7 +49,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
-import { ClipboardCheck, LogIn, LogOut, Settings, User } from "lucide-react";
+import { ClipboardCheck, LogOut, Settings, User } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ThemeToggle } from "../theme/ThemeToggle";
 import { useAuth } from "@/contexts/AuthContext";
@@ -143,14 +144,7 @@ export default function Header({ userEmail, userRole, onLogout }: HeaderProps) {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          ) : (
-            <Link to="/auth">
-              <Button variant="default" size="sm" className="gap-2 academic-btn-primary">
-                <LogIn className="h-4 w-4" />
-                <span>Sign In</span>
-              </Button>
-            </Link>
-          )}
+          ) : null}
         </div>
       </div>
     </header>
