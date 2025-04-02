@@ -1,7 +1,8 @@
+
 /**
  * ContactForm.tsx
  * 
- * This component provides a contact form for users interested in pricing information.
+ * This component provides a general contact form for users interested in Authentiya.
  * It collects user information including name, email, role, institution, and additional messages
  * and provides submission feedback through toast notifications.
  * 
@@ -9,6 +10,7 @@
  * - Enhanced error handling and feedback
  * - Improved loading state management
  * - Better error reporting from edge function
+ * - Removed pricing-specific language to make it a general contact form
  */
 
 import { useState } from "react";
@@ -74,8 +76,8 @@ const ContactForm = () => {
       console.log("Edge function response:", data);
 
       // Show success toast
-      toast.success("Thank you for your interest!", {
-        description: "Our team will contact you with pricing information shortly.",
+      toast.success("Thank you for contacting us!", {
+        description: "Our team will get back to you shortly.",
       });
       
       // Reset form
@@ -111,10 +113,10 @@ const ContactForm = () => {
         <Card className="w-full">
           <CardHeader className="pb-4">
             <CardTitle className="text-2xl md:text-3xl text-authentiya-charcoal-darkest dark:text-white">
-              Get Pricing Information
+              Contact Us
             </CardTitle>
             <CardDescription className="text-authentiya-charcoal-lighter dark:text-authentiya-accent-gray">
-              Complete the form below and our team will contact you with detailed pricing information tailored to your needs.
+              Have questions? Complete the form below and our team will get in touch with you.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -181,14 +183,15 @@ const ContactForm = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="message">Additional Information (Optional)</Label>
+                <Label htmlFor="message">Your Message</Label>
                 <Textarea 
                   id="message" 
                   name="message" 
                   value={formData.message}
                   onChange={handleChange}
-                  placeholder="Tell us about your specific needs or questions"
+                  placeholder="Tell us how we can help you"
                   rows={4}
+                  required
                 />
               </div>
 
@@ -197,7 +200,7 @@ const ContactForm = () => {
                 className="w-full academic-btn-primary"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? "Submitting..." : "Request Pricing Information"}
+                {isSubmitting ? "Submitting..." : "Submit Inquiry"}
               </Button>
             </form>
           </CardContent>
