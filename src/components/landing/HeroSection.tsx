@@ -1,3 +1,4 @@
+
 /**
  * HeroSection.tsx
  * 
@@ -10,6 +11,7 @@
  * 
  * Revisions:
  * - 3/16/2025: Initial creation of the file - Ellia Morse
+ * - 3/28/2025: Changed "Get Started" button text to "Get on our waitlist" - AI Assistant
  * 
  * Preconditions:
  * - The `react-router-dom` and `lucide-react` libraries must be installed and properly configured.
@@ -72,7 +74,7 @@ const HeroSection = () => {
               size="lg" 
               className="gap-2 px-6 academic-btn-primary"
             >
-              Get Started
+              Get on our waitlist
               <ArrowRight className="w-4 h-4" />
             </Button>
             
